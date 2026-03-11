@@ -8,7 +8,7 @@
  import { Badge } from "@/components/ui/badge";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Shield, Clock, Users, Building, Plus, Minus, Search, CreditCard } from "lucide-react";
+import { Shield, Clock, Users, Building, Plus, Minus, Search, CreditCard, LogIn } from "lucide-react";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { supabase } from "@/integrations/supabase/client";
  import { useAdmin } from "@/hooks/useAdmin";
@@ -425,11 +425,12 @@ interface SubscriptionWithFarm {
              </Card>
           </div>
  
-         <Tabs defaultValue="users" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-xs">
-             <TabsTrigger value="users">All Users</TabsTrigger>
-             <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-           </TabsList>
+          <Tabs defaultValue="users" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 max-w-md">
+              <TabsTrigger value="users">All Users</TabsTrigger>
+              <TabsTrigger value="logins">Last Login</TabsTrigger>
+              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+            </TabsList>
  
            <TabsContent value="users">
              <Card>
@@ -608,10 +609,118 @@ interface SubscriptionWithFarm {
                  )}
                </CardContent>
              </Card>
-           </TabsContent>
- 
-           <TabsContent value="subscriptions">
-             <Card>
+            </TabsContent>
+
+            <TabsContent value="logins">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <LogIn className="w-5 h-5" />
+                    User Login Activity
+                  </CardTitle>
+                  <CardDescription>Users sorted by most recent login</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {usersLoading ? (
+                    <p className="text-center py-8 text-muted-foreground">Loading...</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>User</TableHead>
+                            <TableHead>Farm</TableHead>
+                            <TableHead>Last Login</TableHead>
+                            <TableHead>Registered</TableHead>
+                            <TableHead>Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {[...users]
+                            .sort((a, b) => {
+                              const aTime = a.last_sign_in_at ? new Date(a.last_sign_in_at).getTime() : 0;
+                              const bTime = b.last_sign_in_at ? new Date(b.last_sign_in_at).getTime() : 0;
+                              return bTime - aTime;
+                            })
+                            .map((u) => {
+                              const lastLogin = u.last_sign_in_at ? new Date(u.last_sign_in_at) : null;
+                              const now = new Date();
+                              const diffMs = lastLogin ? now.getTime() - lastLogin.getTime() : null;
+                              const diffDays = diffMs ? Math.floor(diffMs / (1000 * 60 * 60 * 24)) : null;
+                              
+                              let timeAgo = "Never";
+                              if (lastLogin && diffDays !== null) {
+                                if (diffDays === 0) {
+                                  const diffHours = Math.floor(diffMs! / (1000 * 60 * 60));
+                                  if (diffHours === 0) {
+                                    const diffMins = Math.floor(diffMs! / (1000 * 60));
+                                    timeAgo = `${diffMins}m ago`;
+                                  } else {
+                                    timeAgo = `${diffHours}h ago`;
+                                  }
+                                } else if (diffDays === 1) {
+                                  timeAgo = "Yesterday";
+                                } else if (diffDays < 7) {
+                                  timeAgo = `${diffDays}d ago`;
+                                } else if (diffDays < 30) {
+                                  timeAgo = `${Math.floor(diffDays / 7)}w ago`;
+                                } else {
+                                  timeAgo = `${Math.floor(diffDays / 30)}mo ago`;
+                                }
+                              }
+
+                              return (
+                                <TableRow key={u.id}>
+                                  <TableCell>
+                                    <span className="font-medium text-sm truncate max-w-[200px] block" title={u.email}>{u.email}</span>
+                                  </TableCell>
+                                  <TableCell>
+                                    {u.farms.length === 0 ? (
+                                      <span className="text-muted-foreground text-xs">—</span>
+                                    ) : (
+                                      <span className="text-sm truncate block max-w-[120px]" title={u.farms.map(f => f.name).join(", ")}>
+                                        {u.farms[0].name}
+                                      </span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <div className="flex flex-col">
+                                      <span className={`text-sm font-medium ${!lastLogin ? 'text-muted-foreground' : diffDays !== null && diffDays <= 1 ? 'text-primary' : ''}`}>
+                                        {timeAgo}
+                                      </span>
+                                      {lastLogin && (
+                                        <span className="text-[10px] text-muted-foreground">
+                                          {lastLogin.toLocaleDateString()} {lastLogin.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-sm text-muted-foreground">
+                                    {new Date(u.created_at).toLocaleDateString()}
+                                  </TableCell>
+                                  <TableCell>
+                                    {u.subscriptions.length > 0 ? (
+                                      <div className="flex items-center gap-1">
+                                        {getTierBadge(u.subscriptions[0].tier)}
+                                        {getStatusBadge(u.subscriptions[0].status)}
+                                      </div>
+                                    ) : (
+                                      <Badge variant="outline" className="text-xs">No Plan</Badge>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="subscriptions">
+              <Card>
                <CardHeader>
                  <CardTitle>All Subscriptions</CardTitle>
                  <CardDescription>Manage subscription tiers and extend access periods</CardDescription>
