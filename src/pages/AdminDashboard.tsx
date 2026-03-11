@@ -8,7 +8,7 @@
  import { Badge } from "@/components/ui/badge";
  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
  import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Shield, Clock, Users, Building, Plus, Minus, Search, CreditCard } from "lucide-react";
+import { Shield, Clock, Users, Building, Plus, Minus, Search, CreditCard, LogIn } from "lucide-react";
  import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  import { supabase } from "@/integrations/supabase/client";
  import { useAdmin } from "@/hooks/useAdmin";
