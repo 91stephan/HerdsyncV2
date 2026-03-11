@@ -719,8 +719,8 @@ interface SubscriptionWithFarm {
               </Card>
             </TabsContent>
 
-
-             <Card>
+            <TabsContent value="subscriptions">
+              <Card>
                <CardHeader>
                  <CardTitle>All Subscriptions</CardTitle>
                  <CardDescription>Manage subscription tiers and extend access periods</CardDescription>
