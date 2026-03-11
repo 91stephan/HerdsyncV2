@@ -425,11 +425,12 @@ interface SubscriptionWithFarm {
              </Card>
           </div>
  
-         <Tabs defaultValue="users" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-xs">
-             <TabsTrigger value="users">All Users</TabsTrigger>
-             <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
-           </TabsList>
+          <Tabs defaultValue="users" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 max-w-md">
+              <TabsTrigger value="users">All Users</TabsTrigger>
+              <TabsTrigger value="logins">Last Login</TabsTrigger>
+              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+            </TabsList>
  
            <TabsContent value="users">
              <Card>
