@@ -15,7 +15,7 @@ export const initializeGoogleAuth = async () => {
     GoogleAuth = module.GoogleAuth;
     
     GoogleAuth.initialize({
-      clientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com", // Replace with your Google Web Client ID
+      clientId: "252187317366-2ti686m3pc4a8phqg7alorlb4q8t59ge.apps.googleusercontent.com",
       scopes: ["profile", "email"],
       grantOfflineAccess: true,
     });
