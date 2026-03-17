@@ -25,6 +25,13 @@ export default function Auth() {
   const { user, loading: authLoading } = useAuth();
   const { refetchFarms, loading: farmLoading } = useFarm();
 
+  // Initialize native Google Auth on mount
+  useEffect(() => {
+    if (isNativePlatform()) {
+      initializeGoogleAuth();
+    }
+  }, []);
+
   // Redirect if already logged in - wait for both auth and farm loading to complete
   useEffect(() => {
     // Only redirect once auth is done loading AND user exists AND farm loading is done
