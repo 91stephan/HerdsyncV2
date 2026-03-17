@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFarm } from "@/hooks/useFarm";
 import { Separator } from "@/components/ui/separator";
 import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
+import { isNativePlatform, nativeGoogleSignIn, initializeGoogleAuth } from "@/utils/nativeGoogleAuth";
 
 export default function Auth() {
   const [loginIdentifier, setLoginIdentifier] = useState("");
