@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFarm } from "@/hooks/useFarm";
 import { Separator } from "@/components/ui/separator";
 import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
+import { isNativePlatform, nativeGoogleSignIn, initializeGoogleAuth } from "@/utils/nativeGoogleAuth";
 
 export default function Auth() {
   const [loginIdentifier, setLoginIdentifier] = useState("");
@@ -23,6 +24,13 @@ export default function Auth() {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const { refetchFarms, loading: farmLoading } = useFarm();
+
+  // Initialize native Google Auth on mount
+  useEffect(() => {
+    if (isNativePlatform()) {
+      initializeGoogleAuth();
+    }
+  }, []);
 
   // Redirect if already logged in - wait for both auth and farm loading to complete
   useEffect(() => {
@@ -192,6 +200,29 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
+      // Use native Google Sign-In on Capacitor (Android/iOS)
+      if (isNativePlatform()) {
+        const { error } = await nativeGoogleSignIn();
+        if (error) {
+          toast({
+            title: "Google Sign-In Failed",
+            description: error.message,
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        // Accept invitations after native sign-in
+        await acceptPendingInvitations();
+        toast({
+          title: "Welcome!",
+          description: "You have successfully signed in with Google.",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Web-based OAuth for browser
       const { error } = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
@@ -204,7 +235,6 @@ export default function Auth() {
         });
         setLoading(false);
       }
-      // If successful, the page will redirect and auth state will update automatically
     } catch (error) {
       console.error("Google sign-in error:", error);
       toast({
