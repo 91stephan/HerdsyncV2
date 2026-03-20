@@ -626,6 +626,7 @@ export default function Landing() {
                 <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
                 <li><Link to="/privacy-policy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
                 <li><Link to="/disclaimer" className="hover:text-foreground transition-colors">Disclaimer</Link></li>
+                <li><Link to="/delete-account" className="hover:text-foreground transition-colors">Delete Account</Link></li>
               </ul>
             </div>
           </div>
