@@ -33,6 +33,7 @@ import FarmExpenses from "./pages/FarmExpenses";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Terms from "./pages/Terms";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Disclaimer from "./pages/Disclaimer";
 import AskAPro from "./pages/AskAPro";
 import NotFound from "./pages/NotFound";
