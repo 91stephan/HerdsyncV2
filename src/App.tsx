@@ -40,6 +40,7 @@ import NotFound from "./pages/NotFound";
 import Settings from "./pages/Settings";
 import ResetPassword from "./pages/ResetPassword";
 import TrialExpired from "./pages/TrialExpired";
+import DeleteAccount from "./pages/DeleteAccount";
  import AdminDashboard from "./pages/AdminDashboard";
  import { AdminProvider } from "@/hooks/useAdmin";
 
