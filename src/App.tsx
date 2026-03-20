@@ -88,6 +88,7 @@ const App = () => (
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/trial-expired" element={<TrialExpired />} />
+                  <Route path="/delete-account" element={<DeleteAccount />} />
                   <Route path="/admin" element={<AdminDashboard />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
