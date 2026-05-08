@@ -143,6 +143,10 @@ const pricingTiers = [
 ];
 
 export default function Pricing() {
+  useSEO({
+    title: "Pricing - HerdSync",
+    description: "Simple, transparent pricing in ZAR. Choose Basic, Starter, or Pro. 14-day free trial included.",
+  });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
