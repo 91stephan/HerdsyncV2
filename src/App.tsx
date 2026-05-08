@@ -9,6 +9,7 @@ import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { EmployeePermissionsProvider } from "@/hooks/useEmployeePermissions";
 import { SupportChat } from "@/components/SupportChat";
 import { AndroidBackButtonHandler } from "@/components/AndroidBackButtonHandler";
+import { useKeyboardScroll } from "@/hooks/useKeyboardScroll";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Landing from "./pages/Landing";
@@ -47,6 +48,11 @@ import DeleteAccount from "./pages/DeleteAccount";
  import { AdminProvider } from "@/hooks/useAdmin";
 
 const queryClient = new QueryClient();
+
+const AppShell = () => {
+  useKeyboardScroll();
+  return null;
+};
 
 const App = () => (
   <ErrorBoundary>
@@ -99,6 +105,7 @@ const App = () => (
                 <SupportChat />
                 <CookieConsent />
                 <AndroidBackButtonHandler />
+                <AppShell />
               </BrowserRouter>
             </TooltipProvider>
            </EmployeePermissionsProvider>
