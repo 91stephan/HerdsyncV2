@@ -169,6 +169,7 @@ export function SupportChat() {
         )}
         style={{ bottom: position.y, right: position.x }}
         size="icon"
+        aria-label="Open support chat"
       >
         <MessageCircle className="h-6 w-6" />
       </Button>
