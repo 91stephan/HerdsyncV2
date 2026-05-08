@@ -9,6 +9,7 @@ import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { EmployeePermissionsProvider } from "@/hooks/useEmployeePermissions";
 import { SupportChat } from "@/components/SupportChat";
 import { AndroidBackButtonHandler } from "@/components/AndroidBackButtonHandler";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Livestock from "./pages/Livestock";
@@ -47,6 +48,7 @@ import DeleteAccount from "./pages/DeleteAccount";
 const queryClient = new QueryClient();
 
 const App = () => (
+  <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <FarmProvider>
@@ -103,6 +105,7 @@ const App = () => (
       </FarmProvider>
     </AuthProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;
