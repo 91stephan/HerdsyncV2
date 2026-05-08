@@ -1,9 +1,47 @@
 User-agent: *
 Allow: /
+Allow: /blog
+Allow: /blog/
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /livestock
+Disallow: /feeding
+Disallow: /inventory
+Disallow: /health
+Disallow: /reports
+Disallow: /tracking
+Disallow: /market
+Disallow: /compliance
+Disallow: /employees
+Disallow: /employee-tasks
+Disallow: /animal-sale
+Disallow: /expenses
+Disallow: /ask-a-pro
+Disallow: /settings
+Disallow: /reset-password
+Disallow: /trial-expired
+Disallow: /delete-account
+
+# Allow major search & social crawlers full access to public pages
+User-agent: Googlebot
+Allow: /
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /settings
-Disallow: /reset-password
-Disallow: /delete-account
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
 
 Sitemap: https://herdsync.co.za/sitemap.xml

@@ -14,8 +14,10 @@ import { Shield, Clock, Users, Building, Plus, Minus, Search, CreditCard, LogIn 
  import { useAdmin } from "@/hooks/useAdmin";
  import { useAuth } from "@/hooks/useAuth";
  import { useToast } from "@/hooks/use-toast";
- import { useNavigate } from "react-router-dom";
- import type { Database } from "@/integrations/supabase/types";
+import { useNavigate } from "react-router-dom";
+import type { Database } from "@/integrations/supabase/types";
+import { BlogManager } from "@/components/admin/BlogManager";
+import { AltTextAudit } from "@/components/admin/AltTextAudit";
  
  type SubscriptionTier = Database["public"]["Enums"]["subscription_tier"];
  type SubscriptionStatus = Database["public"]["Enums"]["subscription_status"];
@@ -426,10 +428,12 @@ interface SubscriptionWithFarm {
           </div>
  
           <Tabs defaultValue="users" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 max-w-md">
+            <TabsList className="grid w-full grid-cols-5 max-w-2xl">
               <TabsTrigger value="users">All Users</TabsTrigger>
               <TabsTrigger value="logins">Last Login</TabsTrigger>
               <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+              <TabsTrigger value="blog">Blog</TabsTrigger>
+              <TabsTrigger value="seo">SEO Audit</TabsTrigger>
             </TabsList>
  
            <TabsContent value="users">
@@ -841,9 +845,17 @@ interface SubscriptionWithFarm {
                  )}
                </CardContent>
              </Card>
-           </TabsContent>
-         </Tabs>
-       </div>
-     </Layout>
+            </TabsContent>
+
+            <TabsContent value="blog">
+              <BlogManager />
+            </TabsContent>
+
+            <TabsContent value="seo">
+              <AltTextAudit />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </Layout>
    );
  }

@@ -16,6 +16,7 @@ import { useKeyboardScroll } from "@/hooks/useKeyboardScroll";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageSkeleton } from "@/components/PageSkeleton";
+import { RouteTracker } from "@/components/RouteTracker";
 import Landing from "./pages/Landing";
 import { AdminProvider } from "@/hooks/useAdmin";
 
@@ -52,6 +53,8 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const TrialExpired = lazy(() => import("./pages/TrialExpired"));
 const DeleteAccount = lazy(() => import("./pages/DeleteAccount"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,10 +141,13 @@ const App = () => (
                     <Route path="/trial-expired" element={<TrialExpired />} />
                     <Route path="/delete-account" element={<DeleteAccount />} />
                     <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<BlogPost />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
+                <RouteTracker />
                 <SupportChat />
                 <CookieConsent />
                 <AndroidBackButtonHandler />
