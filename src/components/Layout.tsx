@@ -328,6 +328,7 @@ export function Layout({ children }: LayoutProps) {
                   onClick={signOut}
                   className="p-2 text-sidebar-foreground/60 hover:text-sidebar-foreground"
                   title="Sign out"
+                  aria-label="Sign out"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -351,6 +352,7 @@ export function Layout({ children }: LayoutProps) {
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 -ml-2 text-muted-foreground hover:text-foreground"
+            aria-label="Open menu"
           >
             <Menu className="w-6 h-6" />
           </button>
