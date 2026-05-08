@@ -36,6 +36,7 @@ import { TasksTable } from "./TasksTable";
 import { DailyTasksList } from "./DailyTasksList";
 import { useFarm } from "@/hooks/useFarm";
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 import { supabase } from "@/integrations/supabase/client";
 import { isToday, isPast } from "date-fns";
 import { useEmployeePermissions } from "@/hooks/useEmployeePermissions";
