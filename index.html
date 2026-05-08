@@ -28,6 +28,21 @@
 
   <body>
     <div id="root"></div>
+    <!--
+      Facebook Pixel <noscript> fallback. The Pixel script itself is loaded
+      conditionally from src/lib/fbPixel.ts when VITE_FB_PIXEL_ID is set.
+      To enable: add VITE_FB_PIXEL_ID=<your numeric pixel id> to env, then
+      replace YOUR_PIXEL_ID below with the same value before deploying.
+    -->
+    <noscript>
+      <img
+        height="1"
+        width="1"
+        style="display:none"
+        alt=""
+        src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1"
+      />
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
