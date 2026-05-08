@@ -50,7 +50,7 @@ const SA_PROVINCES = [
 ];
 
 export function FarmSwitcher() {
-  const { farm, farms, setActiveFarm, loading, refetchFarms, isEmployee } = useFarm();
+  const { farm, farms, setActiveFarm, loading, refetchFarms, isEmployee, error } = useFarm();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [farmName, setFarmName] = useState("");
@@ -145,6 +145,22 @@ export function FarmSwitcher() {
     // Small delay to let popover close before dialog opens
     setTimeout(() => setDialogOpen(true), 100);
   };
+
+  if (error && farms.length === 0 && !loading) {
+    return (
+      <div className="flex flex-col gap-1.5 px-2 py-1.5 bg-destructive/10 border border-destructive/20 rounded-lg">
+        <span className="text-xs text-destructive font-medium">Couldn't load farms</span>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs"
+          onClick={() => refetchFarms()}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

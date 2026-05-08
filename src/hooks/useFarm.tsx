@@ -26,6 +26,7 @@ interface FarmContextType {
   farm: Farm | null;
   farms: Farm[];
   loading: boolean;
+  error: Error | null;
   isEmployee: boolean;
   employeeInfo: EmployeeInfo | null;
   setActiveFarm: (farmId: string) => void;
@@ -36,6 +37,7 @@ const FarmContext = createContext<FarmContextType>({
   farm: null,
   farms: [],
   loading: true,
+  error: null,
   isEmployee: false,
   employeeInfo: null,
   setActiveFarm: () => {},
@@ -104,11 +106,19 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
   const [activeFarmId, setActiveFarmId] = useState<string | null>(null);
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, refetch, error } = useQuery({
     queryKey: farmsKey(user?.id),
-    queryFn: () => fetchFarmsQuery(user!.id),
+    queryFn: async () => {
+      try {
+        return await fetchFarmsQuery(user!.id);
+      } catch (err) {
+        console.error("Farms fetch failed:", err);
+        return { farms: [], isEmployee: false, employeeInfo: null } as FarmsQueryResult;
+      }
+    },
     enabled: !!user && !authLoading,
     staleTime: 60_000,
+    retry: 1,
   });
 
   const farms = data?.farms ?? [];
@@ -150,6 +160,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
         farm,
         farms,
         loading: authLoading || (!!user && isLoading),
+        error: (error as Error | null) ?? null,
         isEmployee,
         employeeInfo,
         setActiveFarm,

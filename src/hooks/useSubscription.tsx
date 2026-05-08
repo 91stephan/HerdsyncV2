@@ -30,6 +30,7 @@ interface SubscriptionData {
 interface SubscriptionContextType {
   subscription: Subscription | null;
   loading: boolean;
+  error: Error | null;
   isActive: boolean;
   isTrialing: boolean;
   daysRemaining: number;
@@ -40,6 +41,7 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType>({
   subscription: null,
   loading: true,
+  error: null,
   isActive: false,
   isTrialing: false,
   daysRemaining: 0,
@@ -166,11 +168,23 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const { farm } = useFarm();
   const qc = useQueryClient();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, refetch, error } = useQuery({
     queryKey: subscriptionKey(user?.id, farm?.id),
-    queryFn: () => fetchSubscriptionQuery(user!.id, farm!.id),
+    queryFn: async () => {
+      try {
+        return await fetchSubscriptionQuery(user!.id, farm!.id);
+      } catch (err) {
+        console.error("Subscription fetch failed:", err);
+        // Graceful fallback so the app never crashes from a query failure
+        return {
+          subscription: null,
+          adminInfo: { isAdmin: false, assignedTier: null },
+        } as SubscriptionData;
+      }
+    },
     enabled: !!user && !!farm,
     staleTime: 60_000,
+    retry: 1,
   });
 
   const subscription = data?.subscription ?? null;
@@ -192,6 +206,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       value={{
         subscription,
         loading: !!user && !!farm && isLoading,
+        error: (error as Error | null) ?? null,
         isActive,
         isTrialing,
         daysRemaining: subscription?.days_remaining || 0,
