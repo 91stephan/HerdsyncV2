@@ -253,6 +253,7 @@ export function useInventory() {
     const item = inventory.find((i) => i.id === inventoryId);
     if (!item) return false;
 
+    // Optimistic guard from local state — server still enforces non-negative atomically.
     if (quantityUsed > item.quantity) {
       toast({
         title: "Insufficient Stock",
@@ -262,6 +263,25 @@ export function useInventory() {
       return false;
     }
 
+    // Atomic decrement first — prevents lost updates if two users log usage at once.
+    const { error: adjError } = await supabase.rpc("adjust_inventory_quantity", {
+      _inventory_id: inventoryId,
+      _delta: -quantityUsed,
+    });
+
+    if (adjError) {
+      console.error("Error adjusting inventory:", adjError);
+      toast({
+        title: "Error",
+        description: adjError.message.includes("Insufficient")
+          ? "Stock changed — another user just used some. Please refresh and try again."
+          : adjError.message,
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Then record the usage entry. If this fails, roll back the quantity.
     const { error: logError } = await supabase.from("inventory_usage_log").insert({
       inventory_id: inventoryId,
       farm_id: farm.id,
@@ -273,18 +293,12 @@ export function useInventory() {
 
     if (logError) {
       console.error("Error logging usage:", logError);
+      // Best-effort rollback
+      await supabase.rpc("adjust_inventory_quantity", {
+        _inventory_id: inventoryId,
+        _delta: quantityUsed,
+      });
       toast({ title: "Error", description: logError.message, variant: "destructive" });
-      return false;
-    }
-
-    const { error: updateError } = await supabase
-      .from("inventory")
-      .update({ quantity: item.quantity - quantityUsed })
-      .eq("id", inventoryId);
-
-    if (updateError) {
-      console.error("Error updating inventory:", updateError);
-      toast({ title: "Error", description: updateError.message, variant: "destructive" });
       return false;
     }
 
