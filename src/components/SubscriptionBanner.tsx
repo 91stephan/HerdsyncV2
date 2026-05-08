@@ -8,7 +8,25 @@ export function SubscriptionBanner() {
   const { user } = useAuth();
   const { subscription, isActive, isTrialing, daysRemaining, loading } = useSubscription();
 
-  if (loading || !user || !subscription) return null;
+  if (!user) return null;
+
+  if (loading) {
+    return (
+      <div className="bg-card border border-border rounded-lg p-4 mb-6 relative overflow-hidden">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-muted" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3.5 w-1/3 rounded bg-muted" />
+            <div className="h-3 w-1/2 rounded bg-muted/70" />
+          </div>
+          <div className="h-8 w-24 rounded-md bg-muted" />
+        </div>
+        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-foreground/5 to-transparent" />
+      </div>
+    );
+  }
+
+  if (!subscription) return null;
 
   // Show upgrade prompt for trialing users with less than 7 days left
   if (isTrialing && daysRemaining <= 7 && daysRemaining > 0) {
