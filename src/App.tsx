@@ -49,6 +49,11 @@ import DeleteAccount from "./pages/DeleteAccount";
 
 const queryClient = new QueryClient();
 
+const AppShell = () => {
+  useKeyboardScroll();
+  return null;
+};
+
 const App = () => (
   <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
