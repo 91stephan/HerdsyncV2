@@ -146,6 +146,22 @@ export function FarmSwitcher() {
     setTimeout(() => setDialogOpen(true), 100);
   };
 
+  if (error && farms.length === 0 && !loading) {
+    return (
+      <div className="flex flex-col gap-1.5 px-2 py-1.5 bg-destructive/10 border border-destructive/20 rounded-lg">
+        <span className="text-xs text-destructive font-medium">Couldn't load farms</span>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 text-xs"
+          onClick={() => refetchFarms()}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="h-9 w-full bg-sidebar-accent/50 animate-pulse rounded-lg" />
