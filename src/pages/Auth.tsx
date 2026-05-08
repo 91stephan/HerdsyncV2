@@ -13,8 +13,15 @@ import { useFarm } from "@/hooks/useFarm";
 import { Separator } from "@/components/ui/separator";
 import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
 import { isNativePlatform, nativeGoogleSignIn, initializeGoogleAuth } from "@/utils/nativeGoogleAuth";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function Auth() {
+  useSEO({
+    title: "Sign in",
+    description: "Sign in to HerdSync to manage your livestock, inventory, and compliance records.",
+    canonical: "https://herdsync.co.za/auth",
+    noindex: true,
+  });
   const [loginIdentifier, setLoginIdentifier] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
