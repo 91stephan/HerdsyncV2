@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,7 +21,6 @@ export interface ChecklistCategory {
   items: ChecklistItem[];
 }
 
-// Define the default checklist structure
 const defaultChecklistItems = [
   {
     category_id: "animal-welfare",
@@ -114,68 +114,49 @@ export function useMonthlyCompliance() {
   const { farm } = useFarm();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [checklists, setChecklists] = useState<Record<string, ChecklistItem[]>>({});
-  const [currentMonthYear] = useState(getCurrentMonthYear());
-  const [history, setHistory] = useState<MonthlyHistory[]>([]);
+  const queryClient = useQueryClient();
+  const currentMonthYear = getCurrentMonthYear();
 
-  const initializeMonth = useCallback(async () => {
-    if (!farm?.id || !user?.id) return;
+  const checklistsKey = ["monthly-compliance", farm?.id, currentMonthYear];
+  const historyKey = ["monthly-compliance-history", farm?.id];
 
-    const monthYear = getCurrentMonthYear();
-    
-    // Check if current month already has entries
-    const { data: existingItems } = await supabase
-      .from("monthly_compliance_checklists")
-      .select("id")
-      .eq("farm_id", farm.id)
-      .eq("month_year", monthYear)
-      .limit(1);
+  const { data: checklists = {}, isLoading: loading } = useQuery({
+    queryKey: checklistsKey,
+    queryFn: async () => {
+      if (!farm?.id || !user?.id) return {} as Record<string, ChecklistItem[]>;
 
-    if (!existingItems || existingItems.length === 0) {
-      // Initialize new month with all checklist items (all unchecked)
-      const newItems = defaultChecklistItems.flatMap((cat) =>
-        cat.items.map((item) => ({
-          farm_id: farm.id,
-          category_id: cat.category_id,
-          item_id: item.item_id,
-          item_text: item.item_text,
-          completed: false,
-          month_year: monthYear,
-        }))
-      );
-
-      const { error } = await supabase
+      // Initialize month if needed
+      const { data: existing } = await supabase
         .from("monthly_compliance_checklists")
-        .insert(newItems);
+        .select("id")
+        .eq("farm_id", farm.id)
+        .eq("month_year", currentMonthYear)
+        .limit(1);
 
-      if (error) {
-        console.error("Error initializing monthly checklists:", error);
+      if (!existing || existing.length === 0) {
+        const newItems = defaultChecklistItems.flatMap((cat) =>
+          cat.items.map((item) => ({
+            farm_id: farm.id,
+            category_id: cat.category_id,
+            item_id: item.item_id,
+            item_text: item.item_text,
+            completed: false,
+            month_year: currentMonthYear,
+          }))
+        );
+        await supabase.from("monthly_compliance_checklists").insert(newItems);
       }
-    }
-  }, [farm?.id, user?.id]);
 
-  const fetchChecklists = useCallback(async () => {
-    if (!farm?.id) return;
-
-    setLoading(true);
-    try {
-      const monthYear = getCurrentMonthYear();
-      
       const { data, error } = await supabase
         .from("monthly_compliance_checklists")
         .select("*")
         .eq("farm_id", farm.id)
-        .eq("month_year", monthYear);
-
+        .eq("month_year", currentMonthYear);
       if (error) throw error;
 
-      // Group by category
       const grouped: Record<string, ChecklistItem[]> = {};
       data?.forEach((item) => {
-        if (!grouped[item.category_id]) {
-          grouped[item.category_id] = [];
-        }
+        if (!grouped[item.category_id]) grouped[item.category_id] = [];
         grouped[item.category_id].push({
           id: item.id,
           category_id: item.category_id,
@@ -186,52 +167,36 @@ export function useMonthlyCompliance() {
           notes: item.notes,
         });
       });
+      return grouped;
+    },
+    enabled: !!farm?.id && !!user?.id,
+  });
 
-      setChecklists(grouped);
-    } catch (error) {
-      console.error("Error fetching monthly checklists:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [farm?.id]);
-
-  const fetchHistory = useCallback(async () => {
-    if (!farm?.id) return;
-
-    try {
-      // Get all historical data grouped by month_year
+  const { data: history = [] } = useQuery({
+    queryKey: historyKey,
+    queryFn: async () => {
+      if (!farm?.id) return [] as MonthlyHistory[];
       const { data, error } = await supabase
         .from("monthly_compliance_checklists")
         .select("month_year, completed")
         .eq("farm_id", farm.id)
         .order("month_year", { ascending: false });
-
       if (error) throw error;
 
-      // Group and calculate stats for each month
       const monthStats: Record<string, { total: number; completed: number }> = {};
       data?.forEach((item) => {
-        if (!monthStats[item.month_year]) {
-          monthStats[item.month_year] = { total: 0, completed: 0 };
-        }
+        if (!monthStats[item.month_year]) monthStats[item.month_year] = { total: 0, completed: 0 };
         monthStats[item.month_year].total += 1;
-        if (item.completed) {
-          monthStats[item.month_year].completed += 1;
-        }
+        if (item.completed) monthStats[item.month_year].completed += 1;
       });
 
-      // Convert to array and calculate progress
-      const historyData: MonthlyHistory[] = Object.entries(monthStats)
+      return Object.entries(monthStats)
         .map(([monthYear, stats]) => {
           const progress = Math.round((stats.completed / stats.total) * 100);
           let status: { status: string; label: string; color: string };
-          if (progress >= 80) {
-            status = { status: "compliant", label: "Compliant", color: "green" };
-          } else if (progress >= 50) {
-            status = { status: "partial", label: "Partially Compliant", color: "yellow" };
-          } else {
-            status = { status: "non-compliant", label: "Non-Compliant", color: "red" };
-          }
+          if (progress >= 80) status = { status: "compliant", label: "Compliant", color: "green" };
+          else if (progress >= 50) status = { status: "partial", label: "Partially Compliant", color: "yellow" };
+          else status = { status: "non-compliant", label: "Non-Compliant", color: "red" };
           return {
             monthYear,
             label: getMonthYearLabel(monthYear),
@@ -241,28 +206,13 @@ export function useMonthlyCompliance() {
             status,
           };
         })
-        .sort((a, b) => b.monthYear.localeCompare(a.monthYear)); // Most recent first
-
-      setHistory(historyData);
-    } catch (error) {
-      console.error("Error fetching compliance history:", error);
-    }
-  }, [farm?.id]);
-
-  useEffect(() => {
-    const init = async () => {
-      await initializeMonth();
-      await fetchChecklists();
-      await fetchHistory();
-    };
-    if (farm?.id && user?.id) {
-      init();
-    }
-  }, [farm?.id, user?.id, initializeMonth, fetchChecklists, fetchHistory]);
+        .sort((a, b) => b.monthYear.localeCompare(a.monthYear));
+    },
+    enabled: !!farm?.id,
+  });
 
   const toggleItem = async (itemId: string, currentState: boolean) => {
     if (!user?.id) return;
-
     const { error } = await supabase
       .from("monthly_compliance_checklists")
       .update({
@@ -271,32 +221,12 @@ export function useMonthlyCompliance() {
         completed_by: !currentState ? user.id : null,
       })
       .eq("id", itemId);
-
     if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update checklist item",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to update checklist item", variant: "destructive" });
       return;
     }
-
-    // Update local state
-    setChecklists((prev) => {
-      const updated = { ...prev };
-      for (const categoryId in updated) {
-        updated[categoryId] = updated[categoryId].map((item) =>
-          item.id === itemId
-            ? {
-                ...item,
-                completed: !currentState,
-                completed_at: !currentState ? new Date().toISOString() : null,
-              }
-            : item
-        );
-      }
-      return updated;
-    });
+    queryClient.invalidateQueries({ queryKey: checklistsKey });
+    queryClient.invalidateQueries({ queryKey: historyKey });
   };
 
   const getOverallProgress = useCallback(() => {
@@ -339,6 +269,6 @@ export function useMonthlyCompliance() {
     getOverallProgress,
     getCategoryProgress,
     getComplianceStatus,
-    refetch: fetchChecklists,
+    refetch: () => queryClient.invalidateQueries({ queryKey: checklistsKey }),
   };
 }
