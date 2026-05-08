@@ -36,6 +36,7 @@ import { TasksTable } from "./TasksTable";
 import { DailyTasksList } from "./DailyTasksList";
 import { useFarm } from "@/hooks/useFarm";
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 import { supabase } from "@/integrations/supabase/client";
 import { isToday, isPast } from "date-fns";
 import { useEmployeePermissions } from "@/hooks/useEmployeePermissions";
@@ -65,7 +66,7 @@ export function TasksSection() {
 
   // Fetch active employees for assignment
   const { data: employees = [] } = useQuery({
-    queryKey: ["employees-active", farm?.id],
+    queryKey: queryKeys.employees.activeByFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       const { data, error } = await supabase

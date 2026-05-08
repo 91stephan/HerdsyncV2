@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { queryKeys } from "@/lib/queryKeys";
 import { Database } from "@/integrations/supabase/types";
 
 type TaskPriority = Database["public"]["Enums"]["task_priority"];
@@ -62,7 +63,7 @@ export function useEmployeeTasks() {
   const queryClient = useQueryClient();
 
   const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ["employee-tasks", farm?.id],
+    queryKey: queryKeys.employees.tasksByFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       
@@ -91,7 +92,7 @@ export function useEmployeeTasks() {
         "postgres_changes",
         { event: "*", schema: "public", table: "employee_tasks", filter: `farm_id=eq.${farm.id}` },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["employee-tasks", farm.id] });
+          queryClient.invalidateQueries({ queryKey: queryKeys.employees.tasksByFarm(farm.id) });
         }
       )
       .subscribe();
@@ -118,7 +119,7 @@ export function useEmployeeTasks() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employee-tasks", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.tasksByFarm(farm?.id) });
       toast({ title: "Task created successfully" });
     },
     onError: (error) => {
@@ -143,7 +144,7 @@ export function useEmployeeTasks() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employee-tasks", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.tasksByFarm(farm?.id) });
       toast({ title: "Task updated successfully" });
     },
     onError: (error) => {
@@ -161,7 +162,7 @@ export function useEmployeeTasks() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employee-tasks", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.tasksByFarm(farm?.id) });
       toast({ title: "Task deleted successfully" });
     },
     onError: (error) => {

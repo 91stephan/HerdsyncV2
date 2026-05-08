@@ -1,9 +1,10 @@
- import { useState } from "react";
- import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
- import { supabase } from "@/integrations/supabase/client";
- import { useFarm } from "./useFarm";
- import { useSubscription } from "./useSubscription";
- import { useToast } from "./use-toast";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useFarm } from "./useFarm";
+import { useSubscription } from "./useSubscription";
+import { useToast } from "./use-toast";
+import { queryKeys } from "@/lib/queryKeys";
  
  interface FarmInvitation {
    id: string;
@@ -43,7 +44,7 @@
  
    // Fetch pending invitations
    const { data: invitations = [], isLoading: invitationsLoading } = useQuery({
-     queryKey: ["farm-invitations", farm?.id],
+     queryKey: queryKeys.invitations.byFarm(farm?.id),
      queryFn: async () => {
        if (!farm?.id) return [];
        const { data, error } = await supabase
@@ -59,7 +60,7 @@
  
    // Fetch accepted/active invited users
    const { data: invitedUsers = [], isLoading: usersLoading } = useQuery({
-     queryKey: ["farm-invited-users", farm?.id],
+     queryKey: queryKeys.invitedUsers.byFarm(farm?.id),
      queryFn: async () => {
        if (!farm?.id) return [];
        const { data, error } = await supabase
@@ -102,7 +103,7 @@
        }
      },
      onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["farm-invitations", farm?.id] });
+       queryClient.invalidateQueries({ queryKey: queryKeys.invitations.byFarm(farm?.id) });
        toast({
          title: "Invitation sent",
          description: "The user will receive an email with instructions to join your farm.",
@@ -127,7 +128,7 @@
        if (error) throw error;
      },
      onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["farm-invitations", farm?.id] });
+       queryClient.invalidateQueries({ queryKey: queryKeys.invitations.byFarm(farm?.id) });
        toast({ title: "Invitation revoked" });
      },
      onError: (error) => {
@@ -151,7 +152,7 @@
        if (error) throw error;
      },
      onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["farm-invited-users", farm?.id] });
+       queryClient.invalidateQueries({ queryKey: queryKeys.invitedUsers.byFarm(farm?.id) });
        toast({ title: "User removed from farm" });
      },
      onError: (error) => {

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useFarmExpenses } from "@/hooks/useFarmExpenses";
 import { useToast } from "@/hooks/use-toast";
+import { queryKeys } from "@/lib/queryKeys";
 
 export const INVENTORY_CATEGORIES = [
   "Feed",
@@ -45,8 +46,8 @@ export interface UsageLogEntry {
   created_at: string;
 }
 
-const inventoryKey = (farmId?: string) => ["inventory", farmId] as const;
-const usageLogKey = (farmId?: string) => ["inventory-usage-log", farmId] as const;
+const inventoryKey = queryKeys.inventory.byFarm;
+const usageLogKey = queryKeys.inventory.usageLog;
 
 export function useInventory() {
   const { farm } = useFarm();

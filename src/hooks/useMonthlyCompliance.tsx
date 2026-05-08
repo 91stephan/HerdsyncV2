@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { queryKeys } from "@/lib/queryKeys";
 
 export interface ChecklistItem {
   id: string;
@@ -117,8 +118,8 @@ export function useMonthlyCompliance() {
   const queryClient = useQueryClient();
   const currentMonthYear = getCurrentMonthYear();
 
-  const checklistsKey = ["monthly-compliance", farm?.id, currentMonthYear];
-  const historyKey = ["monthly-compliance-history", farm?.id];
+  const checklistsKey = queryKeys.monthlyCompliance.checklists(farm?.id, currentMonthYear);
+  const historyKey = queryKeys.monthlyCompliance.history(farm?.id);
 
   const { data: checklists = {}, isLoading: loading } = useQuery({
     queryKey: checklistsKey,

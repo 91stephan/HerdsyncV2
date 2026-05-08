@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useFarm } from "./useFarm";
 import { useSubscription } from "./useSubscription";
+import { queryKeys } from "@/lib/queryKeys";
 
 const TIER_LIMITS = {
   basic: 5,
@@ -31,7 +32,7 @@ export function useAskAProUsage(): AskAProUsage {
   const dailyLimit = TIER_LIMITS[tier] || TIER_LIMITS.basic;
   const isUnlimited = tier === "pro";
   const today = new Date().toISOString().split("T")[0];
-  const queryKey = ["ask-a-pro-usage", user?.id, farm?.id, today];
+  const queryKey = queryKeys.askAProUsage(user?.id, farm?.id, today);
 
   const { data: questionsUsed = 0, isLoading: loading, refetch } = useQuery({
     queryKey,

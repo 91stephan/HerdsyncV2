@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { queryKeys } from "@/lib/queryKeys";
 import { format, subDays } from "date-fns";
 
 export interface DailyTask {
@@ -43,7 +44,7 @@ export function useDailyTasks() {
   const today = format(new Date(), "yyyy-MM-dd");
 
   const { data: dailyTasks = [], isLoading: tasksLoading } = useQuery({
-    queryKey: ["daily-tasks", farm?.id],
+    queryKey: queryKeys.dailyTasks.byFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       const { data, error } = await supabase
@@ -62,7 +63,7 @@ export function useDailyTasks() {
   const sevenDaysAgo = format(subDays(new Date(), 7), "yyyy-MM-dd");
 
   const { data: completions = [], isLoading: completionsLoading } = useQuery({
-    queryKey: ["daily-task-completions", farm?.id, sevenDaysAgo],
+    queryKey: queryKeys.dailyTasks.completions(farm?.id, sevenDaysAgo),
     queryFn: async () => {
       if (!farm?.id || dailyTasks.length === 0) return [];
       const taskIds = dailyTasks.map((t) => t.id);
@@ -111,7 +112,7 @@ export function useDailyTasks() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["daily-tasks", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dailyTasks.byFarm(farm?.id) });
       toast({ title: "Daily task created successfully" });
     },
     onError: (error) => {
@@ -135,7 +136,7 @@ export function useDailyTasks() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["daily-task-completions", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dailyTasks.completionsAll(farm?.id) });
     },
     onError: (error) => {
       toast({ title: "Error updating completion", description: error.message, variant: "destructive" });
@@ -148,7 +149,7 @@ export function useDailyTasks() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["daily-tasks", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dailyTasks.byFarm(farm?.id) });
       toast({ title: "Daily task deleted successfully" });
     },
     onError: (error) => {

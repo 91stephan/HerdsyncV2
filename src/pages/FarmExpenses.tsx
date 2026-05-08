@@ -36,6 +36,7 @@ import { useInventory, INVENTORY_CATEGORIES, InventoryCategory } from "@/hooks/u
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 import {
   Plus,
   Trash2,
@@ -79,7 +80,7 @@ export default function FarmExpenses() {
 
   // Fetch employees for salary data
   const { data: employees = [] } = useQuery({
-    queryKey: ["employees", farm?.id],
+    queryKey: queryKeys.employees.byFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       const { data, error } = await supabase

@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useFarm } from "./useFarm";
+import { queryKeys } from "@/lib/queryKeys";
 
 type SubscriptionTier = "basic" | "starter" | "pro";
 type SubscriptionStatus = "trialing" | "active" | "cancelled" | "expired" | "past_due";
@@ -55,8 +56,7 @@ const TIER_LIMITS: Record<SubscriptionTier, number> = {
   pro: 999999,
 };
 
-const subscriptionKey = (userId?: string, farmId?: string) =>
-  ["subscription", userId, farmId] as const;
+const subscriptionKey = queryKeys.subscription.byUserFarm;
 
 async function fetchSubscriptionQuery(userId: string, farmId: string): Promise<SubscriptionData> {
   // Admin check
