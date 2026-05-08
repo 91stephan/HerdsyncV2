@@ -30,6 +30,7 @@ interface SubscriptionData {
 interface SubscriptionContextType {
   subscription: Subscription | null;
   loading: boolean;
+  error: Error | null;
   isActive: boolean;
   isTrialing: boolean;
   daysRemaining: number;
@@ -40,6 +41,7 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType>({
   subscription: null,
   loading: true,
+  error: null,
   isActive: false,
   isTrialing: false,
   daysRemaining: 0,
