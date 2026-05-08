@@ -521,6 +521,57 @@ export type Database = {
           },
         ]
       }
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          author_name: string
+          content: string
+          cover_image_alt: string | null
+          cover_image_url: string | null
+          created_at: string
+          excerpt: string
+          id: string
+          published: boolean
+          published_at: string | null
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          author_name?: string
+          content: string
+          cover_image_alt?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt: string
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string
+          content?: string
+          cover_image_alt?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string
+          id?: string
+          published?: boolean
+          published_at?: string | null
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chemical_applications: {
         Row: {
           animal_id: string | null
