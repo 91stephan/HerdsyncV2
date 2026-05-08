@@ -164,6 +164,7 @@ export function Layout({ children }: LayoutProps) {
       className="h-screen flex overflow-hidden farm-background"
       style={{ '--farm-bg-image': `url(${farmBackground})` } as React.CSSProperties}
     >
+      <PageProgressBar />
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
