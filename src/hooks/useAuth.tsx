@@ -42,8 +42,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      // ignore — proceed to clear local state regardless
+    }
+    setUser(null);
+    setSession(null);
+    // Replace, don't push — and full URL replace clears any in-memory state cleanly
+    window.location.replace("/");
   };
 
   return (
