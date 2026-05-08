@@ -127,8 +127,8 @@ export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { farm } = useFarm();
-  const { subscription, isActive } = useSubscription();
+  const { farm, loading: farmLoading } = useFarm();
+  const { subscription, isActive, loading: subLoading } = useSubscription();
    const { isAdmin } = useAdmin();
   const { isEmployee } = useEmployeePermissions();
   
