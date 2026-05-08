@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { setTelemetryContext } from "@/lib/telemetry";
 
 interface AuthContextType {
   user: User | null;
@@ -28,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        setTelemetryContext({ user_id: session?.user?.id ?? null });
       }
     );
 
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      setTelemetryContext({ user_id: session?.user?.id ?? null });
     });
 
     return () => subscription.unsubscribe();

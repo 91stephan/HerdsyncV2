@@ -144,6 +144,13 @@ export function FarmProvider({ children }: { children: ReactNode }) {
     }
   }, [user, authLoading, qc]);
 
+  // Keep telemetry context in sync with the active farm
+  useEffect(() => {
+    import("@/lib/telemetry").then(({ setTelemetryContext }) => {
+      setTelemetryContext({ farm_id: farm?.id ?? null });
+    });
+  }, [farm?.id]);
+
   const setActiveFarm = (farmId: string) => {
     if (isEmployee && employeeInfo && farmId !== employeeInfo.farmId) return;
     if (farms.some((f) => f.id === farmId)) {
