@@ -284,7 +284,7 @@ export function FarmSwitcher() {
             aria-expanded={popoverOpen}
             className="w-full justify-between px-3 h-9 text-sm font-normal hover:bg-sidebar-accent"
           >
-            <span className="truncate">{farm?.name || "Select farm"}</span>
+            <span className="flex-1 min-w-0 truncate text-left">{farm?.name || "Select farm"}</span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
