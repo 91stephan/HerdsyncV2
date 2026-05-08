@@ -20,6 +20,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSEO } from "@/hooks/useSEO";
+import { useEffect } from "react";
 import farmBackground from "@/assets/farm-background.jpg";
 
 // Import animal images
@@ -125,13 +127,40 @@ const pricingHighlights = [
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  // If user is logged in, redirect to dashboard
-  if (user) {
-    navigate("/dashboard");
-    return null;
-  }
+  useSEO({
+    title: "HerdSync - Farm Management Made Simple",
+    description:
+      "South African farm management platform: livestock tracking, feeding, inventory, compliance, and ZAR financial reporting.",
+    canonical: "https://herdsync.co.za/",
+  });
+
+  // Redirect logged-in users to dashboard (post-render, not during render)
+  useEffect(() => {
+    if (!loading && user) navigate("/dashboard", { replace: true });
+  }, [user, loading, navigate]);
+
+  // JSON-LD structured data
+  useEffect(() => {
+    const ld = document.createElement("script");
+    ld.type = "application/ld+json";
+    ld.text = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "HerdSync",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web, iOS, Android",
+      url: "https://herdsync.co.za",
+      description:
+        "Farm management platform for South African livestock farmers — tracking, compliance, inventory, and reporting in ZAR.",
+      offers: { "@type": "Offer", priceCurrency: "ZAR" },
+    });
+    document.head.appendChild(ld);
+    return () => {
+      document.head.removeChild(ld);
+    };
+  }, []);
 
   return (
     <div 
