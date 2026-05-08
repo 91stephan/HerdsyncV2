@@ -99,7 +99,7 @@ export function useInventory() {
   const usageLog = usageLogQuery.data ?? [];
   const loading = inventoryQuery.isLoading;
 
-  // Realtime: keep inventory list in sync across users on the same farm
+  // Realtime: keep inventory + usage log in sync across users on the same farm
   useEffect(() => {
     if (!farm?.id) return;
     const channel = supabase
@@ -108,6 +108,15 @@ export function useInventory() {
         "postgres_changes",
         { event: "*", schema: "public", table: "inventory", filter: `farm_id=eq.${farm.id}` },
         () => {
+          qc.invalidateQueries({ queryKey: inventoryKey(farm.id) });
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "inventory_usage_log", filter: `farm_id=eq.${farm.id}` },
+        () => {
+          qc.invalidateQueries({ queryKey: usageLogKey(farm.id) });
+          // Usage rows almost always imply a quantity change too — refresh both.
           qc.invalidateQueries({ queryKey: inventoryKey(farm.id) });
         },
       )
