@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
@@ -72,6 +73,24 @@ export function useAnimals() {
 
   const animals = query.data ?? [];
   const loading = query.isLoading;
+
+  // Realtime: invalidate cache when livestock rows change for this farm
+  useEffect(() => {
+    if (!farm?.id) return;
+    const channel = supabase
+      .channel(`livestock-${farm.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "livestock", filter: `farm_id=eq.${farm.id}` },
+        () => {
+          qc.invalidateQueries({ queryKey: animalsKey(farm.id) });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [farm?.id, qc]);
 
   const fetchAnimals = async () => {
     await qc.invalidateQueries({ queryKey: animalsKey(farm?.id) });
