@@ -42,6 +42,7 @@ import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { FarmSwitcher } from "@/components/FarmSwitcher";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { PageProgressBar } from "@/components/PageProgressBar";
+import { PageSkeleton } from "@/components/PageSkeleton";
 import farmBackground from "@/assets/farm-background.jpg";
 import { NotificationBell } from "@/components/NotificationBell";
 
@@ -126,8 +127,8 @@ export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { farm } = useFarm();
-  const { subscription, isActive } = useSubscription();
+  const { farm, loading: farmLoading } = useFarm();
+  const { subscription, isActive, loading: subLoading } = useSubscription();
    const { isAdmin } = useAdmin();
   const { isEmployee } = useEmployeePermissions();
   
@@ -379,7 +380,11 @@ export function Layout({ children }: LayoutProps) {
               </Button>
             )}
             <PageErrorBoundary resetKey={`${location.pathname}|${farm?.id ?? "no-farm"}`}>
-              {children}
+              {user && (farmLoading || (subLoading && !!farm)) ? (
+                <PageSkeleton />
+              ) : (
+                children
+              )}
             </PageErrorBoundary>
           </div>
         </main>
