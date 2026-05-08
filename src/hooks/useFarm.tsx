@@ -160,6 +160,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
         farm,
         farms,
         loading: authLoading || (!!user && isLoading),
+        error: (error as Error | null) ?? null,
         isEmployee,
         employeeInfo,
         setActiveFarm,
