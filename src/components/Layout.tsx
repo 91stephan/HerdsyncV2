@@ -203,6 +203,7 @@ export function Layout({ children }: LayoutProps) {
                 setSidebarOpen(false);
               }}
               className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground"
+              aria-label="Close menu"
             >
               <X className="w-5 h-5" />
             </button>

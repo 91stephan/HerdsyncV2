@@ -184,7 +184,7 @@ export function SupportChat() {
               <Bot className="h-5 w-5 text-primary" />
               HerdSync Support
             </CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} aria-label="Close support chat">
               <X className="h-4 w-4" />
             </Button>
           </CardHeader>
@@ -244,7 +244,7 @@ export function SupportChat() {
                   onKeyDown={handleKeyDown}
                   disabled={isLoading}
                 />
-                <Button onClick={handleSend} disabled={isLoading || !input.trim()} size="icon">
+                <Button onClick={handleSend} disabled={isLoading || !input.trim()} size="icon" aria-label="Send message">
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
