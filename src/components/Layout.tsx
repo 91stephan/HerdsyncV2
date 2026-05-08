@@ -380,7 +380,11 @@ export function Layout({ children }: LayoutProps) {
               </Button>
             )}
             <PageErrorBoundary resetKey={`${location.pathname}|${farm?.id ?? "no-farm"}`}>
-              {children}
+              {user && (farmLoading || (subLoading && !!farm)) ? (
+                <PageSkeleton />
+              ) : (
+                children
+              )}
             </PageErrorBoundary>
           </div>
         </main>
