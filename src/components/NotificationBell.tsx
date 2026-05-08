@@ -19,7 +19,7 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
 
   const { data: notifications = [] } = useQuery({
-    queryKey: ["notifications", user?.id],
+    queryKey: queryKeys.notifications.byUser(user?.id),
     queryFn: async () => {
       if (!user?.id) return [];
       const { data, error } = await supabase
@@ -43,7 +43,7 @@ export function NotificationBell() {
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
         () => {
-          queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+          queryClient.invalidateQueries({ queryKey: queryKeys.notifications.byUser(user.id) });
         }
       )
       .subscribe();
@@ -61,7 +61,7 @@ export function NotificationBell() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.byUser(user?.id) });
     },
   });
 
@@ -76,7 +76,7 @@ export function NotificationBell() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.byUser(user?.id) });
     },
   });
 

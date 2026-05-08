@@ -44,7 +44,7 @@ import { queryKeys } from "@/lib/queryKeys";
  
    // Fetch pending invitations
    const { data: invitations = [], isLoading: invitationsLoading } = useQuery({
-     queryKey: ["farm-invitations", farm?.id],
+     queryKey: queryKeys.invitations.byFarm(farm?.id),
      queryFn: async () => {
        if (!farm?.id) return [];
        const { data, error } = await supabase
@@ -60,7 +60,7 @@ import { queryKeys } from "@/lib/queryKeys";
  
    // Fetch accepted/active invited users
    const { data: invitedUsers = [], isLoading: usersLoading } = useQuery({
-     queryKey: ["farm-invited-users", farm?.id],
+     queryKey: queryKeys.invitedUsers.byFarm(farm?.id),
      queryFn: async () => {
        if (!farm?.id) return [];
        const { data, error } = await supabase
@@ -103,7 +103,7 @@ import { queryKeys } from "@/lib/queryKeys";
        }
      },
      onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["farm-invitations", farm?.id] });
+       queryClient.invalidateQueries({ queryKey: queryKeys.invitations.byFarm(farm?.id) });
        toast({
          title: "Invitation sent",
          description: "The user will receive an email with instructions to join your farm.",
@@ -128,7 +128,7 @@ import { queryKeys } from "@/lib/queryKeys";
        if (error) throw error;
      },
      onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["farm-invitations", farm?.id] });
+       queryClient.invalidateQueries({ queryKey: queryKeys.invitations.byFarm(farm?.id) });
        toast({ title: "Invitation revoked" });
      },
      onError: (error) => {
@@ -152,7 +152,7 @@ import { queryKeys } from "@/lib/queryKeys";
        if (error) throw error;
      },
      onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["farm-invited-users", farm?.id] });
+       queryClient.invalidateQueries({ queryKey: queryKeys.invitedUsers.byFarm(farm?.id) });
        toast({ title: "User removed from farm" });
      },
      onError: (error) => {
