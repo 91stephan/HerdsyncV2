@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useToast } from "@/hooks/use-toast";
@@ -134,40 +134,31 @@ export const getDefaultSale = (): AnimalSale => ({
 export function useAnimalSales() {
   const { farm } = useFarm();
   const { toast } = useToast();
-  const [sales, setSales] = useState<AnimalSale[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const queryKey = ["animal-sales", farm?.id];
 
-  const fetchSales = async () => {
-    if (!farm?.id) return;
-    
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("animal_sales")
-      .select(`
-        *,
-        animal_sale_items (
-          id,
-          animal_id,
-          unit_price,
-          notes
-        )
-      `)
-      .eq("farm_id", farm.id)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching sales:", error);
-      toast({ title: "Error", description: "Failed to load sales", variant: "destructive" });
-    } else {
-      // Map the nested items to the expected format
-      const salesWithItems = (data || []).map((sale: any) => ({
+  const { data: sales = [], isLoading: loading, refetch } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!farm?.id) return [] as AnimalSale[];
+      const { data, error } = await supabase
+        .from("animal_sales")
+        .select(`*, animal_sale_items (id, animal_id, unit_price, notes)`)
+        .eq("farm_id", farm.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []).map((sale: any) => ({
         ...sale,
         items: sale.animal_sale_items || [],
-      }));
-      setSales(salesWithItems as AnimalSale[]);
-    }
-    setLoading(false);
+      })) as AnimalSale[];
+    },
+    enabled: !!farm?.id,
+  });
+
+  const fetchSales = async () => {
+    await refetch();
   };
+  const invalidate = () => queryClient.invalidateQueries({ queryKey });
 
   const saveSale = async (sale: AnimalSale, items: AnimalSaleItem[]): Promise<AnimalSale | null> => {
     if (!farm?.id) return null;
@@ -273,7 +264,7 @@ export function useAnimalSales() {
       }
 
       toast({ title: "Sale Saved", description: `Sale ${savedSale.sale_number} has been saved.` });
-      await fetchSales();
+      invalidate();
       return savedSale;
     } catch (error: any) {
       console.error("Error saving sale:", error);
@@ -316,12 +307,6 @@ export function useAnimalSales() {
 
     return savedSale;
   };
-
-  useEffect(() => {
-    if (farm?.id) {
-      fetchSales();
-    }
-  }, [farm?.id]);
 
   return {
     sales,
