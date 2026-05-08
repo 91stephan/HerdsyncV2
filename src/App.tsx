@@ -53,7 +53,39 @@ const TrialExpired = lazy(() => import("./pages/TrialExpired"));
 const DeleteAccount = lazy(() => import("./pages/DeleteAccount"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, staleTime: 30_000 },
+  },
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      const msg = error instanceof Error ? error.message : String(error);
+      void logError({
+        message: msg,
+        stack: error instanceof Error ? error.stack : null,
+        source: "react-query.query",
+        severity: "warning",
+        context: { queryKey: query.queryKey as unknown as Record<string, unknown> },
+      });
+      // Only surface a toast if the query was actively observed by the UI
+      if (query.state.data !== undefined) {
+        toast.error("Something went wrong loading data. Please try again.");
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error, _vars, _ctx, mutation) => {
+      const msg = error instanceof Error ? error.message : String(error);
+      void logError({
+        message: msg,
+        stack: error instanceof Error ? error.stack : null,
+        source: "react-query.mutation",
+        context: { mutationKey: (mutation.options.mutationKey ?? null) as unknown as Record<string, unknown> },
+      });
+      toast.error(msg || "Action failed. Please try again.");
+    },
+  }),
+});
 
 const AppShell = () => {
   useKeyboardScroll();
