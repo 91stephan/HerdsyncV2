@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode, useMemo } fr
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { queryKeys } from "@/lib/queryKeys";
 
 interface Farm {
   id: string;
@@ -44,7 +45,7 @@ const FarmContext = createContext<FarmContextType>({
   refetchFarms: async () => {},
 });
 
-const farmsKey = (userId: string | undefined) => ["farms", userId] as const;
+const farmsKey = queryKeys.farms.byUser;
 
 async function fetchFarmsQuery(userId: string): Promise<FarmsQueryResult> {
   // Check if user is an employee
@@ -138,7 +139,7 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   // Clear cache when user logs out
   useEffect(() => {
     if (!user && !authLoading) {
-      qc.removeQueries({ queryKey: ["farms"] });
+      qc.removeQueries({ queryKey: queryKeys.farms.all });
       setActiveFarmId(null);
     }
   }, [user, authLoading, qc]);

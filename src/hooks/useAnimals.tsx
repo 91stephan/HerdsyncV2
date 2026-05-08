@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useToast } from "@/hooks/use-toast";
+import { queryKeys } from "@/lib/queryKeys";
 
 // Re-export Animal type that maps to livestock table
 export interface Animal {
@@ -25,7 +26,7 @@ export interface Animal {
   updated_at: string;
 }
 
-const animalsKey = (farmId: string | undefined) => ["animals", farmId] as const;
+const animalsKey = queryKeys.animals.byFarm;
 
 export function useAnimals() {
   const { farm } = useFarm();
