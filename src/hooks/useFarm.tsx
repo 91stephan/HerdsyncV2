@@ -106,11 +106,19 @@ export function FarmProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
   const [activeFarmId, setActiveFarmId] = useState<string | null>(null);
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, refetch, error } = useQuery({
     queryKey: farmsKey(user?.id),
-    queryFn: () => fetchFarmsQuery(user!.id),
+    queryFn: async () => {
+      try {
+        return await fetchFarmsQuery(user!.id);
+      } catch (err) {
+        console.error("Farms fetch failed:", err);
+        return { farms: [], isEmployee: false, employeeInfo: null } as FarmsQueryResult;
+      }
+    },
     enabled: !!user && !authLoading,
     staleTime: 60_000,
+    retry: 1,
   });
 
   const farms = data?.farms ?? [];
