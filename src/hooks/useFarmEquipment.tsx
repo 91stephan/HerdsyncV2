@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useToast } from "@/hooks/use-toast";
+import { queryKeys } from "@/lib/queryKeys";
 
 export const EQUIPMENT_TYPES = [
   "Tractor",
@@ -44,7 +45,7 @@ export function useFarmEquipment() {
   const { farm } = useFarm();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const queryKey = ["farm-equipment", farm?.id];
+  const queryKey = queryKeys.farmEquipment.byFarm(farm?.id);
 
   const { data: equipment = [], isLoading: loading, refetch } = useQuery({
     queryKey,

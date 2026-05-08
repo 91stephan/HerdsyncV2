@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useToast } from "@/hooks/use-toast";
+import { queryKeys } from "@/lib/queryKeys";
 
 export interface AnimalSaleItem {
   id?: string;
@@ -135,7 +136,7 @@ export function useAnimalSales() {
   const { farm } = useFarm();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const queryKey = ["animal-sales", farm?.id];
+  const queryKey = queryKeys.animalSales.byFarm(farm?.id);
 
   const { data: sales = [], isLoading: loading, refetch } = useQuery({
     queryKey,

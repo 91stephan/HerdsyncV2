@@ -65,7 +65,7 @@ export function TasksSection() {
 
   // Fetch active employees for assignment
   const { data: employees = [] } = useQuery({
-    queryKey: ["employees-active", farm?.id],
+    queryKey: queryKeys.employees.activeByFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       const { data, error } = await supabase

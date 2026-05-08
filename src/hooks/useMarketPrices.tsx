@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { queryKeys } from "@/lib/queryKeys";
 
 export interface CommodityPrice {
   id: string;
@@ -32,7 +33,7 @@ export interface CommodityWithPrices extends Commodity {
 
 export function useMarketPrices() {
   return useQuery({
-    queryKey: ["market-prices"],
+    queryKey: queryKeys.marketPrices.all,
     queryFn: async () => {
       // Fetch categories
       const { data: categories, error: catError } = await supabase

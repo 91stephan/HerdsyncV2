@@ -115,7 +115,7 @@ export function InviteEmployeeDialog({
 
   // Fetch existing usernames to check for duplicates
   const { data: existingUsernames = [] } = useQuery({
-    queryKey: ["employee-usernames", farmId],
+    queryKey: queryKeys.employees.usernamesByFarm(farmId),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employee_users")
