@@ -104,6 +104,14 @@ export default {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
+        "page-progress": {
+          "0%": { transform: "translateX(-100%)" },
+          "60%": { transform: "translateX(20%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -112,6 +120,8 @@ export default {
         "slide-in-left": "slide-in-left 0.3s ease-out forwards",
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
         "count-up": "count-up 0.6s ease-out forwards",
+        shimmer: "shimmer 1.4s infinite",
+        "page-progress": "page-progress 0.9s ease-in-out forwards",
       },
     },
   },

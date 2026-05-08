@@ -164,7 +164,11 @@ export function FarmSwitcher() {
 
   if (loading) {
     return (
-      <div className="h-9 w-full bg-sidebar-accent/50 animate-pulse rounded-lg" />
+      <div className="flex items-center gap-2 px-3 h-9 bg-sidebar-accent/40 rounded-lg overflow-hidden relative">
+        <Building className="w-4 h-4 text-sidebar-foreground/40 shrink-0" />
+        <div className="h-3 flex-1 rounded bg-sidebar-foreground/10" />
+        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-sidebar-foreground/10 to-transparent" />
+      </div>
     );
   }
 
