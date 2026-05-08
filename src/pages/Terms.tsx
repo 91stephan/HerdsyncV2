@@ -1,7 +1,13 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function Terms() {
+  useSEO({
+    title: "Terms of Service",
+    description: "HerdSync Terms of Service — the rules for using our farm management platform, payments, and acceptable use in South Africa.",
+    canonical: "https://herdsync.co.za/terms",
+  });
   return (
     <Layout>
       <div className="space-y-6 max-w-4xl">
