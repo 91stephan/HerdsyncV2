@@ -42,6 +42,7 @@ import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { FarmSwitcher } from "@/components/FarmSwitcher";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { PageProgressBar } from "@/components/PageProgressBar";
+import { PageSkeleton } from "@/components/PageSkeleton";
 import farmBackground from "@/assets/farm-background.jpg";
 import { NotificationBell } from "@/components/NotificationBell";
 
