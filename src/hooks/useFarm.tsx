@@ -26,6 +26,7 @@ interface FarmContextType {
   farm: Farm | null;
   farms: Farm[];
   loading: boolean;
+  error: Error | null;
   isEmployee: boolean;
   employeeInfo: EmployeeInfo | null;
   setActiveFarm: (farmId: string) => void;
@@ -36,6 +37,7 @@ const FarmContext = createContext<FarmContextType>({
   farm: null,
   farms: [],
   loading: true,
+  error: null,
   isEmployee: false,
   employeeInfo: null,
   setActiveFarm: () => {},
