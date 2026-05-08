@@ -45,6 +45,7 @@ import { PageProgressBar } from "@/components/PageProgressBar";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import farmBackground from "@/assets/farm-background.jpg";
 import { NotificationBell } from "@/components/NotificationBell";
+import { SEOFooter } from "@/components/SEOFooter";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -390,6 +391,7 @@ export function Layout({ children }: LayoutProps) {
               )}
             </PageErrorBoundary>
           </div>
+          {!user && <SEOFooter />}
         </main>
       </div>
     </div>
