@@ -58,7 +58,7 @@ export async function logError(payload: LogPayload) {
     };
 
     // Best-effort; never throw out of telemetry.
-    await supabase.from("error_logs").insert(row);
+    await supabase.from("error_logs").insert([row]);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("[telemetry] failed to log error", e);
