@@ -54,7 +54,7 @@ export async function logError(payload: LogPayload) {
       user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
       user_id: ctx.user_id ?? null,
       farm_id: ctx.farm_id ?? null,
-      context: payload.context ?? null,
+      context: (payload.context ?? null) as any,
     };
 
     // Best-effort; never throw out of telemetry.
