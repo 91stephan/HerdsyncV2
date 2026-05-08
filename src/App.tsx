@@ -105,6 +105,7 @@ const App = () => (
                 <SupportChat />
                 <CookieConsent />
                 <AndroidBackButtonHandler />
+                <AppShell />
               </BrowserRouter>
             </TooltipProvider>
            </EmployeePermissionsProvider>
