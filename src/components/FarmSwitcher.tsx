@@ -50,7 +50,7 @@ const SA_PROVINCES = [
 ];
 
 export function FarmSwitcher() {
-  const { farm, farms, setActiveFarm, loading, refetchFarms, isEmployee } = useFarm();
+  const { farm, farms, setActiveFarm, loading, refetchFarms, isEmployee, error } = useFarm();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [farmName, setFarmName] = useState("");
