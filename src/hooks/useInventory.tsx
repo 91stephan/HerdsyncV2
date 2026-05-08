@@ -99,7 +99,7 @@ export function useInventory() {
   const usageLog = usageLogQuery.data ?? [];
   const loading = inventoryQuery.isLoading;
 
-  // Realtime: keep inventory list in sync across users on the same farm
+  // Realtime: keep inventory + usage log in sync across users on the same farm
   useEffect(() => {
     if (!farm?.id) return;
     const channel = supabase
@@ -108,6 +108,15 @@ export function useInventory() {
         "postgres_changes",
         { event: "*", schema: "public", table: "inventory", filter: `farm_id=eq.${farm.id}` },
         () => {
+          qc.invalidateQueries({ queryKey: inventoryKey(farm.id) });
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "inventory_usage_log", filter: `farm_id=eq.${farm.id}` },
+        () => {
+          qc.invalidateQueries({ queryKey: usageLogKey(farm.id) });
+          // Usage rows almost always imply a quantity change too — refresh both.
           qc.invalidateQueries({ queryKey: inventoryKey(farm.id) });
         },
       )
@@ -188,18 +197,15 @@ export function useInventory() {
     const item = inventory.find((i) => i.id === id);
     if (!item) return false;
 
-    const newQuantity = item.quantity + quantityToAdd;
     const totalCost = quantityToAdd * costPerUnit;
 
-    const { error } = await supabase
-      .from("inventory")
-      .update({
-        quantity: newQuantity,
-        cost_per_unit: costPerUnit,
-        last_restocked: new Date().toISOString().split("T")[0],
-        supplier: supplier || item.supplier,
-      })
-      .eq("id", id);
+    // Atomic restock — server adds quantity, no read-then-write race
+    const { error } = await supabase.rpc("restock_inventory_item", {
+      _inventory_id: id,
+      _quantity_to_add: quantityToAdd,
+      _cost_per_unit: costPerUnit,
+      _supplier: supplier ?? null,
+    });
 
     if (error) {
       console.error("Error restocking item:", error);
@@ -247,6 +253,7 @@ export function useInventory() {
     const item = inventory.find((i) => i.id === inventoryId);
     if (!item) return false;
 
+    // Optimistic guard from local state — server still enforces non-negative atomically.
     if (quantityUsed > item.quantity) {
       toast({
         title: "Insufficient Stock",
@@ -256,6 +263,25 @@ export function useInventory() {
       return false;
     }
 
+    // Atomic decrement first — prevents lost updates if two users log usage at once.
+    const { error: adjError } = await supabase.rpc("adjust_inventory_quantity", {
+      _inventory_id: inventoryId,
+      _delta: -quantityUsed,
+    });
+
+    if (adjError) {
+      console.error("Error adjusting inventory:", adjError);
+      toast({
+        title: "Error",
+        description: adjError.message.includes("Insufficient")
+          ? "Stock changed — another user just used some. Please refresh and try again."
+          : adjError.message,
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Then record the usage entry. If this fails, roll back the quantity.
     const { error: logError } = await supabase.from("inventory_usage_log").insert({
       inventory_id: inventoryId,
       farm_id: farm.id,
@@ -267,18 +293,12 @@ export function useInventory() {
 
     if (logError) {
       console.error("Error logging usage:", logError);
+      // Best-effort rollback
+      await supabase.rpc("adjust_inventory_quantity", {
+        _inventory_id: inventoryId,
+        _delta: quantityUsed,
+      });
       toast({ title: "Error", description: logError.message, variant: "destructive" });
-      return false;
-    }
-
-    const { error: updateError } = await supabase
-      .from("inventory")
-      .update({ quantity: item.quantity - quantityUsed })
-      .eq("id", inventoryId);
-
-    if (updateError) {
-      console.error("Error updating inventory:", updateError);
-      toast({ title: "Error", description: updateError.message, variant: "destructive" });
       return false;
     }
 

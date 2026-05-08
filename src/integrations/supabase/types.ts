@@ -2460,6 +2460,14 @@ export type Database = {
       }
     }
     Functions: {
+      adjust_inventory_quantity: {
+        Args: { _delta: number; _inventory_id: string }
+        Returns: {
+          farm_id: string
+          id: string
+          quantity: number
+        }[]
+      }
       auto_renew_admin_subscription: {
         Args: { _user_id: string }
         Returns: undefined
@@ -2552,6 +2560,19 @@ export type Database = {
       mark_invitation_accessed: {
         Args: { invitation_token: string }
         Returns: undefined
+      }
+      restock_inventory_item: {
+        Args: {
+          _cost_per_unit: number
+          _inventory_id: string
+          _quantity_to_add: number
+          _supplier?: string
+        }
+        Returns: {
+          farm_id: string
+          id: string
+          quantity: number
+        }[]
       }
     }
     Enums: {
