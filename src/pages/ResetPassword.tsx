@@ -6,8 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Wheat, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function ResetPassword() {
+  useSEO({
+    title: "Reset password",
+    description: "Reset your HerdSync account password.",
+    noindex: true,
+  });
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);

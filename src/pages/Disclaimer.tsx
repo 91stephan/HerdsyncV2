@@ -1,8 +1,14 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function Disclaimer() {
+  useSEO({
+    title: "Disclaimer",
+    description: "Important disclaimers about using HerdSync for livestock management, compliance reporting, and financial tracking.",
+    canonical: "https://herdsync.co.za/disclaimer",
+  });
   return (
     <Layout>
       <div className="space-y-6 max-w-4xl">
