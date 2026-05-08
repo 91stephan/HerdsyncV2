@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useFarmExpenses } from "@/hooks/useFarmExpenses";
@@ -44,60 +44,68 @@ export interface UsageLogEntry {
   created_at: string;
 }
 
+const inventoryKey = (farmId?: string) => ["inventory", farmId] as const;
+const usageLogKey = (farmId?: string) => ["inventory-usage-log", farmId] as const;
+
 export function useInventory() {
   const { farm } = useFarm();
   const { addExpense } = useFarmExpenses();
   const { toast } = useToast();
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [usageLog, setUsageLog] = useState<UsageLogEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
+
+  const inventoryQuery = useQuery({
+    queryKey: inventoryKey(farm?.id),
+    enabled: !!farm?.id,
+    staleTime: 60_000,
+    queryFn: async (): Promise<InventoryItem[]> => {
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("*")
+        .eq("farm_id", farm!.id)
+        .order("category", { ascending: true })
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching inventory:", error);
+        toast({ title: "Error", description: "Failed to load inventory", variant: "destructive" });
+        throw error;
+      }
+      return (data || []) as InventoryItem[];
+    },
+  });
+
+  const usageLogQuery = useQuery({
+    queryKey: usageLogKey(farm?.id),
+    enabled: !!farm?.id,
+    staleTime: 60_000,
+    queryFn: async (): Promise<UsageLogEntry[]> => {
+      const { data, error } = await supabase
+        .from("inventory_usage_log")
+        .select("*")
+        .eq("farm_id", farm!.id)
+        .order("usage_date", { ascending: false })
+        .limit(100);
+      if (error) {
+        console.error("Error fetching usage log:", error);
+        throw error;
+      }
+      return (data || []) as UsageLogEntry[];
+    },
+  });
+
+  const inventory = inventoryQuery.data ?? [];
+  const usageLog = usageLogQuery.data ?? [];
+  const loading = inventoryQuery.isLoading;
 
   const fetchInventory = async () => {
-    if (!farm?.id) return;
-
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("inventory")
-      .select("*")
-      .eq("farm_id", farm.id)
-      .order("category", { ascending: true })
-      .order("name", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching inventory:", error);
-      toast({ title: "Error", description: "Failed to load inventory", variant: "destructive" });
-    } else {
-      setInventory((data || []) as InventoryItem[]);
-    }
-    setLoading(false);
+    await qc.invalidateQueries({ queryKey: inventoryKey(farm?.id) });
   };
-
-  const fetchUsageLog = async (inventoryId?: string) => {
-    if (!farm?.id) return;
-
-    let query = supabase
-      .from("inventory_usage_log")
-      .select("*")
-      .eq("farm_id", farm.id)
-      .order("usage_date", { ascending: false })
-      .limit(100);
-
-    if (inventoryId) {
-      query = query.eq("inventory_id", inventoryId);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error("Error fetching usage log:", error);
-    } else {
-      setUsageLog((data || []) as UsageLogEntry[]);
-    }
+  const fetchUsageLog = async () => {
+    await qc.invalidateQueries({ queryKey: usageLogKey(farm?.id) });
   };
 
   const addItem = async (item: Omit<InventoryItem, "id" | "farm_id" | "created_at" | "updated_at">) => {
     if (!farm?.id) return null;
-
     const { data, error } = await supabase
       .from("inventory")
       .insert({
@@ -111,7 +119,7 @@ export function useInventory() {
         supplier: item.supplier || null,
         storage_location: item.storage_location || null,
         notes: item.notes || null,
-        last_restocked: item.last_restocked || new Date().toISOString().split('T')[0],
+        last_restocked: item.last_restocked || new Date().toISOString().split("T")[0],
       })
       .select()
       .single();
@@ -128,34 +136,24 @@ export function useInventory() {
   };
 
   const updateItem = async (id: string, updates: Partial<InventoryItem>) => {
-    const { error } = await supabase
-      .from("inventory")
-      .update(updates)
-      .eq("id", id);
-
+    const { error } = await supabase.from("inventory").update(updates).eq("id", id);
     if (error) {
       console.error("Error updating inventory item:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return false;
     }
-
     toast({ title: "Item Updated", description: "Inventory item has been updated." });
     await fetchInventory();
     return true;
   };
 
   const deleteItem = async (id: string) => {
-    const { error } = await supabase
-      .from("inventory")
-      .delete()
-      .eq("id", id);
-
+    const { error } = await supabase.from("inventory").delete().eq("id", id);
     if (error) {
       console.error("Error deleting inventory item:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return false;
     }
-
     toast({ title: "Item Deleted", description: "Inventory item has been removed." });
     await fetchInventory();
     return true;
@@ -165,7 +163,7 @@ export function useInventory() {
     id: string,
     quantityToAdd: number,
     costPerUnit: number,
-    supplier?: string
+    supplier?: string,
   ) => {
     const item = inventory.find((i) => i.id === id);
     if (!item) return false;
@@ -173,13 +171,12 @@ export function useInventory() {
     const newQuantity = item.quantity + quantityToAdd;
     const totalCost = quantityToAdd * costPerUnit;
 
-    // Update inventory
     const { error } = await supabase
       .from("inventory")
       .update({
         quantity: newQuantity,
         cost_per_unit: costPerUnit,
-        last_restocked: new Date().toISOString().split('T')[0],
+        last_restocked: new Date().toISOString().split("T")[0],
         supplier: supplier || item.supplier,
       })
       .eq("id", id);
@@ -190,7 +187,6 @@ export function useInventory() {
       return false;
     }
 
-    // Auto-create expense
     const categoryMap: Record<string, string> = {
       "Feed": "Feed & Supplements",
       "Fuel": item.name.toLowerCase().includes("diesel") ? "Diesel" : "Petrol",
@@ -201,21 +197,21 @@ export function useInventory() {
     };
 
     await addExpense({
-      expense_date: new Date().toISOString().split('T')[0],
+      expense_date: new Date().toISOString().split("T")[0],
       category: categoryMap[item.category] || "Other",
       description: `Restock: ${item.name} (${quantityToAdd} ${item.unit})`,
       amount: totalCost,
       supplier_vendor: supplier || item.supplier,
       receipt_reference: null,
       notes: `Auto-created from inventory restock`,
-       receipt_image_url: null,
+      receipt_image_url: null,
     });
 
-    toast({ 
-      title: "Item Restocked", 
-      description: `Added ${quantityToAdd} ${item.unit} of ${item.name}. Expense of R${totalCost.toFixed(2)} recorded.` 
+    toast({
+      title: "Item Restocked",
+      description: `Added ${quantityToAdd} ${item.unit} of ${item.name}. Expense of R${totalCost.toFixed(2)} recorded.`,
     });
-    
+
     await fetchInventory();
     return true;
   };
@@ -225,33 +221,29 @@ export function useInventory() {
     quantityUsed: number,
     reason: string,
     usedBy?: string,
-    notes?: string
+    notes?: string,
   ) => {
     if (!farm?.id) return false;
-
     const item = inventory.find((i) => i.id === inventoryId);
     if (!item) return false;
 
     if (quantityUsed > item.quantity) {
-      toast({ 
-        title: "Insufficient Stock", 
-        description: `Only ${item.quantity} ${item.unit} available.`, 
-        variant: "destructive" 
+      toast({
+        title: "Insufficient Stock",
+        description: `Only ${item.quantity} ${item.unit} available.`,
+        variant: "destructive",
       });
       return false;
     }
 
-    // Create usage log entry
-    const { error: logError } = await supabase
-      .from("inventory_usage_log")
-      .insert({
-        inventory_id: inventoryId,
-        farm_id: farm.id,
-        quantity_used: quantityUsed,
-        reason,
-        used_by: usedBy || null,
-        notes: notes || null,
-      });
+    const { error: logError } = await supabase.from("inventory_usage_log").insert({
+      inventory_id: inventoryId,
+      farm_id: farm.id,
+      quantity_used: quantityUsed,
+      reason,
+      used_by: usedBy || null,
+      notes: notes || null,
+    });
 
     if (logError) {
       console.error("Error logging usage:", logError);
@@ -259,7 +251,6 @@ export function useInventory() {
       return false;
     }
 
-    // Update inventory quantity
     const { error: updateError } = await supabase
       .from("inventory")
       .update({ quantity: item.quantity - quantityUsed })
@@ -271,11 +262,11 @@ export function useInventory() {
       return false;
     }
 
-    toast({ 
-      title: "Usage Logged", 
-      description: `Used ${quantityUsed} ${item.unit} of ${item.name}.` 
+    toast({
+      title: "Usage Logged",
+      description: `Used ${quantityUsed} ${item.unit} of ${item.name}.`,
     });
-    
+
     await fetchInventory();
     await fetchUsageLog();
     return true;
@@ -289,27 +280,12 @@ export function useInventory() {
     return { label: "In Stock", variant: "default" as const };
   };
 
-  const getLowStockItems = () => {
-    return inventory.filter((item) => {
-      if (item.reorder_level === 0) return false;
-      return item.quantity <= item.reorder_level;
-    });
-  };
-
-  const getItemsByCategory = (category: InventoryCategory) => {
-    return inventory.filter((item) => item.category === category);
-  };
-
-  const getTotalValue = () => {
-    return inventory.reduce((sum, item) => sum + (item.quantity * item.cost_per_unit), 0);
-  };
-
-  useEffect(() => {
-    if (farm?.id) {
-      fetchInventory();
-      fetchUsageLog();
-    }
-  }, [farm?.id]);
+  const getLowStockItems = () =>
+    inventory.filter((item) => item.reorder_level !== 0 && item.quantity <= item.reorder_level);
+  const getItemsByCategory = (category: InventoryCategory) =>
+    inventory.filter((item) => item.category === category);
+  const getTotalValue = () =>
+    inventory.reduce((sum, item) => sum + item.quantity * item.cost_per_unit, 0);
 
   return {
     inventory,
