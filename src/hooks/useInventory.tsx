@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
@@ -96,6 +97,24 @@ export function useInventory() {
   const inventory = inventoryQuery.data ?? [];
   const usageLog = usageLogQuery.data ?? [];
   const loading = inventoryQuery.isLoading;
+
+  // Realtime: keep inventory list in sync across users on the same farm
+  useEffect(() => {
+    if (!farm?.id) return;
+    const channel = supabase
+      .channel(`inventory-${farm.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "inventory", filter: `farm_id=eq.${farm.id}` },
+        () => {
+          qc.invalidateQueries({ queryKey: inventoryKey(farm.id) });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [farm?.id, qc]);
 
   const fetchInventory = async () => {
     await qc.invalidateQueries({ queryKey: inventoryKey(farm?.id) });
