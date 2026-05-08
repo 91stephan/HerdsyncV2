@@ -40,6 +40,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useEmployeePermissions } from "@/hooks/useEmployeePermissions";
 import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { FarmSwitcher } from "@/components/FarmSwitcher";
+import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import farmBackground from "@/assets/farm-background.jpg";
 import { NotificationBell } from "@/components/NotificationBell";
 
