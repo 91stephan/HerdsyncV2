@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
@@ -80,6 +81,24 @@ export function useEmployeeTasks() {
     },
     enabled: !!farm?.id,
   });
+
+  // Realtime subscription for task changes on this farm
+  useEffect(() => {
+    if (!farm?.id) return;
+    const channel = supabase
+      .channel(`employee_tasks:${farm.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "employee_tasks", filter: `farm_id=eq.${farm.id}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["employee-tasks", farm.id] });
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [farm?.id, queryClient]);
 
   const createTask = useMutation({
     mutationFn: async (data: CreateTaskData) => {
