@@ -16,6 +16,7 @@ import { useKeyboardScroll } from "@/hooks/useKeyboardScroll";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageSkeleton } from "@/components/PageSkeleton";
+import { RouteTracker } from "@/components/RouteTracker";
 import Landing from "./pages/Landing";
 import { AdminProvider } from "@/hooks/useAdmin";
 
