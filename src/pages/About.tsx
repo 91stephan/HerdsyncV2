@@ -1,8 +1,13 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target, Users, Award, Heart } from "lucide-react";
+import { useSEO } from "@/hooks/useSEO";
 
 export default function About() {
+  useSEO({
+    title: "About HerdSync",
+    description: "Learn about HerdSync — the South African farm management platform empowering livestock farmers.",
+  });
   return (
     <Layout>
       <div className="space-y-8">

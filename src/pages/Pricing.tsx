@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSEO } from "@/hooks/useSEO";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -143,6 +144,10 @@ const pricingTiers = [
 ];
 
 export default function Pricing() {
+  useSEO({
+    title: "Pricing - HerdSync",
+    description: "Simple, transparent pricing in ZAR. Choose Basic, Starter, or Pro. 14-day free trial included.",
+  });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
