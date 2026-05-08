@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useToast } from "@/hooks/use-toast";
@@ -10,48 +10,51 @@ export interface Animal {
   animal_tag_id: string; // maps to livestock.tag
   species: string; // maps to livestock.type
   breed: string | null;
-  sex: string | null; // maps from livestock.status or null
+  sex: string | null;
   dob_or_age: string | null; // maps to livestock.age
   color_markings: string | null;
   brand_mark: string | null;
   microchip_number: string | null;
   health_notes: string | null; // maps to livestock.notes
   status: "available" | "sold" | "deceased" | "transferred";
-  name: string; // livestock name
+  name: string;
   weight: string | null;
-  plannedSaleDate: string | null; // maps to livestock.planned_sale_date
+  plannedSaleDate: string | null;
   created_at: string;
   updated_at: string;
 }
 
+const animalsKey = (farmId: string | undefined) => ["animals", farmId] as const;
+
 export function useAnimals() {
   const { farm } = useFarm();
   const { toast } = useToast();
-  const [animals, setAnimals] = useState<Animal[]>([]);
-  const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
 
-  const fetchAnimals = async () => {
-    if (!farm?.id) return;
-    
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("livestock")
-      .select("*")
-      .eq("farm_id", farm.id)
-      .order("tag", { ascending: true });
+  const query = useQuery({
+    queryKey: animalsKey(farm?.id),
+    enabled: !!farm?.id,
+    staleTime: 60_000,
+    queryFn: async (): Promise<Animal[]> => {
+      const { data, error } = await supabase
+        .from("livestock")
+        .select("*")
+        .eq("farm_id", farm!.id)
+        .order("tag", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching animals:", error);
-      toast({ title: "Error", description: "Failed to load animals", variant: "destructive" });
-    } else {
-      // Map livestock data to Animal interface
-      const mappedAnimals: Animal[] = (data || []).map((livestock) => ({
+      if (error) {
+        console.error("Error fetching animals:", error);
+        toast({ title: "Error", description: "Failed to load animals", variant: "destructive" });
+        throw error;
+      }
+
+      return (data || []).map((livestock) => ({
         id: livestock.id,
         farm_id: livestock.farm_id,
         animal_tag_id: livestock.tag,
         species: livestock.type,
         breed: livestock.breed,
-        sex: null, // livestock doesn't have sex field
+        sex: null,
         dob_or_age: livestock.age,
         color_markings: null,
         brand_mark: null,
@@ -64,52 +67,49 @@ export function useAnimals() {
         created_at: livestock.created_at,
         updated_at: livestock.updated_at,
       }));
-      setAnimals(mappedAnimals);
-    }
-    setLoading(false);
+    },
+  });
+
+  const animals = query.data ?? [];
+  const loading = query.isLoading;
+
+  const fetchAnimals = async () => {
+    await qc.invalidateQueries({ queryKey: animalsKey(farm?.id) });
   };
 
-  const getAvailableAnimals = () => {
-    return animals.filter((a) => a.status === "available");
-  };
+  const getAvailableAnimals = () => animals.filter((a) => a.status === "available");
 
-  // Mark animals as sold with individual prices from sale items
   const markAnimalsSoldWithPrices = async (
     items: { animal_id: string; unit_price: number | null }[],
-    soldTo?: string
+    soldTo?: string,
   ) => {
     const now = new Date().toISOString();
-    
-    // Update each animal with its individual sale price
-    const updatePromises = items.map((item) =>
-      supabase
-        .from("livestock")
-        .update({
-          sold_at: now,
-          sale_price: item.unit_price || null,
-          sold_to: soldTo || null,
-        })
-        .eq("id", item.animal_id)
+    const results = await Promise.all(
+      items.map((item) =>
+        supabase
+          .from("livestock")
+          .update({
+            sold_at: now,
+            sale_price: item.unit_price || null,
+            sold_to: soldTo || null,
+          })
+          .eq("id", item.animal_id),
+      ),
     );
-
-    const results = await Promise.all(updatePromises);
     const errors = results.filter((r) => r.error);
-
     if (errors.length > 0) {
       console.error("Error marking animals as sold:", errors);
       toast({ title: "Error", description: "Failed to update some animals", variant: "destructive" });
       return false;
     }
-
     await fetchAnimals();
     return true;
   };
 
-  // Legacy function for backward compatibility (single price for all)
   const markAnimalsSold = async (animalIds: string[], salePrice?: number, soldTo?: string) => {
     const { error } = await supabase
       .from("livestock")
-      .update({ 
+      .update({
         sold_at: new Date().toISOString(),
         sale_price: salePrice || null,
         sold_to: soldTo || null,
@@ -121,16 +121,9 @@ export function useAnimals() {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return false;
     }
-
     await fetchAnimals();
     return true;
   };
-
-  useEffect(() => {
-    if (farm?.id) {
-      fetchAnimals();
-    }
-  }, [farm?.id]);
 
   return {
     animals,
