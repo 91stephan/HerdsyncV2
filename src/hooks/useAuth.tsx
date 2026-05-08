@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        setTelemetryContext({ user_id: session?.user?.id ?? null });
       }
     );
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      setTelemetryContext({ user_id: session?.user?.id ?? null });
     });
 
     return () => subscription.unsubscribe();
