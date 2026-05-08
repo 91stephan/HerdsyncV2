@@ -47,6 +47,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFarm } from "@/hooks/useFarm";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 import { Plus, Search, UserMinus, Edit, Users, UserCheck, UserX, Phone, Mail, ShieldCheck, KeyRound, ClipboardList, Crown } from "lucide-react";
 import { format } from "date-fns";
 import { InviteEmployeeDialog } from "@/components/InviteEmployeeDialog";
@@ -125,7 +126,7 @@ export default function Employees() {
   }, [isEmployee, isFarmManager, navigate]);
 
   const { data: employees = [], isLoading } = useQuery({
-    queryKey: ["employees", farm?.id],
+    queryKey: queryKeys.employees.byFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       const { data, error } = await supabase
@@ -141,7 +142,7 @@ export default function Employees() {
 
   // Fetch employee_users to know which employees have system access
   const { data: employeeUsers = [] } = useQuery({
-    queryKey: ["employee-users", farm?.id],
+    queryKey: queryKeys.employees.usersByFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       const { data, error } = await supabase
@@ -156,7 +157,7 @@ export default function Employees() {
 
   // Fetch farm_members to know which employees are managers
   const { data: farmManagers = [] } = useQuery({
-    queryKey: ["farm-managers", farm?.id],
+    queryKey: queryKeys.employees.managersByFarm(farm?.id),
     queryFn: async () => {
       if (!farm?.id) return [];
       const { data, error } = await supabase
@@ -189,7 +190,7 @@ export default function Employees() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["farm-managers", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.managersByFarm(farm?.id) });
       toast({ title: "Employee promoted to Farm Manager" });
     },
     onError: (error) => {
@@ -209,7 +210,7 @@ export default function Employees() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["farm-managers", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.managersByFarm(farm?.id) });
       toast({ title: "Farm Manager role removed" });
     },
     onError: (error) => {
@@ -252,7 +253,7 @@ export default function Employees() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.byFarm(farm?.id) });
       setIsAddDialogOpen(false);
       resetForm();
       toast({ title: "Employee added successfully" });
@@ -286,7 +287,7 @@ export default function Employees() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.byFarm(farm?.id) });
       setIsEditDialogOpen(false);
       setSelectedEmployee(null);
       resetForm();
@@ -309,7 +310,7 @@ export default function Employees() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees", farm?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.employees.byFarm(farm?.id) });
       setIsDeleteDialogOpen(false);
       setSelectedEmployee(null);
       toast({ title: "Employee removed successfully" });
@@ -929,7 +930,7 @@ export default function Employees() {
             employeeName={`${selectedEmployee.first_name} ${selectedEmployee.last_name}`}
             farmId={farm.id}
             onSuccess={() => {
-              queryClient.invalidateQueries({ queryKey: ["employees", farm.id] });
+              queryClient.invalidateQueries({ queryKey: queryKeys.employees.byFarm(farm.id) });
             }}
           />
         )}
