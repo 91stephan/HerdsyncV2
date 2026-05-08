@@ -197,18 +197,15 @@ export function useInventory() {
     const item = inventory.find((i) => i.id === id);
     if (!item) return false;
 
-    const newQuantity = item.quantity + quantityToAdd;
     const totalCost = quantityToAdd * costPerUnit;
 
-    const { error } = await supabase
-      .from("inventory")
-      .update({
-        quantity: newQuantity,
-        cost_per_unit: costPerUnit,
-        last_restocked: new Date().toISOString().split("T")[0],
-        supplier: supplier || item.supplier,
-      })
-      .eq("id", id);
+    // Atomic restock — server adds quantity, no read-then-write race
+    const { error } = await supabase.rpc("restock_inventory_item", {
+      _inventory_id: id,
+      _quantity_to_add: quantityToAdd,
+      _cost_per_unit: costPerUnit,
+      _supplier: supplier ?? null,
+    });
 
     if (error) {
       console.error("Error restocking item:", error);
