@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useFarm } from "@/hooks/useFarm";
 import { useToast } from "@/hooks/use-toast";
@@ -43,113 +43,82 @@ export interface FarmEquipment {
 export function useFarmEquipment() {
   const { farm } = useFarm();
   const { toast } = useToast();
-  const [equipment, setEquipment] = useState<FarmEquipment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const queryKey = ["farm-equipment", farm?.id];
 
-  const fetchEquipment = async () => {
-    if (!farm?.id) return;
+  const { data: equipment = [], isLoading: loading, refetch } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (!farm?.id) return [] as FarmEquipment[];
+      const { data, error } = await supabase
+        .from("farm_equipment")
+        .select("*")
+        .eq("farm_id", farm.id)
+        .order("equipment_type", { ascending: true })
+        .order("name", { ascending: true });
+      if (error) throw error;
+      return (data || []) as FarmEquipment[];
+    },
+    enabled: !!farm?.id,
+  });
 
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("farm_equipment")
-      .select("*")
-      .eq("farm_id", farm.id)
-      .order("equipment_type", { ascending: true })
-      .order("name", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching equipment:", error);
-      toast({ title: "Error", description: "Failed to load equipment", variant: "destructive" });
-    } else {
-      setEquipment((data || []) as FarmEquipment[]);
-    }
-    setLoading(false);
-  };
+  const invalidate = () => queryClient.invalidateQueries({ queryKey });
 
   const addEquipment = async (item: Omit<FarmEquipment, "id" | "farm_id" | "created_at" | "updated_at">) => {
     if (!farm?.id) return null;
-
     const { data, error } = await supabase
       .from("farm_equipment")
-      .insert({
-        farm_id: farm.id,
-        ...item,
-      })
+      .insert({ farm_id: farm.id, ...item })
       .select()
       .single();
-
     if (error) {
-      console.error("Error adding equipment:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return null;
     }
-
     toast({ title: "Equipment Added", description: `${item.name} has been added to your equipment.` });
-    await fetchEquipment();
+    invalidate();
     return data;
   };
 
   const updateEquipment = async (id: string, updates: Partial<FarmEquipment>) => {
-    const { error } = await supabase
-      .from("farm_equipment")
-      .update(updates)
-      .eq("id", id);
-
+    const { error } = await supabase.from("farm_equipment").update(updates).eq("id", id);
     if (error) {
-      console.error("Error updating equipment:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return false;
     }
-
     toast({ title: "Equipment Updated", description: "Equipment has been updated." });
-    await fetchEquipment();
+    invalidate();
     return true;
   };
 
   const deleteEquipment = async (id: string) => {
-    const { error } = await supabase
-      .from("farm_equipment")
-      .delete()
-      .eq("id", id);
-
+    const { error } = await supabase.from("farm_equipment").delete().eq("id", id);
     if (error) {
-      console.error("Error deleting equipment:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return false;
     }
-
     toast({ title: "Equipment Deleted", description: "Equipment has been removed." });
-    await fetchEquipment();
+    invalidate();
     return true;
   };
 
-  const getTotalValue = () => {
-    return equipment.reduce((sum, item) => sum + (item.current_value || item.purchase_cost || 0), 0);
-  };
+  const getTotalValue = () =>
+    equipment.reduce((sum, item) => sum + (item.current_value || item.purchase_cost || 0), 0);
 
-  const getEquipmentByType = (type: string) => {
-    return equipment.filter((item) => item.equipment_type === type);
-  };
+  const getEquipmentByType = (type: string) =>
+    equipment.filter((item) => item.equipment_type === type);
 
-  // Get equipment purchased in a specific month (for monthly reports)
-  const getEquipmentPurchasedInMonth = (year: number, month: number) => {
-    return equipment.filter((item) => {
+  const getEquipmentPurchasedInMonth = (year: number, month: number) =>
+    equipment.filter((item) => {
       if (!item.purchase_date) return false;
       const purchaseDate = new Date(item.purchase_date);
       return purchaseDate.getFullYear() === year && purchaseDate.getMonth() === month;
     });
-  };
-
-  useEffect(() => {
-    if (farm?.id) {
-      fetchEquipment();
-    }
-  }, [farm?.id]);
 
   return {
     equipment,
     loading,
-    fetchEquipment,
+    fetchEquipment: refetch,
     addEquipment,
     updateEquipment,
     deleteEquipment,
