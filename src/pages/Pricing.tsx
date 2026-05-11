@@ -405,6 +405,7 @@ export default function Pricing() {
   return (
     <Layout>
       <div className="space-y-8">
+      <Breadcrumbs items={[{ label: "Pricing" }]} />
       {/* Admin Status Banner */}
       {isAdminLocked && (
         <div className="bg-accent/20 border border-accent/30 rounded-xl py-3 px-4">
