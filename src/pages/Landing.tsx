@@ -130,11 +130,12 @@ export default function Landing() {
   const { user, loading } = useAuth();
 
   useSEO({
-    title: "HerdSync - Farm Management Made Simple",
+    title: "Livestock Management Software South Africa | HerdSync",
     description:
-      "South African farm management platform: livestock tracking, feeding, inventory, compliance, and ZAR financial reporting.",
+      "HerdSync is livestock management software built for South African farmers — herd tracking, AIDA compliance, feed costs, and ZAR financial reporting.",
     canonical: "https://herdsync.co.za/",
-    keywords: "farm management, livestock tracking, South Africa, ZAR, compliance, inventory, herd management",
+    keywords:
+      "livestock management software South Africa, herd management app South Africa, farm management software South Africa, cattle management app SA, livestock tracking app South Africa, AIDA, LITS-SA",
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -144,8 +145,13 @@ export default function Landing() {
         operatingSystem: "Web, iOS, Android",
         url: "https://herdsync.co.za",
         description:
-          "Farm management platform for South African livestock farmers — tracking, compliance, inventory, and reporting in ZAR.",
-        offers: { "@type": "Offer", priceCurrency: "ZAR" },
+          "Livestock management software built for South African farmers — herd tracking, AIDA compliance, feeding, inventory, and ZAR financial reporting.",
+        offers: [
+          { "@type": "Offer", name: "Basic", price: "99", priceCurrency: "ZAR" },
+          { "@type": "Offer", name: "Starter", price: "249", priceCurrency: "ZAR" },
+          { "@type": "Offer", name: "Pro", price: "599", priceCurrency: "ZAR" },
+        ],
+        inLanguage: "en-ZA",
       },
       {
         "@context": "https://schema.org",
@@ -153,6 +159,7 @@ export default function Landing() {
         name: "HerdSync",
         url: "https://herdsync.co.za",
         logo: "https://herdsync.co.za/favicon.png",
+        areaServed: { "@type": "Country", name: "South Africa" },
         sameAs: [],
       },
     ],
