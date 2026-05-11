@@ -7,6 +7,7 @@ import { Wheat, ArrowLeft, Loader2 } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { useBlogPosts } from "@/hooks/useBlogPosts";
 import { SEOFooter } from "@/components/SEOFooter";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function Blog() {
   const { data: posts, isLoading } = useBlogPosts();
