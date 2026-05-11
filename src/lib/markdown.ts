@@ -26,6 +26,18 @@ function renderInline(s: string): string {
   return out;
 }
 
+function isTableSeparator(line: string): boolean {
+  // e.g. |---|---|---| or | --- | :---: | ---: |
+  return /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+}
+
+function splitRow(line: string): string[] {
+  let s = line.trim();
+  if (s.startsWith("|")) s = s.slice(1);
+  if (s.endsWith("|")) s = s.slice(0, -1);
+  return s.split("|").map((c) => c.trim());
+}
+
 export function renderMarkdown(input: string): string {
   const lines = escapeHtml(input).split(/\r?\n/);
   const html: string[] = [];
@@ -37,10 +49,50 @@ export function renderMarkdown(input: string): string {
     }
   };
 
-  for (const raw of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
     const line = raw.trimEnd();
     if (!line.trim()) {
       closeList();
+      continue;
+    }
+    // Markdown table: header row, separator row, then body rows
+    if (line.includes("|") && i + 1 < lines.length && isTableSeparator(lines[i + 1])) {
+      closeList();
+      const headers = splitRow(line);
+      i += 1; // skip separator
+      const bodyRows: string[][] = [];
+      while (i + 1 < lines.length && lines[i + 1].includes("|") && lines[i + 1].trim()) {
+        i += 1;
+        bodyRows.push(splitRow(lines[i]));
+      }
+      html.push(
+        '<div class="my-4 overflow-x-auto"><table class="w-full text-sm border-collapse border border-border">',
+      );
+      html.push(
+        "<thead><tr>" +
+          headers
+            .map(
+              (h) =>
+                `<th class="border border-border bg-muted px-3 py-2 text-left font-semibold">${renderInline(h)}</th>`,
+            )
+            .join("") +
+          "</tr></thead>",
+      );
+      html.push("<tbody>");
+      for (const row of bodyRows) {
+        html.push(
+          "<tr>" +
+            row
+              .map(
+                (c) =>
+                  `<td class="border border-border px-3 py-2 align-top">${renderInline(c)}</td>`,
+              )
+              .join("") +
+            "</tr>",
+        );
+      }
+      html.push("</tbody></table></div>");
       continue;
     }
     if (line.startsWith("### ")) {
