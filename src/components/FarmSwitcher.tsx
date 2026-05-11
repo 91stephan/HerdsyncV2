@@ -192,7 +192,7 @@ export function FarmSwitcher() {
           onClick={() => setDialogOpen(true)}
         >
           <Plus className="w-4 h-4 shrink-0" />
-          <span className="flex-1 min-w-0 truncate text-left">Create Your First Farm</span>
+          <span className="flex-1 min-w-0 truncate text-left">Create Farm</span>
         </Button>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
