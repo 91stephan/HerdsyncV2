@@ -70,24 +70,24 @@ const features = [
 
 const testimonials = [
   {
-    name: "Johan van der Merwe",
-    farm: "Karoo Lamb Farm",
-    location: "Northern Cape",
-    quote: "HerdSync has transformed how we manage our 500+ sheep. The compliance features saved us hours during our last audit.",
+    name: "Hendrik Botha",
+    farm: "Doringkloof Boerdery",
+    location: "Eastern Cape",
+    quote: "Switching to HerdSync cut our paperwork in half. Tracking each Bonsmara from birth to sale, and pulling a movement permit in minutes, is exactly what our operation needed.",
     rating: 5,
   },
   {
-    name: "Thandi Nkosi",
-    farm: "Green Valley Dairy",
-    location: "KwaZulu-Natal",
-    quote: "The feeding schedules and health tracking have improved our herd's productivity by 20%. Best investment we've made.",
+    name: "Nomvula Dlamini",
+    farm: "Umthombo Livestock Co-op",
+    location: "Mpumalanga",
+    quote: "Our co-op runs Nguni cattle across three farms and HerdSync keeps every animal, vaccination and chemical record in one place. The Rand-based expense reports make month-end painless.",
     rating: 5,
   },
   {
-    name: "Pieter du Plessis",
-    farm: "Highveld Cattle Ranch",
-    location: "Free State",
-    quote: "Finally, a farm management app built for South African farmers. The UIF and COIDA document tracking is a game-changer.",
+    name: "Riaan Steenkamp",
+    farm: "Vaalrivier Mixed Farming",
+    location: "North West",
+    quote: "The stock theft alerts and SAPS-ready reports have already helped us recover animals twice this season. Built by people who clearly understand SA farming.",
     rating: 5,
   },
 ];
