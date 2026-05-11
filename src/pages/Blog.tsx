@@ -43,7 +43,7 @@ export default function Blog() {
               <Wheat className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
             </div>
             <div>
-              <h1 className="text-lg font-bold font-display">HerdSync</h1>
+              <span className="text-lg font-bold font-display block">HerdSync</span>
               <p className="text-xs text-muted-foreground">Farm Management</p>
             </div>
           </Link>
