@@ -183,7 +183,7 @@ export default function Landing() {
               <Wheat className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold font-display">HerdSync</h1>
+              <span className="text-xl font-bold font-display block">HerdSync</span>
               <p className="text-xs text-muted-foreground hidden sm:block">Farm Management</p>
             </div>
           </div>
