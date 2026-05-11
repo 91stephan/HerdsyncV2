@@ -68,6 +68,7 @@ export default function Contact() {
   return (
     <Layout>
       <div className="space-y-6">
+        <Breadcrumbs items={[{ label: "Contact" }]} />
         <div>
           <h1 className="text-3xl font-bold text-foreground font-display">Contact Us</h1>
           <p className="text-muted-foreground mt-1">
