@@ -14,19 +14,16 @@ export default function BlogPost() {
   const { data: post, isLoading } = useBlogPost(slug);
   const { data: allPosts } = useBlogPosts();
 
-  useSEO({
-    title: post?.title ?? "Blog post",
-    description: post?.excerpt,
-    canonical: slug ? `https://herdsync.co.za/blog/${slug}` : undefined,
-    image: post?.cover_image_url ?? undefined,
-    type: "article",
-    keywords: post?.tags?.join(", "),
-    jsonLd: post
-      ? {
+  // Build JSON-LD: always include the BlogPosting Article schema; if the post
+  // exposes FAQ-style Q&A pairs, also emit FAQPage schema so Google can show
+  // the rich-result accordion for "People Also Ask" queries.
+  const jsonLd = post
+    ? (() => {
+        const article = {
           "@context": "https://schema.org",
           "@type": "BlogPosting",
           headline: post.title,
-          description: post.excerpt,
+          description: post.seo_description ?? post.excerpt,
           image: post.cover_image_url ?? "https://herdsync.co.za/favicon.png",
           datePublished: post.published_at,
           dateModified: post.published_at,
@@ -37,8 +34,39 @@ export default function BlogPost() {
             logo: { "@type": "ImageObject", url: "https://herdsync.co.za/favicon.png" },
           },
           mainEntityOfPage: `https://herdsync.co.za/blog/${post.slug}`,
+          keywords: post.primary_keyword
+            ? [post.primary_keyword, ...(post.tags ?? [])].join(", ")
+            : (post.tags ?? []).join(", "),
+          inLanguage: "en-ZA",
+        };
+        if (post.faqs && post.faqs.length > 0) {
+          return [
+            article,
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: post.faqs.map((f) => ({
+                "@type": "Question",
+                name: f.question,
+                acceptedAnswer: { "@type": "Answer", text: f.answer },
+              })),
+            },
+          ];
         }
-      : undefined,
+        return article;
+      })()
+    : undefined;
+
+  useSEO({
+    title: post?.seo_title ?? post?.title ?? "Blog post",
+    description: post?.seo_description ?? post?.excerpt,
+    canonical: slug ? `https://herdsync.co.za/blog/${slug}` : undefined,
+    image: post?.cover_image_url ?? undefined,
+    type: "article",
+    keywords: post?.primary_keyword
+      ? [post.primary_keyword, ...(post?.tags ?? [])].join(", ")
+      : post?.tags?.join(", "),
+    jsonLd,
   });
 
   if (isLoading) {
