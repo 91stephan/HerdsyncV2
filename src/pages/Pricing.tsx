@@ -709,6 +709,23 @@ export default function Pricing() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="py-8" id="faq" aria-labelledby="faq-heading">
+        <div className="max-w-3xl mx-auto">
+          <h2 id="faq-heading" className="text-2xl lg:text-3xl font-bold font-display text-center mb-8">
+            Frequently Asked Questions
+          </h2>
+          <Accordion type="single" collapsible className="w-full bg-card/60 backdrop-blur-sm rounded-xl px-4">
+            {faqs.map((f, i) => (
+              <AccordionItem key={f.question} value={`faq-${i}`}>
+                <AccordionTrigger className="text-left">{f.question}</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">{f.answer}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-8">
         <div className="text-center">
