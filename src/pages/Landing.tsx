@@ -238,13 +238,13 @@ export default function Landing() {
               🌾 Built for South African Farmers
             </Badge>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
-              Manage Your Farm
-              <span className="text-primary block">Like Never Before</span>
+              Livestock Management Software
+              <span className="text-primary block">for South African Farmers</span>
             </h1>
             <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              The complete farm management solution with livestock tracking, SA compliance 
-              documentation, real-time market insights, and everything you need to run 
-              a successful farming operation.
+              Built for South African farmers and compliant with the Animal Identification Act —
+              herd tracking, feeding, AIDA-ready stock registers, real-time market insights and
+              ZAR financial reporting in one place.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button 
