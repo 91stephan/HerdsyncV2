@@ -2,15 +2,19 @@ import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target, Users, Award, Heart } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function About() {
   useSEO({
     title: "About HerdSync",
-    description: "Learn about HerdSync, the South African farm management platform empowering livestock farmers.",
+    description:
+      "Learn about HerdSync, the South African farm management platform empowering livestock farmers with AIDA-ready compliance and ZAR reporting.",
+    canonical: "https://herdsync.co.za/about",
   });
   return (
     <Layout>
       <div className="space-y-8">
+        <Breadcrumbs items={[{ label: "About" }]} />
         <div>
           <h1 className="text-3xl font-bold text-foreground font-display">About HerdSync</h1>
           <p className="text-muted-foreground mt-1">
