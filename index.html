@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>Livestock Management Software South Africa | HerdSync</title>
-    <meta name="description" content="HerdSync is livestock management software built for South African farmers, herd tracking, AIDA compliance, feed costs and audit-ready records." />
-    <meta name="author" content="HerdSync" />
+    <meta name="description" content="HerdSync is livestock management software built for South African farmers - herd tracking, AIDA compliance, feed costs and audit-ready records in ZAR." />
+    <meta name="author" content="Mathys Van Heerden" />
     <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#2d5016" />
+    <meta name="keywords" content="livestock management South Africa, farm management software, herd tracking, AIDA compliance, cattle records, sheep tracking, feed cost calculator, ZAR farm software, smallholder farm app" />
 
     <!-- Geo targeting (South Africa, Gauteng / Krugersdorp) -->
     <meta name="geo.region" content="ZA-GT" />
@@ -16,20 +17,25 @@
     <meta name="geo.position" content="-26.0853;27.7763" />
     <meta name="ICBM" content="-26.0853, 27.7763" />
 
-    <meta property="og:title" content="Livestock Management Software South Africa | HerdSync" />
-    <meta property="og:description" content="Herd tracking, AIDA compliance, feed cost control and audit-ready records, built for South African livestock farmers." />
+    <!-- Open Graph -->
+    <meta property="og:title" content="HerdSync — Livestock & Farm Management for South African Farmers" />
+    <meta property="og:description" content="Herd tracking, AIDA compliance, feed cost control and audit-ready records, built for South African livestock farmers. From R99/month." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="HerdSync" />
     <meta property="og:url" content="https://herdsync.co.za" />
-    <meta property="og:image" content="https://herdsync.co.za/favicon.png" />
+    <meta property="og:image" content="https://herdsync.co.za/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="HerdSync — Livestock and Farm Management for South African Farmers" />
     <meta property="og:locale" content="en_ZA" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@HerdSync" />
-    <meta name="twitter:title" content="HerdSync - Farm Management Made Simple" />
-    <meta name="twitter:description" content="Comprehensive farm management platform for livestock tracking, inventory, compliance, and reporting." />
-    <meta name="twitter:image" content="https://herdsync.co.za/favicon.png" />
-    
+    <meta name="twitter:title" content="HerdSync — Livestock Management Software South Africa" />
+    <meta name="twitter:description" content="Herd tracking, AIDA compliance, feed costs and audit-ready records in ZAR. 14-day free trial." />
+    <meta name="twitter:image" content="https://herdsync.co.za/og-image.png" />
+
     <link rel="canonical" href="https://herdsync.co.za" />
 
     <!-- Google Analytics 4 -->
@@ -41,39 +47,178 @@
       gtag('config', 'G-TMK6R8G8KT', { send_page_view: true });
     </script>
 
-    <!-- Global Organization + WebSite SearchAction JSON-LD -->
+    <!-- Organization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "https://herdsync.co.za/#org",
-          "name": "HerdSync",
-          "url": "https://herdsync.co.za",
-          "logo": "https://herdsync.co.za/favicon.png",
-          "email": "syncherd@gmail.com",
-          "telephone": "+27-78-318-6923",
-          "areaServed": { "@type": "Country", "name": "South Africa" },
-          "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Krugersdorp",
-            "addressRegion": "Gauteng",
-            "addressCountry": "ZA"
+      "@type": "Organization",
+      "@id": "https://herdsync.co.za/#org",
+      "name": "HerdSync",
+      "url": "https://herdsync.co.za",
+      "logo": "https://herdsync.co.za/favicon.png",
+      "image": "https://herdsync.co.za/og-image.png",
+      "email": "syncherd@gmail.com",
+      "telephone": "+27-78-318-6923",
+      "founder": {
+        "@type": "Person",
+        "name": "Mathys Van Heerden",
+        "jobTitle": "Founder",
+        "nationality": "South African"
+      },
+      "areaServed": { "@type": "Country", "name": "South Africa" },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Krugersdorp",
+        "addressRegion": "Gauteng",
+        "addressCountry": "ZA"
+      },
+      "sameAs": []
+    }
+    </script>
+
+    <!-- WebSite + SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://herdsync.co.za/#website",
+      "url": "https://herdsync.co.za",
+      "name": "HerdSync",
+      "publisher": { "@id": "https://herdsync.co.za/#org" },
+      "inLanguage": "en-ZA",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://herdsync.co.za/blog?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "HerdSync",
+      "operatingSystem": "Web, iOS, Android",
+      "applicationCategory": "BusinessApplication",
+      "applicationSubCategory": "Farm & Livestock Management",
+      "url": "https://herdsync.co.za",
+      "image": "https://herdsync.co.za/og-image.png",
+      "description": "Cloud and mobile livestock management for South African farmers — animal tracking, feeding schedules, health records, AIDA compliance, inventory, market prices and audit-ready PDF reports in ZAR.",
+      "publisher": { "@id": "https://herdsync.co.za/#org" },
+      "offers": [
+        { "@type": "Offer", "name": "Basic", "price": "99", "priceCurrency": "ZAR", "url": "https://herdsync.co.za/pricing", "availability": "https://schema.org/InStock", "category": "subscription" },
+        { "@type": "Offer", "name": "Starter", "price": "249", "priceCurrency": "ZAR", "url": "https://herdsync.co.za/pricing", "availability": "https://schema.org/InStock", "category": "subscription" },
+        { "@type": "Offer", "name": "Pro", "price": "599", "priceCurrency": "ZAR", "url": "https://herdsync.co.za/pricing", "availability": "https://schema.org/InStock", "category": "subscription" }
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "27",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    }
+    </script>
+
+    <!-- Product + Offers (pricing tiers) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "HerdSync Subscription",
+      "brand": { "@id": "https://herdsync.co.za/#org" },
+      "description": "Subscription plans for HerdSync livestock and farm management software, billed monthly in South African Rand.",
+      "image": "https://herdsync.co.za/og-image.png",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "ZAR",
+        "lowPrice": "99",
+        "highPrice": "599",
+        "offerCount": "3",
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Basic - up to 80 animals",
+            "price": "99",
+            "priceCurrency": "ZAR",
+            "url": "https://herdsync.co.za/pricing",
+            "availability": "https://schema.org/InStock"
           },
-          "sameAs": []
+          {
+            "@type": "Offer",
+            "name": "Starter - includes market prices",
+            "price": "249",
+            "priceCurrency": "ZAR",
+            "url": "https://herdsync.co.za/pricing",
+            "availability": "https://schema.org/InStock"
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro - unlimited animals, RFID option",
+            "price": "599",
+            "priceCurrency": "ZAR",
+            "url": "https://herdsync.co.za/pricing",
+            "availability": "https://schema.org/InStock"
+          }
+        ]
+      }
+    }
+    </script>
+
+    <!-- FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is HerdSync?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HerdSync is a cloud and mobile livestock management platform built for South African farmers. It handles animal tracking, feeding schedules, health and vaccination records, AIDA compliance, inventory, market prices and audit-ready PDF reports — all priced and reported in South African Rand (ZAR)."
+          }
         },
         {
-          "@type": "WebSite",
-          "@id": "https://herdsync.co.za/#website",
-          "url": "https://herdsync.co.za",
-          "name": "HerdSync",
-          "publisher": { "@id": "https://herdsync.co.za/#org" },
-          "inLanguage": "en-ZA",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://herdsync.co.za/blog?q={search_term_string}",
-            "query-input": "required name=search_term_string"
+          "@type": "Question",
+          "name": "How much does HerdSync cost?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HerdSync starts at R99/month for the Basic plan (up to 80 animals), R249/month for Starter (includes market prices), and R599/month for Pro (unlimited animals, with optional RFID tracking). Every account includes a 14-day free trial of the Starter plan with no credit card required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does HerdSync support South African compliance requirements?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. HerdSync includes AIDA-aligned animal identification records, Labour and OHS checklists, animal-linked chemical and remedy tracking, document vaults and an Audit Pack Builder that generates compliance-ready PDFs for inspections."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What payment methods does HerdSync accept?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HerdSync accepts Yoco (South African card payments, EFT, SnapScan, Zapper, Apple Pay, Google Pay) and PayPal. All subscriptions are billed monthly in ZAR."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a mobile app?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. HerdSync is available as a native iOS and Android app (built with Capacitor) in addition to the web platform, so you can manage your herd from the field."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who built HerdSync?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "HerdSync was founded by Mathys Van Heerden, a South African farmer-builder based in Krugersdorp, Gauteng, to solve the day-to-day record-keeping and compliance pain felt by local livestock producers."
           }
         }
       ]
@@ -83,21 +228,88 @@
 
   <body>
     <div id="root"></div>
+
     <!--
-      Facebook Pixel <noscript> fallback. The Pixel script itself is loaded
-      conditionally from src/lib/fbPixel.ts when VITE_FB_PIXEL_ID is set.
-      To enable: add VITE_FB_PIXEL_ID=<your numeric pixel id> to env, then
-      replace YOUR_PIXEL_ID below with the same value before deploying.
+      Static, crawler-visible marketing block. JS-enabled visitors never see
+      this (React mounts in #root and noscript is hidden); AI engines and
+      non-JS crawlers read it as the canonical page content for HerdSync.
     -->
     <noscript>
-      <img
-        height="1"
-        width="1"
-        style="display:none"
-        alt=""
-        src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1"
-      />
+      <header>
+        <h1>HerdSync — Livestock &amp; Farm Management Software for South African Farmers</h1>
+        <p>
+          HerdSync is the all-in-one livestock and farm management platform built
+          specifically for South African farmers. Track every animal, schedule
+          feeding, log health and vaccinations, control feed costs in ZAR, stay
+          AIDA-compliant and produce audit-ready reports — from your phone or
+          desktop.
+        </p>
+        <p>
+          <a href="/auth">Start your 14-day free trial</a> ·
+          <a href="/pricing">See pricing in ZAR</a> ·
+          <a href="/about">About HerdSync</a> ·
+          <a href="/contact">Contact</a> ·
+          <a href="/blog">Farming blog</a>
+        </p>
+      </header>
+
+      <section>
+        <h2>What HerdSync does</h2>
+        <ul>
+          <li><strong>Livestock management</strong> — domestic and wild game records, automatic age calculation, soft-remove workflow that preserves your herd history.</li>
+          <li><strong>Feeding schedules</strong> — animal-specific feed plans mapped directly to livestock IDs, with daily, weekly and monthly cost roll-ups.</li>
+          <li><strong>Health &amp; vaccinations</strong> — per-animal medical records, vaccination tracking and treatment history.</li>
+          <li><strong>RFID livestock tracking</strong> — checkpoint-based RFID/Arduino integration via Supabase webhooks for real-time animal location.</li>
+          <li><strong>Inventory &amp; equipment</strong> — multi-category tracking of feed, chemicals, equipment and consumables with low-stock alerts.</li>
+          <li><strong>Chemicals &amp; remedies</strong> — animal-linked chemical usage logs that satisfy South African residue and traceability requirements.</li>
+          <li><strong>Farm expenses</strong> — operating cost tracking with receipt uploads and automatic inventory linking.</li>
+          <li><strong>Animal sales</strong> — single-page sale workflow with voetstoots clause and PDF receipts.</li>
+          <li><strong>AIDA &amp; SA compliance</strong> — Labour and OHS checklists, document vault, and an Audit Pack Builder that produces inspection-ready PDFs.</li>
+          <li><strong>Market prices</strong> — South African agricultural commodity prices and trends for cattle, sheep, grain and produce.</li>
+          <li><strong>Reports &amp; analytics</strong> — PDF cost analysis, livestock statistics and month-specific equipment reports, all in ZAR.</li>
+          <li><strong>Employee management</strong> — Manager and Employee roles with daily task tracking and 7-day missed-task alerts.</li>
+          <li><strong>Ask a Pro AI assistant</strong> — multimodal Gemini-powered farming assistant for instant answers on disease, breeds and best practice.</li>
+          <li><strong>Native mobile apps</strong> — iOS and Android apps via Capacitor for field-ready use.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Pricing in South African Rand</h2>
+        <p>Simple, transparent monthly pricing in ZAR. 14-day free trial of the Starter plan, no credit card required.</p>
+        <ul>
+          <li><strong>Basic — R99/month</strong>: Up to 80 animals. Core livestock, feeding, health, inventory and reports. Ideal for smallholders, hobby farms and emerging commercial operations.</li>
+          <li><strong>Starter — R249/month</strong>: Everything in Basic plus market prices, expanded animal capacity and full compliance tools.</li>
+          <li><strong>Pro — R599/month</strong>: Unlimited animals, full RFID tracking option (+ hardware), employee management and priority support. Web-based or RFID package.</li>
+        </ul>
+        <p><a href="/pricing">View full pricing and plan comparison →</a></p>
+      </section>
+
+      <section>
+        <h2>Built by a South African farmer</h2>
+        <p>
+          HerdSync is founded and built by <strong>Mathys Van Heerden</strong>, based in
+          Krugersdorp, Gauteng. It was created in direct response to the
+          day-to-day record-keeping, compliance and cost-control challenges
+          faced by South African livestock producers — from smallholder
+          herders to commercial cattle, sheep and game farms.
+        </p>
+        <p>
+          Contact: <a href="mailto:syncherd@gmail.com">syncherd@gmail.com</a> ·
+          <a href="tel:+27783186923">+27 78 318 6923</a>
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          <a href="/terms">Terms</a> ·
+          <a href="/privacy-policy">Privacy Policy</a> ·
+          <a href="/disclaimer">Disclaimer</a> ·
+          <a href="/delete-account">Delete Account</a>
+        </p>
+        <p>By Mathys Van Heerden, founder of HerdSync. © HerdSync, South Africa.</p>
+      </footer>
     </noscript>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
