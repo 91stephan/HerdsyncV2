@@ -23,7 +23,7 @@ function classify(img: HTMLImageElement): AltIssue["reason"] | null {
   const trimmed = alt.trim();
   if (trimmed === "") {
     // Empty alt is *valid* for decorative imagery, but most of ours shouldn't
-    // be decorative — flag for review without blocking.
+    // be decorative, flag for review without blocking.
     return "empty";
   }
   if (FILENAME_LIKE.test(trimmed)) return "filename-only";
@@ -50,7 +50,7 @@ export function scanCurrentPageForAltIssues(): AltIssue[] {
 let observer: MutationObserver | null = null;
 const warnedSrcs = new Set<string>();
 
-/** Dev-only — install a MutationObserver that warns about new alt-less images. */
+/** Dev-only, install a MutationObserver that warns about new alt-less images. */
 export function installAltTextDevWatcher(): void {
   if (!import.meta.env.DEV || typeof document === "undefined" || observer) return;
 

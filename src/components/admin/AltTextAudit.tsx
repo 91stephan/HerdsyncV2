@@ -22,7 +22,7 @@ export function AltTextAudit() {
     // Fetch each public route's HTML and parse for <img> tags. This catches
     // server-rendered or static images (e.g. favicons, OG fallbacks). Note:
     // SPA routes that render images via JS will be best-checked from the live
-    // page itself — that's why we include the in-page scan above.
+    // page itself, that's why we include the in-page scan above.
     await Promise.all(PUBLIC_ROUTES.map(async (route) => {
       try {
         const res = await fetch(route, { headers: { Accept: "text/html" } });

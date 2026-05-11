@@ -48,11 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await supabase.auth.signOut();
     } catch (e) {
-      // ignore — proceed to clear local state regardless
+      // ignore, proceed to clear local state regardless
     }
     setUser(null);
     setSession(null);
-    // Replace, don't push — and full URL replace clears any in-memory state cleanly
+    // Replace, don't push, and full URL replace clears any in-memory state cleanly
     window.location.replace("/");
   };
 

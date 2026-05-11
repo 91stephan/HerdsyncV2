@@ -132,7 +132,7 @@ export default function Landing() {
   useSEO({
     title: "Livestock Management Software South Africa | HerdSync",
     description:
-      "HerdSync is livestock management software built for South African farmers — herd tracking, AIDA compliance, feed costs, and ZAR financial reporting.",
+      "HerdSync is livestock management software built for South African farmers, herd tracking, AIDA compliance, feed costs, and ZAR financial reporting.",
     canonical: "https://herdsync.co.za/",
     keywords:
       "livestock management software South Africa, herd management app South Africa, farm management software South Africa, cattle management app SA, livestock tracking app South Africa, AIDA, LITS-SA",
@@ -145,7 +145,7 @@ export default function Landing() {
         operatingSystem: "Web, iOS, Android",
         url: "https://herdsync.co.za",
         description:
-          "Livestock management software built for South African farmers — herd tracking, AIDA compliance, feeding, inventory, and ZAR financial reporting.",
+          "Livestock management software built for South African farmers, herd tracking, AIDA compliance, feeding, inventory, and ZAR financial reporting.",
         offers: [
           { "@type": "Offer", name: "Basic", price: "99", priceCurrency: "ZAR" },
           { "@type": "Offer", name: "Starter", price: "249", priceCurrency: "ZAR" },
@@ -242,7 +242,7 @@ export default function Landing() {
               <span className="text-primary block">for South African Farmers</span>
             </h1>
             <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Built for South African farmers and compliant with the Animal Identification Act —
+              Built for South African farmers and compliant with the Animal Identification Act , 
               herd tracking, feeding, AIDA-ready stock registers, real-time market insights and
               ZAR financial reporting in one place.
             </p>

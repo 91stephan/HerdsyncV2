@@ -8,7 +8,7 @@ interface SEOOptions {
   image?: string;
   /** Open Graph type: website (default), article, profile, etc. */
   type?: "website" | "article" | "profile";
-  /** Comma-separated keywords. Optional — most engines ignore this, but it doesn't hurt. */
+  /** Comma-separated keywords. Optional, most engines ignore this, but it doesn't hurt. */
   keywords?: string;
   /** Set to true on auth/internal pages we don't want indexed. */
   noindex?: boolean;

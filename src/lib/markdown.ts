@@ -1,5 +1,5 @@
 // Tiny, dependency-free markdown renderer for blog posts. We deliberately
-// keep this minimal — full markdown support would mean adding a parser dep.
+// keep this minimal, full markdown support would mean adding a parser dep.
 // Supports: ## headings, ### headings, paragraphs, bullet lists, [text](url)
 // links, **bold**, and *italic*. Output is HTML-safe (escapes input first).
 

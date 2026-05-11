@@ -171,7 +171,7 @@ export function BlogManager() {
                 <Textarea rows={2} value={editing.excerpt ?? ""} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} maxLength={300} />
               </div>
               <div>
-                <Label>Content (Markdown — `## H2`, `### H3`, `- bullets`, `[link](/path)`, **bold**)</Label>
+                <Label>Content (Markdown, `## H2`, `### H3`, `- bullets`, `[link](/path)`, **bold**)</Label>
                 <Textarea rows={14} value={editing.content ?? ""} onChange={(e) => setEditing({ ...editing, content: e.target.value })} className="font-mono text-sm" />
               </div>
               <div className="grid grid-cols-2 gap-3">

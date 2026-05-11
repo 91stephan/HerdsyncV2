@@ -201,7 +201,7 @@ export function useExpensesPdf() {
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(100, 100, 100);
-      doc.text(`${data.farmName} — Confidential`, 14, pageH - 10);
+      doc.text(`${data.farmName}, Confidential`, 14, pageH - 10);
       doc.text(`Page ${i} of ${pageCount}`, pageWidth - 14, pageH - 10, { align: "right" });
       doc.setTextColor(0, 0, 0);
     }

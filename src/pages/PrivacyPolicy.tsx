@@ -6,7 +6,7 @@ import { useSEO } from "@/hooks/useSEO";
 export default function PrivacyPolicy() {
   useSEO({
     title: "Privacy Policy",
-    description: "How HerdSync collects, stores, and protects your farm data — POPIA and GDPR compliant.",
+    description: "How HerdSync collects, stores, and protects your farm data, POPIA and GDPR compliant.",
     canonical: "https://herdsync.co.za/privacy-policy",
   });
   return (

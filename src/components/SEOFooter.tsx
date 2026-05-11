@@ -23,7 +23,7 @@ export function SEOFooter() {
               </div>
             </div>
             <p className="text-sm text-muted-foreground">
-              Comprehensive farm management built for South African farmers — livestock, compliance, and reporting in one place.
+              Comprehensive farm management built for South African farmers, livestock, compliance, and reporting in one place.
             </p>
           </div>
           <nav aria-label="Product">

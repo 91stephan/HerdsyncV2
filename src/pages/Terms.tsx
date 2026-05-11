@@ -5,7 +5,7 @@ import { useSEO } from "@/hooks/useSEO";
 export default function Terms() {
   useSEO({
     title: "Terms of Service",
-    description: "HerdSync Terms of Service — the rules for using our farm management platform, payments, and acceptable use in South Africa.",
+    description: "HerdSync Terms of Service, the rules for using our farm management platform, payments, and acceptable use in South Africa.",
     canonical: "https://herdsync.co.za/terms",
   });
   return (

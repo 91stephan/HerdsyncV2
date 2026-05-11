@@ -491,7 +491,7 @@ interface SubscriptionWithFarm {
                               </TableCell>
                               <TableCell>
                                 {u.farms.length === 0 ? (
-                                   <span className="text-muted-foreground text-xs">—</span>
+                                   <span className="text-muted-foreground text-xs">-</span>
                                 ) : (
                                    <span className="text-sm truncate block max-w-[120px]" title={u.farms.map(f => f.name).join(", ")}>
                                      {u.farms[0].name}{u.farms.length > 1 && ` +${u.farms.length - 1}`}
@@ -514,7 +514,7 @@ interface SubscriptionWithFarm {
                               </TableCell>
                                <TableCell>
                                  {u.subscriptions.length === 0 ? (
-                                    <span className="text-muted-foreground text-xs">—</span>
+                                    <span className="text-muted-foreground text-xs">-</span>
                                  ) : (
                                     <div className="flex flex-col gap-0.5">
                                       {getStatusBadge(u.subscriptions[0].status)}
@@ -548,7 +548,7 @@ interface SubscriptionWithFarm {
                                      <DialogHeader>
                                        <DialogTitle>Manage User Subscription</DialogTitle>
                                        <DialogDescription>
-                                         {u.email} — {u.subscriptions[0]?.farm_name}
+                                         {u.email}, {u.subscriptions[0]?.farm_name}
                                        </DialogDescription>
                                      </DialogHeader>
                                      
@@ -602,7 +602,7 @@ interface SubscriptionWithFarm {
                                    </DialogContent>
                                  </Dialog>
                                 ) : (
-                                  <span className="text-muted-foreground text-xs">—</span>
+                                  <span className="text-muted-foreground text-xs">-</span>
                                )}
                              </TableCell>
                            </TableRow>
@@ -680,7 +680,7 @@ interface SubscriptionWithFarm {
                                   </TableCell>
                                   <TableCell>
                                     {u.farms.length === 0 ? (
-                                      <span className="text-muted-foreground text-xs">—</span>
+                                      <span className="text-muted-foreground text-xs">-</span>
                                     ) : (
                                       <span className="text-sm truncate block max-w-[120px]" title={u.farms.map(f => f.name).join(", ")}>
                                         {u.farms[0].name}
@@ -759,7 +759,7 @@ interface SubscriptionWithFarm {
                                   {sub.payment_provider}
                                 </Badge>
                               ) : (
-                                <span className="text-muted-foreground text-xs">—</span>
+                                <span className="text-muted-foreground text-xs">-</span>
                               )}
                             </TableCell>
                           <TableCell className="text-sm">

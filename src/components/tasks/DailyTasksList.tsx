@@ -58,7 +58,7 @@ export function DailyTasksList({
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <RotateCcw className="h-5 w-5 text-primary" />
-              Daily Tasks — {format(new Date(), "MMM d, yyyy")}
+              Daily Tasks, {format(new Date(), "MMM d, yyyy")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">

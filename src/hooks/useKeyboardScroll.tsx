@@ -31,7 +31,7 @@ export function useKeyboardScroll() {
           showHandler.remove();
         };
       } catch (e) {
-        // Plugin not installed in this build — silently ignore.
+        // Plugin not installed in this build, silently ignore.
       }
     })();
 
