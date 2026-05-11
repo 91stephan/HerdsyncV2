@@ -8,6 +8,7 @@ import { useSEO } from "@/hooks/useSEO";
 import { useBlogPost, useBlogPosts } from "@/hooks/useBlogPosts";
 import { renderMarkdown } from "@/lib/markdown";
 import { SEOFooter } from "@/components/SEOFooter";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
@@ -100,6 +101,7 @@ export default function BlogPost() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-10 max-w-3xl">
+        <Breadcrumbs items={[{ label: "Blog", to: "/blog" }, { label: post.title }]} />
         <article>
           <div className="flex flex-wrap gap-2 mb-4">
             {post.tags.map((t) => (

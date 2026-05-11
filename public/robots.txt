@@ -1,7 +1,41 @@
 User-agent: *
 Allow: /
+Allow: /about
+Allow: /pricing
+Allow: /contact
 Allow: /blog
 Allow: /blog/
+Allow: /terms
+Allow: /privacy-policy
+Allow: /disclaimer
+
+# Authenticated / private app routes — do not index
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /livestock
+Disallow: /feeding
+Disallow: /inventory
+Disallow: /health
+Disallow: /reports
+Disallow: /tracking
+Disallow: /market
+Disallow: /compliance
+Disallow: /compliance/
+Disallow: /employees
+Disallow: /employee-tasks
+Disallow: /animal-sale
+Disallow: /expenses
+Disallow: /ask-a-pro
+Disallow: /settings
+Disallow: /audit
+Disallow: /reset-password
+Disallow: /trial-expired
+Disallow: /delete-account
+Disallow: /auth
+
+# Allow major search & social crawlers full access to public pages
+User-agent: Googlebot
+Allow: /
 Disallow: /admin
 Disallow: /dashboard
 Disallow: /livestock
@@ -18,16 +52,11 @@ Disallow: /animal-sale
 Disallow: /expenses
 Disallow: /ask-a-pro
 Disallow: /settings
+Disallow: /audit
 Disallow: /reset-password
 Disallow: /trial-expired
 Disallow: /delete-account
-
-# Allow major search & social crawlers full access to public pages
-User-agent: Googlebot
-Allow: /
-Disallow: /admin
-Disallow: /dashboard
-Disallow: /settings
+Disallow: /auth
 
 User-agent: Bingbot
 Allow: /

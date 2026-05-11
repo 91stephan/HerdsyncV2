@@ -8,8 +8,32 @@ import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSEO } from "@/hooks/useSEO";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function Contact() {
+  useSEO({
+    title: "Contact HerdSync",
+    description:
+      "Contact the HerdSync team for support, sales, or partnership enquiries. South African livestock management software based in Krugersdorp, Gauteng.",
+    canonical: "https://herdsync.co.za/contact",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      url: "https://herdsync.co.za/contact",
+      mainEntity: {
+        "@type": "Organization",
+        name: "HerdSync",
+        email: "syncherd@gmail.com",
+        telephone: "+27-78-318-6923",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Krugersdorp",
+          addressRegion: "Gauteng",
+          addressCountry: "ZA",
+        },
+      },
+    },
+  });
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,6 +68,7 @@ export default function Contact() {
   return (
     <Layout>
       <div className="space-y-6">
+        <Breadcrumbs items={[{ label: "Contact" }]} />
         <div>
           <h1 className="text-3xl font-bold text-foreground font-display">Contact Us</h1>
           <p className="text-muted-foreground mt-1">

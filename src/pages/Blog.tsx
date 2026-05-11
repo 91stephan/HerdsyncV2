@@ -7,6 +7,7 @@ import { Wheat, ArrowLeft, Loader2 } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { useBlogPosts } from "@/hooks/useBlogPosts";
 import { SEOFooter } from "@/components/SEOFooter";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function Blog() {
   const { data: posts, isLoading } = useBlogPosts();
@@ -54,6 +55,7 @@ export default function Blog() {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-10 max-w-5xl">
+        <Breadcrumbs items={[{ label: "Blog" }]} />
         <div className="mb-10">
           <h1 className="text-4xl md:text-5xl font-bold font-display text-foreground mb-3">
             HerdSync Blog

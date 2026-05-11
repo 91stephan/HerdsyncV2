@@ -10,12 +10,19 @@
     <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#2d5016" />
 
+    <!-- Geo targeting (South Africa, Gauteng / Krugersdorp) -->
+    <meta name="geo.region" content="ZA-GT" />
+    <meta name="geo.placename" content="Krugersdorp" />
+    <meta name="geo.position" content="-26.0853;27.7763" />
+    <meta name="ICBM" content="-26.0853, 27.7763" />
+
     <meta property="og:title" content="Livestock Management Software South Africa | HerdSync" />
     <meta property="og:description" content="Herd tracking, AIDA compliance, feed cost control and audit-ready records, built for South African livestock farmers." />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="HerdSync" />
     <meta property="og:url" content="https://herdsync.co.za" />
     <meta property="og:image" content="https://herdsync.co.za/favicon.png" />
+    <meta property="og:locale" content="en_ZA" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@HerdSync" />
@@ -33,6 +40,45 @@
       gtag('js', new Date());
       gtag('config', 'G-TMK6R8G8KT', { send_page_view: true });
     </script>
+
+    <!-- Global Organization + WebSite SearchAction JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://herdsync.co.za/#org",
+          "name": "HerdSync",
+          "url": "https://herdsync.co.za",
+          "logo": "https://herdsync.co.za/favicon.png",
+          "email": "syncherd@gmail.com",
+          "telephone": "+27-78-318-6923",
+          "areaServed": { "@type": "Country", "name": "South Africa" },
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Krugersdorp",
+            "addressRegion": "Gauteng",
+            "addressCountry": "ZA"
+          },
+          "sameAs": []
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://herdsync.co.za/#website",
+          "url": "https://herdsync.co.za",
+          "name": "HerdSync",
+          "publisher": { "@id": "https://herdsync.co.za/#org" },
+          "inLanguage": "en-ZA",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://herdsync.co.za/blog?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+  
   </head>
 
   <body>

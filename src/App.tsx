@@ -17,6 +17,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageSkeleton } from "@/components/PageSkeleton";
 import { RouteTracker } from "@/components/RouteTracker";
+import { RobotsGuard } from "@/components/RobotsGuard";
 import Landing from "./pages/Landing";
 import { AdminProvider } from "@/hooks/useAdmin";
 
@@ -148,6 +149,7 @@ const App = () => (
                   </Routes>
                 </Suspense>
                 <RouteTracker />
+                <RobotsGuard />
                 <SupportChat />
                 <CookieConsent />
                 <AndroidBackButtonHandler />
