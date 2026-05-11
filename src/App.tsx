@@ -149,6 +149,7 @@ const App = () => (
                   </Routes>
                 </Suspense>
                 <RouteTracker />
+                <RobotsGuard />
                 <SupportChat />
                 <CookieConsent />
                 <AndroidBackButtonHandler />
