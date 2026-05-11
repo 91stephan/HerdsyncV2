@@ -12,11 +12,11 @@ export default function Blog() {
   const { data: posts, isLoading } = useBlogPosts();
 
   useSEO({
-    title: "HerdSync Blog — Farming Insights for South African Farmers",
+    title: "Farm Management Blog for South African Livestock Farmers",
     description:
-      "Practical guides on livestock tracking, compliance, feed cost control, and farm management — written for South African producers.",
+      "Practical guides on livestock tracking, AIDA compliance, feed cost control and herd management — written for South African producers.",
     canonical: "https://herdsync.co.za/blog",
-    keywords: "south african farming, livestock tracking, farm compliance, feed cost, herd management",
+    keywords: "livestock management software South Africa, AIDA, livestock tracking, farm compliance, feed cost, herd management",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "Blog",
