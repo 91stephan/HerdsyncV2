@@ -143,10 +143,98 @@ const pricingTiers = [
   },
 ];
 
+const faqs = [
+  {
+    question: "Is HerdSync POPIA compliant?",
+    answer:
+      "Yes. HerdSync is fully POPIA and GDPR compliant. Your farm data is stored securely in encrypted databases, never sold or shared, and you can export or delete your data at any time from Settings.",
+  },
+  {
+    question: "Does HerdSync work offline?",
+    answer:
+      "The web app requires an internet connection. The native iOS and Android apps cache recent data so you can view animals and records offline; new entries sync automatically when you reconnect.",
+  },
+  {
+    question: "Can I import my existing animals from a CSV?",
+    answer:
+      "Yes. The Livestock page includes a CSV import wizard that accepts standard columns (tag, species, breed, sex, date of birth, weight). Our AI mapper also handles non-standard column names automatically.",
+  },
+  {
+    question: "What payment methods are supported?",
+    answer:
+      "We accept Yoco (South African card payments, EFT, SnapScan, Zapper, Apple Pay, Google Pay) and PayPal. All subscriptions are billed monthly in South African Rand (ZAR).",
+  },
+  {
+    question: "Can I change or cancel my plan at any time?",
+    answer:
+      "Yes. You can upgrade, downgrade or cancel from the Settings page. Changes take effect at the end of your current billing cycle and there are no cancellation fees.",
+  },
+  {
+    question: "Do I get a free trial?",
+    answer:
+      "Every new account includes a 14-day free trial of the Starter plan with no credit card required. You only pay if you choose to continue after the trial ends.",
+  },
+  {
+    question: "Is HerdSync suitable for small farms?",
+    answer:
+      "Absolutely. The Basic plan starts at R99/month for up to 80 animals, making professional livestock management affordable for smallholder farmers, hobby farms and emerging commercial operations.",
+  },
+];
+
 export default function Pricing() {
   useSEO({
     title: "Pricing - HerdSync",
-    description: "Simple, transparent pricing in ZAR. Choose Basic, Starter, or Pro. 14-day free trial included.",
+    description:
+      "Simple, transparent pricing in ZAR. Basic R99, Starter R249, Pro R599. 14-day free trial, no credit card required.",
+    canonical: "https://herdsync.co.za/pricing",
+    jsonLd: [
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: "HerdSync Livestock Management Software",
+        description:
+          "Cloud and mobile livestock management for South African farmers, AIDA compliance, feeding, inventory, market prices and ZAR financial reporting.",
+        brand: { "@type": "Brand", name: "HerdSync" },
+        offers: [
+          {
+            "@type": "Offer",
+            name: "Basic",
+            price: "99",
+            priceCurrency: "ZAR",
+            url: "https://herdsync.co.za/pricing",
+            availability: "https://schema.org/InStock",
+            category: "subscription",
+          },
+          {
+            "@type": "Offer",
+            name: "Starter",
+            price: "249",
+            priceCurrency: "ZAR",
+            url: "https://herdsync.co.za/pricing",
+            availability: "https://schema.org/InStock",
+            category: "subscription",
+          },
+          {
+            "@type": "Offer",
+            name: "Pro",
+            price: "599",
+            priceCurrency: "ZAR",
+            url: "https://herdsync.co.za/pricing",
+            availability: "https://schema.org/InStock",
+            category: "subscription",
+          },
+        ],
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+          "@type": "Question",
+          name: f.question,
+          acceptedAnswer: { "@type": "Answer", text: f.answer },
+        })),
+      },
+    ],
   });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
