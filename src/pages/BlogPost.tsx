@@ -8,6 +8,7 @@ import { useSEO } from "@/hooks/useSEO";
 import { useBlogPost, useBlogPosts } from "@/hooks/useBlogPosts";
 import { renderMarkdown } from "@/lib/markdown";
 import { SEOFooter } from "@/components/SEOFooter";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
