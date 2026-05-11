@@ -1,4 +1,4 @@
-// Facebook Pixel — gated by VITE_FB_PIXEL_ID. When the env var is unset
+// Facebook Pixel, gated by VITE_FB_PIXEL_ID. When the env var is unset
 // (current state) every function below is a safe no-op so we never ship a
 // broken or partially-initialised pixel to users.
 //

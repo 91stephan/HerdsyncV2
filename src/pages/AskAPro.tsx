@@ -283,7 +283,7 @@ export default function AskAPro() {
                 <div className="min-w-0">
                   <CardTitle className="font-display text-base sm:text-lg">Ask a Pro</CardTitle>
                   <CardDescription className="text-xs sm:text-sm truncate">
-                    AI advice — text or 📷 photo
+                    AI advice, text or 📷 photo
                   </CardDescription>
                 </div>
               </div>
@@ -440,7 +440,7 @@ export default function AskAPro() {
                 </div>
                 <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
                   <ImageIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                  <span className="hidden sm:inline">Photo attached — add a question or send as-is</span>
+                  <span className="hidden sm:inline">Photo attached, add a question or send as-is</span>
                   <span className="sm:hidden">Photo attached</span>
                 </div>
               </div>

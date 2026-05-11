@@ -85,7 +85,7 @@ export function SubscriptionBanner() {
       <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <p className="text-sm">
-            <span className="font-medium">🎉 Free Trial</span> —{" "}
+            <span className="font-medium">🎉 Free Trial</span> , {" "}
             <span className="text-muted-foreground">
               {daysRemaining} days remaining
             </span>

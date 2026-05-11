@@ -14,7 +14,7 @@ export default function Blog() {
   useSEO({
     title: "Farm Management Blog for South African Livestock Farmers",
     description:
-      "Practical guides on livestock tracking, AIDA compliance, feed cost control and herd management — written for South African producers.",
+      "Practical guides on livestock tracking, AIDA compliance, feed cost control and herd management, written for South African producers.",
     canonical: "https://herdsync.co.za/blog",
     keywords: "livestock management software South Africa, AIDA, livestock tracking, farm compliance, feed cost, herd management",
     jsonLd: {
@@ -59,7 +59,7 @@ export default function Blog() {
             HerdSync Blog
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Field-tested guides for South African farmers — livestock, compliance, and the day-to-day
+            Field-tested guides for South African farmers, livestock, compliance, and the day-to-day
             mechanics of running a profitable operation.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function Blog() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : !posts || posts.length === 0 ? (
-          <p className="text-muted-foreground">No posts yet — check back soon.</p>
+          <p className="text-muted-foreground">No posts yet, check back soon.</p>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (

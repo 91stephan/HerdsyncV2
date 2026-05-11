@@ -26,7 +26,7 @@ export function WelcomeDialog() {
     const dismissed = localStorage.getItem(`${WELCOME_DISMISSED_KEY}_${user.id}`);
     if (dismissed) return;
 
-    // Check if user was created recently (within last 5 minutes) — new registration
+    // Check if user was created recently (within last 5 minutes), new registration
     const createdAt = new Date(user.created_at);
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     if (createdAt > fiveMinutesAgo) {
@@ -61,7 +61,7 @@ export function WelcomeDialog() {
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
             <div className="flex items-center gap-2">
               <Badge className="bg-primary text-primary-foreground">Free Trial</Badge>
-              <span className="text-sm font-medium text-foreground">14 Days — No Card Required</span>
+              <span className="text-sm font-medium text-foreground">14 Days, No Card Required</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Explore all HerdSync features free for 14 days. Manage your livestock, track health records, monitor feeding schedules, and much more.

@@ -6,7 +6,7 @@ import { useSEO } from "@/hooks/useSEO";
 export default function About() {
   useSEO({
     title: "About HerdSync",
-    description: "Learn about HerdSync — the South African farm management platform empowering livestock farmers.",
+    description: "Learn about HerdSync, the South African farm management platform empowering livestock farmers.",
   });
   return (
     <Layout>

@@ -99,8 +99,8 @@ import { Link } from "react-router-dom";
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="viewer">Viewer — Can view farm data</SelectItem>
-                    <SelectItem value="manager">Farm Manager — Can view all tasks & employees</SelectItem>
+                    <SelectItem value="viewer">Viewer, Can view farm data</SelectItem>
+                    <SelectItem value="manager">Farm Manager, Can view all tasks & employees</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

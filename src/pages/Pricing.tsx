@@ -621,7 +621,7 @@ export default function Pricing() {
           </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
             Join hundreds of South African farmers already using HerdSync. Start your
-            free 14-day trial today—no credit card required.
+            free 14-day trial today, no credit card required.
           </p>
           {!user ? (
             <Button size="lg" onClick={() => navigate("/auth")} className="bg-gradient-primary">

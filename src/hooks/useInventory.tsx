@@ -116,7 +116,7 @@ export function useInventory() {
         { event: "*", schema: "public", table: "inventory_usage_log", filter: `farm_id=eq.${farm.id}` },
         () => {
           qc.invalidateQueries({ queryKey: usageLogKey(farm.id) });
-          // Usage rows almost always imply a quantity change too — refresh both.
+          // Usage rows almost always imply a quantity change too, refresh both.
           qc.invalidateQueries({ queryKey: inventoryKey(farm.id) });
         },
       )
@@ -199,7 +199,7 @@ export function useInventory() {
 
     const totalCost = quantityToAdd * costPerUnit;
 
-    // Atomic restock — server adds quantity, no read-then-write race
+    // Atomic restock, server adds quantity, no read-then-write race
     const { error } = await supabase.rpc("restock_inventory_item", {
       _inventory_id: id,
       _quantity_to_add: quantityToAdd,
@@ -253,7 +253,7 @@ export function useInventory() {
     const item = inventory.find((i) => i.id === inventoryId);
     if (!item) return false;
 
-    // Optimistic guard from local state — server still enforces non-negative atomically.
+    // Optimistic guard from local state, server still enforces non-negative atomically.
     if (quantityUsed > item.quantity) {
       toast({
         title: "Insufficient Stock",
@@ -263,7 +263,7 @@ export function useInventory() {
       return false;
     }
 
-    // Atomic decrement first — prevents lost updates if two users log usage at once.
+    // Atomic decrement first, prevents lost updates if two users log usage at once.
     const { error: adjError } = await supabase.rpc("adjust_inventory_quantity", {
       _inventory_id: inventoryId,
       _delta: -quantityUsed,
@@ -274,7 +274,7 @@ export function useInventory() {
       toast({
         title: "Error",
         description: adjError.message.includes("Insufficient")
-          ? "Stock changed — another user just used some. Please refresh and try again."
+          ? "Stock changed, another user just used some. Please refresh and try again."
           : adjError.message,
         variant: "destructive",
       });

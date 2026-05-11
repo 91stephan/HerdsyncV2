@@ -595,7 +595,7 @@ function ApplicationDialog({ open, onOpenChange, editing, onSave, inventory }: {
                   <SelectItem value="none">None</SelectItem>
                   {animals.map((animal) => (
                     <SelectItem key={animal.id} value={animal.tag}>
-                      {animal.tag} — {animal.name} ({animal.type})
+                      {animal.tag}, {animal.name} ({animal.type})
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -20,7 +20,7 @@ import { RouteTracker } from "@/components/RouteTracker";
 import Landing from "./pages/Landing";
 import { AdminProvider } from "@/hooks/useAdmin";
 
-// Lazy-loaded routes — keeps the initial bundle small (especially on mobile)
+// Lazy-loaded routes, keeps the initial bundle small (especially on mobile)
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Livestock = lazy(() => import("./pages/Livestock"));
 const Feeding = lazy(() => import("./pages/Feeding"));
