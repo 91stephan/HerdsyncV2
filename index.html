@@ -40,6 +40,45 @@
       gtag('js', new Date());
       gtag('config', 'G-TMK6R8G8KT', { send_page_view: true });
     </script>
+
+    <!-- Global Organization + WebSite SearchAction JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://herdsync.co.za/#org",
+          "name": "HerdSync",
+          "url": "https://herdsync.co.za",
+          "logo": "https://herdsync.co.za/favicon.png",
+          "email": "syncherd@gmail.com",
+          "telephone": "+27-78-318-6923",
+          "areaServed": { "@type": "Country", "name": "South Africa" },
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Krugersdorp",
+            "addressRegion": "Gauteng",
+            "addressCountry": "ZA"
+          },
+          "sameAs": []
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://herdsync.co.za/#website",
+          "url": "https://herdsync.co.za",
+          "name": "HerdSync",
+          "publisher": { "@id": "https://herdsync.co.za/#org" },
+          "inLanguage": "en-ZA",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://herdsync.co.za/blog?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+  
   </head>
 
   <body>
