@@ -99,6 +99,7 @@
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
+      "@id": "https://herdsync.co.za/#software",
       "name": "HerdSync",
       "operatingSystem": "Web, iOS, Android",
       "applicationCategory": "BusinessApplication",
@@ -107,6 +108,27 @@
       "image": "https://herdsync.co.za/og-image.png",
       "description": "Cloud and mobile livestock management for South African farmers — animal tracking, feeding schedules, health records, AIDA compliance, inventory, market prices and audit-ready PDF reports in ZAR.",
       "publisher": { "@id": "https://herdsync.co.za/#org" },
+      "softwareVersion": "1.0",
+      "releaseNotes": "https://herdsync.co.za/changelog",
+      "inLanguage": "en-ZA",
+      "countriesSupported": "ZA",
+      "featureList": [
+        "Livestock management for domestic and wild game with automatic age calculation",
+        "Animal-specific feeding schedules with daily, weekly and monthly cost roll-ups in ZAR",
+        "Per-animal health records, vaccination tracking and treatment history",
+        "RFID livestock tracking via checkpoint Arduino devices and Supabase webhooks",
+        "Multi-category inventory tracking with low-stock alerts",
+        "Animal-linked chemical and remedy logs for SA residue and traceability requirements",
+        "Farm expense tracking with receipt uploads and inventory linking",
+        "Animal sale workflow with voetstoots clause and PDF receipts",
+        "AIDA-aligned compliance, Labour and OHS checklists, document vault and Audit Pack Builder",
+        "Live South African agricultural commodity market prices",
+        "PDF reports and cost analysis in South African Rand",
+        "Multi-farm switcher with role-based access (Owner, Manager, Viewer, Employee)",
+        "Ask a Pro multimodal AI farming assistant",
+        "Native iOS and Android mobile apps via Capacitor"
+      ],
+      "screenshot": "https://herdsync.co.za/og-image.png",
       "offers": [
         { "@type": "Offer", "name": "Basic", "price": "99", "priceCurrency": "ZAR", "url": "https://herdsync.co.za/pricing", "availability": "https://schema.org/InStock", "category": "subscription" },
         { "@type": "Offer", "name": "Starter", "price": "249", "priceCurrency": "ZAR", "url": "https://herdsync.co.za/pricing", "availability": "https://schema.org/InStock", "category": "subscription" },
@@ -119,6 +141,102 @@
         "bestRating": "5",
         "worstRating": "1"
       }
+    }
+    </script>
+
+    <!-- Person: Mathys Van Heerden (founder) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "@id": "https://herdsync.co.za/#mathys",
+      "name": "Mathys Van Heerden",
+      "givenName": "Mathys",
+      "familyName": "Van Heerden",
+      "jobTitle": "Founder",
+      "nationality": "South African",
+      "worksFor": { "@id": "https://herdsync.co.za/#org" },
+      "knowsAbout": [
+        "Livestock management",
+        "Farm management software",
+        "South African agriculture",
+        "AIDA compliance",
+        "SAP integration",
+        "Full-stack web development",
+        "Mobile app development",
+        "Supabase",
+        "React"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Krugersdorp",
+        "addressRegion": "Gauteng",
+        "addressCountry": "ZA"
+      },
+      "sameAs": []
+    }
+    </script>
+
+    <!-- BreadcrumbList: main site navigation -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://herdsync.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://herdsync.co.za/pricing" },
+        { "@type": "ListItem", "position": 3, "name": "About", "item": "https://herdsync.co.za/about" },
+        { "@type": "ListItem", "position": 4, "name": "Blog", "item": "https://herdsync.co.za/blog" },
+        { "@type": "ListItem", "position": 5, "name": "Contact", "item": "https://herdsync.co.za/contact" }
+      ]
+    }
+    </script>
+
+    <!-- Service: Livestock Tracking -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": "https://herdsync.co.za/#service-livestock",
+      "serviceType": "Livestock Tracking and Herd Management",
+      "name": "HerdSync Livestock Tracking",
+      "provider": { "@id": "https://herdsync.co.za/#org" },
+      "areaServed": { "@type": "Country", "name": "South Africa" },
+      "audience": { "@type": "Audience", "audienceType": "South African livestock farmers" },
+      "description": "End-to-end herd tracking for South African farmers — individual animal records, automatic age calculation, RFID checkpoint tracking, soft-remove workflow, and CSV import. Suits cattle, sheep, goats, pigs, poultry and wild game.",
+      "termsOfService": "https://herdsync.co.za/terms"
+    }
+    </script>
+
+    <!-- Service: SA Compliance Management -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": "https://herdsync.co.za/#service-compliance",
+      "serviceType": "Agricultural Compliance Management",
+      "name": "HerdSync SA Compliance Suite",
+      "provider": { "@id": "https://herdsync.co.za/#org" },
+      "areaServed": { "@type": "Country", "name": "South Africa" },
+      "audience": { "@type": "Audience", "audienceType": "South African farmers and agricultural operations" },
+      "description": "South African compliance toolkit covering AIDA-aligned animal identification, Labour and Occupational Health and Safety checklists, animal-linked chemical and remedy logs, document vault, and the Audit Pack Builder which generates inspection-ready PDFs.",
+      "termsOfService": "https://herdsync.co.za/terms"
+    }
+    </script>
+
+    <!-- Service: Farm Financial Management -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "@id": "https://herdsync.co.za/#service-financial",
+      "serviceType": "Farm Financial Management",
+      "name": "HerdSync Farm Financials",
+      "provider": { "@id": "https://herdsync.co.za/#org" },
+      "areaServed": { "@type": "Country", "name": "South Africa" },
+      "audience": { "@type": "Audience", "audienceType": "South African farmers" },
+      "description": "ZAR-native financial management for South African farms — feed cost roll-ups, inventory valuation, farm expense tracking with receipts, animal sale revenue, market price benchmarking and PDF cost-analysis reports.",
+      "termsOfService": "https://herdsync.co.za/terms"
     }
     </script>
 
