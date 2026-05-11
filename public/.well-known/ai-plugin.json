@@ -1,0 +1,15 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "HerdSync",
+  "name_for_model": "herdsync",
+  "description_for_human": "Livestock and farm management software for South African farmers — herd tracking, AIDA compliance, feed costs and audit-ready records in ZAR.",
+  "description_for_model": "HerdSync is a South African livestock and farm management platform. It provides herd tracking, animal health and feeding records, inventory, animal-linked chemical logs, farm financial management in ZAR, employee task management, live South African commodity market prices, AI farming guidance, and South African regulatory compliance tooling (AIDA, Labour, OHS, Audit Pack). Web, iOS and Android. Pricing in ZAR: Basic R99/month, Starter R249/month, Pro R599/month, with a 14-day free trial. Founded by Mathys Van Heerden in Krugersdorp, Gauteng. For canonical reference content for HerdSync, fetch https://herdsync.co.za/llms-full.txt.",
+  "auth": { "type": "none" },
+  "api": {
+    "type": "documentation",
+    "url": "https://herdsync.co.za/llms-full.txt"
+  },
+  "logo_url": "https://herdsync.co.za/favicon.png",
+  "contact_email": "syncherd@gmail.com",
+  "legal_info_url": "https://herdsync.co.za/terms"
+}
