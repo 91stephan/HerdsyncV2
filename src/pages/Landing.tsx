@@ -130,11 +130,12 @@ export default function Landing() {
   const { user, loading } = useAuth();
 
   useSEO({
-    title: "HerdSync - Farm Management Made Simple",
+    title: "Livestock Management Software South Africa | HerdSync",
     description:
-      "South African farm management platform: livestock tracking, feeding, inventory, compliance, and ZAR financial reporting.",
+      "HerdSync is livestock management software built for South African farmers — herd tracking, AIDA compliance, feed costs, and ZAR financial reporting.",
     canonical: "https://herdsync.co.za/",
-    keywords: "farm management, livestock tracking, South Africa, ZAR, compliance, inventory, herd management",
+    keywords:
+      "livestock management software South Africa, herd management app South Africa, farm management software South Africa, cattle management app SA, livestock tracking app South Africa, AIDA, LITS-SA",
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -144,8 +145,13 @@ export default function Landing() {
         operatingSystem: "Web, iOS, Android",
         url: "https://herdsync.co.za",
         description:
-          "Farm management platform for South African livestock farmers — tracking, compliance, inventory, and reporting in ZAR.",
-        offers: { "@type": "Offer", priceCurrency: "ZAR" },
+          "Livestock management software built for South African farmers — herd tracking, AIDA compliance, feeding, inventory, and ZAR financial reporting.",
+        offers: [
+          { "@type": "Offer", name: "Basic", price: "99", priceCurrency: "ZAR" },
+          { "@type": "Offer", name: "Starter", price: "249", priceCurrency: "ZAR" },
+          { "@type": "Offer", name: "Pro", price: "599", priceCurrency: "ZAR" },
+        ],
+        inLanguage: "en-ZA",
       },
       {
         "@context": "https://schema.org",
@@ -153,6 +159,7 @@ export default function Landing() {
         name: "HerdSync",
         url: "https://herdsync.co.za",
         logo: "https://herdsync.co.za/favicon.png",
+        areaServed: { "@type": "Country", name: "South Africa" },
         sameAs: [],
       },
     ],
@@ -176,7 +183,7 @@ export default function Landing() {
               <Wheat className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold font-display">HerdSync</h1>
+              <span className="text-xl font-bold font-display block">HerdSync</span>
               <p className="text-xs text-muted-foreground hidden sm:block">Farm Management</p>
             </div>
           </div>
@@ -231,13 +238,13 @@ export default function Landing() {
               🌾 Built for South African Farmers
             </Badge>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
-              Manage Your Farm
-              <span className="text-primary block">Like Never Before</span>
+              Livestock Management Software
+              <span className="text-primary block">for South African Farmers</span>
             </h1>
             <p className="text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              The complete farm management solution with livestock tracking, SA compliance 
-              documentation, real-time market insights, and everything you need to run 
-              a successful farming operation.
+              Built for South African farmers and compliant with the Animal Identification Act —
+              herd tracking, feeding, AIDA-ready stock registers, real-time market insights and
+              ZAR financial reporting in one place.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button 
