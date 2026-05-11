@@ -1,0 +1,65 @@
+# HerdSync
+
+> Livestock and farm management software built specifically for South African farmers. Herd tracking, AIDA compliance, feed cost control, audit-ready records, and ZAR financial reporting on web, iOS and Android.
+
+## Overview
+
+HerdSync is a livestock and farm management platform built specifically for South African farmers. Founded by Mathys Van Heerden in Krugersdorp, Gauteng, the platform offers herd tracking, health records, compliance management, and financial reporting tailored to South African regulatory requirements including the Animal Identification Act (AIDA) and POPIA.
+
+It runs as a cloud web application and as native iOS and Android apps (Capacitor). All financial calculations and displays are in South African Rand (ZAR).
+
+## Pricing
+
+- Basic: R99/month — up to 80 animals. Core livestock, feeding, health, inventory and reports. Aimed at smallholders, hobby farms and emerging commercial operations.
+- Starter: R249/month — everything in Basic plus market prices and expanded capacity.
+- Pro: R599/month — unlimited animals, optional RFID tracking package (+ hardware), employee management and priority support. Available web-based or as an RFID package.
+
+All plans include a 14-day free trial of the Starter plan with no credit card required. Billing is monthly in ZAR via Yoco (cards, EFT, SnapScan, Zapper, Apple Pay, Google Pay) or PayPal.
+
+## Key Features
+
+- Livestock tracking — domestic livestock and wild game, automatic age calculation, soft-remove workflow that preserves historical counts, CSV import, optional RFID checkpoint tracking via Arduino devices and Supabase webhooks.
+- Health records — per-animal medical records, vaccination tracking, treatment history.
+- Feeding schedules — animal-specific feed plans mapped directly to livestock IDs with daily, weekly and monthly cost roll-ups in ZAR.
+- Inventory management — multi-category tracking of feed, chemicals, equipment and consumables with low-stock alerts.
+- Chemicals and remedies — animal-linked chemical usage logs supporting SA residue and traceability requirements.
+- Farm expenses — operating cost tracking with receipt uploads and inventory linking.
+- Animal sales — single-page sale workflow with voetstoots clause and PDF receipts.
+- SA compliance — AIDA-aligned identification, Labour and OHS checklists, document vault, Audit Pack Builder generating inspection-ready PDFs.
+- Market area — live South African agricultural commodity prices and trends.
+- Reports — PDF cost analysis, livestock statistics and equipment reports, all in ZAR.
+- Employee management — Manager and Employee roles with daily task tracking and 7-day missed-task alerts.
+- Ask a Pro — multimodal Gemini-powered AI farming assistant.
+- Multi-farm — switch between multiple farms with role-based access (Owner, Manager, Viewer, Employee).
+- Notifications — global bell alerts for events and role assignments.
+
+## Platforms
+
+Web (any modern browser), iOS, Android.
+
+## Founder
+
+Mathys Van Heerden, full-stack developer and South African farmer-builder based in Krugersdorp, Gauteng. Background in SAP integration. HerdSync was created in direct response to the day-to-day record-keeping, compliance and cost-control challenges faced by South African livestock producers.
+
+## Compliance and data
+
+POPIA-compliant. RLS-isolated data per farm. PII masking via secure database views. HMAC-SHA256 webhook verification. 30-day account deletion window.
+
+## Important pages
+
+- Home: https://herdsync.co.za/
+- About: https://herdsync.co.za/about
+- Pricing: https://herdsync.co.za/pricing
+- Contact: https://herdsync.co.za/contact
+- Blog: https://herdsync.co.za/blog
+- Terms: https://herdsync.co.za/terms
+- Privacy Policy: https://herdsync.co.za/privacy-policy
+- Disclaimer: https://herdsync.co.za/disclaimer
+- Extended AI document: https://herdsync.co.za/llms-full.txt
+
+## Contact
+
+- Website: https://herdsync.co.za
+- Email: syncherd@gmail.com
+- Phone: +27 78 318 6923
+- Location: Krugersdorp, Gauteng, South Africa
