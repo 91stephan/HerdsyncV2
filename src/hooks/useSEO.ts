@@ -99,6 +99,7 @@ export function useSEO({
     setMeta("og:type", type, "property");
     setMeta("og:image", finalImage, "property");
     setMeta("og:site_name", "HerdSync", "property");
+    setMeta("og:locale", "en_ZA", "property");
     if (finalCanonical) setMeta("og:url", finalCanonical, "property");
 
     // Twitter
