@@ -188,11 +188,11 @@ export function FarmSwitcher() {
         <Button
           variant="outline"
           size="sm"
-          className="w-full gap-2 justify-start"
+          className="w-full gap-2 justify-start min-w-0 px-2"
           onClick={() => setDialogOpen(true)}
         >
-          <Plus className="w-4 h-4" />
-          Create Your First Farm
+          <Plus className="w-4 h-4 shrink-0" />
+          <span className="flex-1 min-w-0 truncate text-left">Create Your First Farm</span>
         </Button>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
