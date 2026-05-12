@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://herdsync.co.za/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://herdsync.co.za/pricing</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://herdsync.co.za/about</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://herdsync.co.za/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://herdsync.co.za/blog</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://herdsync.co.za/blog/getting-started-with-livestock-tracking-south-africa</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://herdsync.co.za/blog/south-african-farm-compliance-checklist-2026</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://herdsync.co.za/blog/cutting-feed-costs-without-cutting-condition</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://herdsync.co.za/auth</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://herdsync.co.za/</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://herdsync.co.za/pricing</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://herdsync.co.za/about</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://herdsync.co.za/contact</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://herdsync.co.za/blog</loc><lastmod>2026-05-12</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://herdsync.co.za/changelog</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+
+  <!-- Blog posts -->
+  <url><loc>https://herdsync.co.za/blog/getting-started-with-livestock-tracking-south-africa</loc><lastmod>2026-04-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/south-african-farm-compliance-checklist-2026</loc><lastmod>2026-04-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/cutting-feed-costs-without-cutting-condition</loc><lastmod>2026-05-01</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/foot-and-mouth-disease-south-africa-2026</loc><lastmod>2026-05-05</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/stock-theft-prevention-south-africa</loc><lastmod>2026-05-06</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/load-shedding-solutions-for-south-african-farms</loc><lastmod>2026-05-07</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/drought-management-south-african-livestock-farmers</loc><lastmod>2026-05-08</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/avian-influenza-south-african-poultry-farmers</loc><lastmod>2026-05-09</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/sars-diesel-rebate-for-farmers</loc><lastmod>2026-05-10</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/tick-borne-diseases-south-african-cattle</loc><lastmod>2026-05-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/land-reform-title-deed-security-south-african-farmers</loc><lastmod>2026-05-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/invasive-species-black-wattle-prosopis-management</loc><lastmod>2026-05-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://herdsync.co.za/blog/carbon-farming-regenerative-agriculture-south-africa</loc><lastmod>2026-05-11</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <!-- AI discovery files -->
+  <url><loc>https://herdsync.co.za/llms.txt</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://herdsync.co.za/llms-full.txt</loc><lastmod>2026-05-12</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>
+
+  <!-- Auth & legal -->
+  <url><loc>https://herdsync.co.za/auth</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://herdsync.co.za/terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://herdsync.co.za/privacy-policy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://herdsync.co.za/disclaimer</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
