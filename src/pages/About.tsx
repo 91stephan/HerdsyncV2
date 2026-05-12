@@ -10,6 +10,29 @@ export default function About() {
     description:
       "Learn about HerdSync, the South African farm management platform empowering livestock farmers with AIDA-ready compliance and ZAR reporting.",
     canonical: "https://herdsync.co.za/about",
+    keywords:
+      "about HerdSync, South African farm management, livestock software founder, Mathys Van Heerden, AIDA compliance, Krugersdorp Gauteng",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      url: "https://herdsync.co.za/about",
+      name: "About HerdSync",
+      inLanguage: "en-ZA",
+      mainEntity: {
+        "@type": "Organization",
+        name: "HerdSync",
+        url: "https://herdsync.co.za",
+        logo: "https://herdsync.co.za/favicon.png",
+        founder: {
+          "@type": "Person",
+          name: "Mathys Van Heerden",
+          jobTitle: "Founder",
+        },
+        areaServed: { "@type": "Country", name: "South Africa" },
+        description:
+          "HerdSync is a South African livestock and farm management platform built to simplify herd tracking, AIDA compliance, feeding, inventory, and ZAR financial reporting for producers of every scale.",
+      },
+    },
   });
   return (
     <Layout>
