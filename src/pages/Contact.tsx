@@ -16,15 +16,26 @@ export default function Contact() {
     description:
       "Contact the HerdSync team for support, sales, or partnership enquiries. South African livestock management software based in Krugersdorp, Gauteng.",
     canonical: "https://herdsync.co.za/contact",
+    keywords:
+      "contact HerdSync, livestock software support South Africa, farm management contact, Krugersdorp Gauteng",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "ContactPage",
       url: "https://herdsync.co.za/contact",
+      inLanguage: "en-ZA",
       mainEntity: {
         "@type": "Organization",
         name: "HerdSync",
         email: "syncherd@gmail.com",
         telephone: "+27-78-318-6923",
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "syncherd@gmail.com",
+          telephone: "+27-78-318-6923",
+          areaServed: "ZA",
+          availableLanguage: ["English", "Afrikaans"],
+        },
         address: {
           "@type": "PostalAddress",
           addressLocality: "Krugersdorp",

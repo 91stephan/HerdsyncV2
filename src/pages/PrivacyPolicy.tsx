@@ -8,6 +8,15 @@ export default function PrivacyPolicy() {
     title: "Privacy Policy",
     description: "How HerdSync collects, stores, and protects your farm data, POPIA and GDPR compliant.",
     canonical: "https://herdsync.co.za/privacy-policy",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "HerdSync Privacy Policy",
+      url: "https://herdsync.co.za/privacy-policy",
+      inLanguage: "en-ZA",
+      isPartOf: { "@type": "WebSite", name: "HerdSync", url: "https://herdsync.co.za" },
+      about: { "@type": "Organization", name: "HerdSync" },
+    },
   });
   return (
     <Layout>
