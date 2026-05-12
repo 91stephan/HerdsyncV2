@@ -7,6 +7,15 @@ export default function Terms() {
     title: "Terms of Service",
     description: "HerdSync Terms of Service, the rules for using our farm management platform, payments, and acceptable use in South Africa.",
     canonical: "https://herdsync.co.za/terms",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "HerdSync Terms of Service",
+      url: "https://herdsync.co.za/terms",
+      inLanguage: "en-ZA",
+      isPartOf: { "@type": "WebSite", name: "HerdSync", url: "https://herdsync.co.za" },
+      about: { "@type": "Organization", name: "HerdSync" },
+    },
   });
   return (
     <Layout>
