@@ -8,6 +8,9 @@ Allow: /blog/
 Allow: /terms
 Allow: /privacy-policy
 Allow: /disclaimer
+Allow: /changelog
+Allow: /llms.txt
+Allow: /llms-full.txt
 
 # Authenticated / private app routes — do not index
 Disallow: /admin
@@ -33,7 +36,7 @@ Disallow: /trial-expired
 Disallow: /delete-account
 Disallow: /auth
 
-# Allow major search & social crawlers full access to public pages
+# Major search & social crawlers
 User-agent: Googlebot
 Allow: /
 Disallow: /admin
@@ -72,5 +75,85 @@ Allow: /
 
 User-agent: LinkedInBot
 Allow: /
+
+# AI engine crawlers — explicitly allow public content + AI discovery files
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: CCBot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
+
+User-agent: Bytespider
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /auth
 
 Sitemap: https://herdsync.co.za/sitemap.xml
