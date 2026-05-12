@@ -194,6 +194,8 @@ export default function Pricing() {
     description:
       "Simple, transparent pricing in ZAR. Basic R99, Starter R249, Pro R599. 14-day free trial, no credit card required.",
     canonical: "https://herdsync.co.za/pricing",
+    keywords:
+      "HerdSync pricing, livestock software pricing South Africa, ZAR farm software cost, AIDA compliance subscription, herd management price",
     jsonLd: [
       {
         "@context": "https://schema.org",
