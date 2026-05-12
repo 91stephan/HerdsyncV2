@@ -8,6 +8,15 @@ export default function Disclaimer() {
     title: "Disclaimer",
     description: "Important disclaimers about using HerdSync for livestock management, compliance reporting, and financial tracking.",
     canonical: "https://herdsync.co.za/disclaimer",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "HerdSync Disclaimer",
+      url: "https://herdsync.co.za/disclaimer",
+      inLanguage: "en-ZA",
+      isPartOf: { "@type": "WebSite", name: "HerdSync", url: "https://herdsync.co.za" },
+      about: { "@type": "Organization", name: "HerdSync" },
+    },
   });
   return (
     <Layout>
