@@ -1,34 +1,38 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Target, Users, Award, Heart } from "lucide-react";
+import { Target, Users, Award, Heart, ShieldCheck, MapPin } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+
+const ABOUT_LAST_UPDATED = "2026-05-13";
 
 export default function About() {
   useSEO({
     title: "About HerdSync",
     description:
-      "Learn about HerdSync, the South African farm management platform empowering livestock farmers with AIDA-ready compliance and ZAR reporting.",
+      "HerdSync is a South African farm management platform built for livestock farmers — AIDA-ready compliance, ZAR reporting and audit-ready records, by The HerdSync Team in Krugersdorp, Gauteng.",
     canonical: "https://herdsync.co.za/about",
     keywords:
-      "about HerdSync, South African farm management, livestock software founder, Mathys Van Heerden, AIDA compliance, Krugersdorp Gauteng",
+      "about HerdSync, South African farm management, livestock software, AIDA compliance, POPIA, ZAR farm software, Krugersdorp Gauteng",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "AboutPage",
       url: "https://herdsync.co.za/about",
       name: "About HerdSync",
       inLanguage: "en-ZA",
+      dateModified: ABOUT_LAST_UPDATED,
       mainEntity: {
         "@type": "Organization",
         name: "HerdSync",
         url: "https://herdsync.co.za",
         logo: "https://herdsync.co.za/favicon.png",
-        founder: {
-          "@type": "Person",
-          name: "Mathys Van Heerden",
-          jobTitle: "Founder",
-        },
         areaServed: { "@type": "Country", name: "South Africa" },
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Krugersdorp",
+          addressRegion: "Gauteng",
+          addressCountry: "ZA",
+        },
         description:
           "HerdSync is a South African livestock and farm management platform built to simplify herd tracking, AIDA compliance, feeding, inventory, and ZAR financial reporting for producers of every scale.",
       },
