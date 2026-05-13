@@ -68,6 +68,8 @@ const features = [
   },
 ];
 
+// TODO: Replace with real customer testimonials (with explicit consent for name, farm and region).
+// The entries below are placeholders only and should not be presented as live attestations.
 const testimonials = [
   {
     name: "Hendrik Botha",
