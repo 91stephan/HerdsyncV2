@@ -1,34 +1,38 @@
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Target, Users, Award, Heart } from "lucide-react";
+import { Target, Users, Award, Heart, ShieldCheck, MapPin } from "lucide-react";
 import { useSEO } from "@/hooks/useSEO";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+
+const ABOUT_LAST_UPDATED = "2026-05-13";
 
 export default function About() {
   useSEO({
     title: "About HerdSync",
     description:
-      "Learn about HerdSync, the South African farm management platform empowering livestock farmers with AIDA-ready compliance and ZAR reporting.",
+      "HerdSync is a South African farm management platform built for livestock farmers — AIDA-ready compliance, ZAR reporting and audit-ready records, by The HerdSync Team in Krugersdorp, Gauteng.",
     canonical: "https://herdsync.co.za/about",
     keywords:
-      "about HerdSync, South African farm management, livestock software founder, Mathys Van Heerden, AIDA compliance, Krugersdorp Gauteng",
+      "about HerdSync, South African farm management, livestock software, AIDA compliance, POPIA, ZAR farm software, Krugersdorp Gauteng",
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "AboutPage",
       url: "https://herdsync.co.za/about",
       name: "About HerdSync",
       inLanguage: "en-ZA",
+      dateModified: ABOUT_LAST_UPDATED,
       mainEntity: {
         "@type": "Organization",
         name: "HerdSync",
         url: "https://herdsync.co.za",
         logo: "https://herdsync.co.za/favicon.png",
-        founder: {
-          "@type": "Person",
-          name: "Mathys Van Heerden",
-          jobTitle: "Founder",
-        },
         areaServed: { "@type": "Country", name: "South Africa" },
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Krugersdorp",
+          addressRegion: "Gauteng",
+          addressCountry: "ZA",
+        },
         description:
           "HerdSync is a South African livestock and farm management platform built to simplify herd tracking, AIDA compliance, feeding, inventory, and ZAR financial reporting for producers of every scale.",
       },
@@ -41,7 +45,10 @@ export default function About() {
         <div>
           <h1 className="text-3xl font-bold text-foreground font-display">About HerdSync</h1>
           <p className="text-muted-foreground mt-1">
-            Empowering farmers with modern livestock management solutions
+            Livestock and farm management software, built for South Africa.
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Last updated: 13 May 2026
           </p>
         </div>
 
@@ -55,11 +62,38 @@ export default function About() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground leading-relaxed">
-              At HerdSync, our mission is to simplify farm management for livestock farmers across South Africa 
-              and beyond. We believe that every farmer, regardless of the size of their operation, deserves 
-              access to professional-grade tools that help them manage their herds efficiently, stay compliant 
-              with regulations, and ultimately run more profitable farms.
+              HerdSync exists to make professional-grade livestock and farm management
+              accessible to every South African farmer — from emerging smallholders
+              to established commercial operations. We replace scattered notebooks,
+              spreadsheets and WhatsApp messages with a single, audit-ready system
+              that speaks the language of South African regulation, weather and rand-based economics.
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Why HerdSync exists */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-primary" />
+              Why HerdSync was built for South Africa
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-muted-foreground leading-relaxed">
+            <p>
+              Most farm management software is built for European or North American
+              farms. The currency is wrong, the compliance frameworks are wrong, the
+              animal mix is wrong and the connectivity assumptions are wrong.
+              HerdSync is the opposite — every screen, schedule and report is shaped
+              by South African realities:
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Regulation:</strong> AIDA-aligned animal identification, Labour Relations Act and Occupational Health and Safety checklists, animal-linked chemical and remedy registers, and an Audit Pack Builder that produces inspection-ready PDFs.</li>
+              <li><strong>Currency:</strong> All pricing, expenses, sales and reports are in South African Rand. No conversions, no rounding errors, no surprises at month-end.</li>
+              <li><strong>Climate &amp; mix:</strong> Domestic livestock and wild game side-by-side. Drought-aware feeding plans. Veld management is a first-class concept.</li>
+              <li><strong>Connectivity:</strong> Mobile-first UX with safe-area insets, large touch targets and resilient sync — designed for farms with intermittent rural connectivity.</li>
+              <li><strong>Language &amp; payment:</strong> Local payment rails (Yoco, EFT, SnapScan, Zapper, PayPal) and ZA-native communication patterns.</li>
+            </ul>
           </CardContent>
         </Card>
 
@@ -145,6 +179,53 @@ export default function About() {
                 when stock runs low.
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Data security & POPIA */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+              Data security & POPIA commitment
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-muted-foreground text-sm leading-relaxed">
+            <p>
+              Your farm's data is yours. HerdSync is engineered around POPIA-compliant
+              data handling: row-level security isolates every farm's data, personally
+              identifiable information is masked through secure database views,
+              webhooks are HMAC-SHA256 verified, and sensitive endpoints are
+              rate-limited.
+            </p>
+            <p>
+              You can request a full export or deletion of your account at any time.
+              Account deletions follow a 30-day window with administrator
+              notification, so accidental requests can be reversed.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Our team */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              The HerdSync Team
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-muted-foreground text-sm leading-relaxed">
+            <p>
+              HerdSync is built and maintained by The HerdSync Team — a small,
+              South-Africa-based group combining experienced product engineers
+              with hands-on agricultural domain knowledge. We work directly with
+              farmers across the country to make sure every release reflects
+              real on-farm workflows, not theoretical ones.
+            </p>
+            <p>
+              HerdSync is operated as a standalone agricultural technology brand,
+              based in Krugersdorp, Gauteng.
+            </p>
           </CardContent>
         </Card>
 

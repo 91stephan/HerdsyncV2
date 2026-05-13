@@ -471,9 +471,12 @@ export default function Pricing() {
             Manage Your Farm
             <span className="text-primary block">Like a Pro</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
             The complete farm management solution with livestock tracking, compliance
             documentation, and real-time market insights. Start your 2-week free trial today.
+          </p>
+          <p className="text-xs text-muted-foreground mb-8">
+            Pricing last updated: 13 May 2026 · All amounts in ZAR
           </p>
           {!user && (
             <Button size="lg" onClick={() => navigate("/auth")} className="bg-gradient-primary">

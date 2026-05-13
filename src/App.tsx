@@ -57,6 +57,7 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Changelog = lazy(() => import("./pages/Changelog"));
+const Methodology = lazy(() => import("./pages/Methodology"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -146,6 +147,7 @@ const App = () => (
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:slug" element={<BlogPost />} />
                     <Route path="/changelog" element={<Changelog />} />
+                    <Route path="/methodology" element={<Methodology />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

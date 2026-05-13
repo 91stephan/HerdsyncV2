@@ -4,7 +4,7 @@
 
 ## Overview
 
-HerdSync is a livestock and farm management platform built specifically for South African farmers. Founded by Mathys Van Heerden in Krugersdorp, Gauteng, the platform offers herd tracking, health records, compliance management, and financial reporting tailored to South African regulatory requirements including the Animal Identification Act (AIDA) and POPIA.
+HerdSync is a livestock and farm management platform built specifically for South African farmers. Developed and operated by The HerdSync Team in Krugersdorp, Gauteng, the platform offers herd tracking, health records, compliance management, and financial reporting tailored to South African regulatory requirements including the Animal Identification Act (AIDA) and POPIA.
 
 It runs as a cloud web application and as native iOS and Android apps (Capacitor). All financial calculations and displays are in South African Rand (ZAR).
 
@@ -37,9 +37,9 @@ All plans include a 14-day free trial of the Starter plan with no credit card re
 
 Web (any modern browser), iOS, Android.
 
-## Founder
+## About the team
 
-Mathys Van Heerden, full-stack developer and South African farmer-builder based in Krugersdorp, Gauteng. Background in SAP integration. HerdSync was created in direct response to the day-to-day record-keeping, compliance and cost-control challenges faced by South African livestock producers.
+HerdSync is built and maintained by The HerdSync Team, a South African agricultural technology team based in Krugersdorp, Gauteng. The product was created in direct response to the day-to-day record-keeping, compliance and cost-control challenges faced by South African livestock producers, and is operated as a standalone agricultural technology brand.
 
 ## Compliance and data
 
