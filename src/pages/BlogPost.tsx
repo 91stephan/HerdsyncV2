@@ -9,6 +9,9 @@ import { useBlogPost, useBlogPosts } from "@/hooks/useBlogPosts";
 import { renderMarkdown } from "@/lib/markdown";
 import { SEOFooter } from "@/components/SEOFooter";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { AuthorByline } from "@/components/AuthorByline";
+
+const TEAM_AUTHOR = "The HerdSync Team";
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
@@ -28,7 +31,7 @@ export default function BlogPost() {
           image: post.cover_image_url ?? "https://herdsync.co.za/favicon.png",
           datePublished: post.published_at,
           dateModified: post.published_at,
-          author: { "@type": "Organization", name: post.author_name },
+          author: { "@type": "Organization", name: TEAM_AUTHOR, url: "https://herdsync.co.za" },
           publisher: {
             "@type": "Organization",
             name: "HerdSync",
@@ -111,9 +114,11 @@ export default function BlogPost() {
           <h1 className="text-3xl md:text-4xl font-bold font-display text-foreground mb-3">
             {post.title}
           </h1>
-          <p className="text-sm text-muted-foreground mb-8">
-            {post.published_at ? format(new Date(post.published_at), "d MMMM yyyy") : ""} · {post.author_name}
-          </p>
+          <AuthorByline
+            publishedAt={post.published_at}
+            updatedAt={post.published_at}
+            className="mb-8"
+          />
           {post.cover_image_url && (
             <img
               src={post.cover_image_url}

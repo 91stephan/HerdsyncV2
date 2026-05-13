@@ -39,7 +39,7 @@ export default function Blog() {
         image: p.cover_image_url ?? "https://herdsync.co.za/og-image.png",
         datePublished: p.published_at,
         dateModified: p.published_at,
-        author: { "@type": "Organization", name: p.author_name },
+        author: { "@type": "Organization", name: "The HerdSync Team", url: "https://herdsync.co.za" },
       })),
     },
   });
@@ -97,7 +97,7 @@ export default function Blog() {
                     </h2>
                     <p className="text-sm text-muted-foreground flex-1">{post.excerpt}</p>
                     <p className="text-xs text-muted-foreground mt-4">
-                      {post.published_at ? format(new Date(post.published_at), "d MMM yyyy") : ""} · {post.author_name}
+                      {post.published_at ? format(new Date(post.published_at), "d MMM yyyy") : ""} · The HerdSync Team
                     </p>
                   </CardContent>
                 </Card>
