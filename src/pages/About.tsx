@@ -182,6 +182,53 @@ export default function About() {
           </CardContent>
         </Card>
 
+        {/* Data security & POPIA */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+              Data security & POPIA commitment
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-muted-foreground text-sm leading-relaxed">
+            <p>
+              Your farm's data is yours. HerdSync is engineered around POPIA-compliant
+              data handling: row-level security isolates every farm's data, personally
+              identifiable information is masked through secure database views,
+              webhooks are HMAC-SHA256 verified, and sensitive endpoints are
+              rate-limited.
+            </p>
+            <p>
+              You can request a full export or deletion of your account at any time.
+              Account deletions follow a 30-day window with administrator
+              notification, so accidental requests can be reversed.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Our team */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              The HerdSync Team
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-muted-foreground text-sm leading-relaxed">
+            <p>
+              HerdSync is built and maintained by The HerdSync Team — a small,
+              South-Africa-based group combining experienced product engineers
+              with hands-on agricultural domain knowledge. We work directly with
+              farmers across the country to make sure every release reflects
+              real on-farm workflows, not theoretical ones.
+            </p>
+            <p>
+              HerdSync is operated as a standalone agricultural technology brand,
+              based in Krugersdorp, Gauteng.
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Contact CTA */}
         <Card className="bg-primary/5 border-primary/20">
           <CardContent className="py-6">
