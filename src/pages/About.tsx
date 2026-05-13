@@ -45,7 +45,10 @@ export default function About() {
         <div>
           <h1 className="text-3xl font-bold text-foreground font-display">About HerdSync</h1>
           <p className="text-muted-foreground mt-1">
-            Empowering farmers with modern livestock management solutions
+            Livestock and farm management software, built for South Africa.
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Last updated: 13 May 2026
           </p>
         </div>
 
@@ -59,11 +62,38 @@ export default function About() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground leading-relaxed">
-              At HerdSync, our mission is to simplify farm management for livestock farmers across South Africa 
-              and beyond. We believe that every farmer, regardless of the size of their operation, deserves 
-              access to professional-grade tools that help them manage their herds efficiently, stay compliant 
-              with regulations, and ultimately run more profitable farms.
+              HerdSync exists to make professional-grade livestock and farm management
+              accessible to every South African farmer — from emerging smallholders
+              to established commercial operations. We replace scattered notebooks,
+              spreadsheets and WhatsApp messages with a single, audit-ready system
+              that speaks the language of South African regulation, weather and rand-based economics.
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Why HerdSync exists */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-primary" />
+              Why HerdSync was built for South Africa
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-muted-foreground leading-relaxed">
+            <p>
+              Most farm management software is built for European or North American
+              farms. The currency is wrong, the compliance frameworks are wrong, the
+              animal mix is wrong and the connectivity assumptions are wrong.
+              HerdSync is the opposite — every screen, schedule and report is shaped
+              by South African realities:
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Regulation:</strong> AIDA-aligned animal identification, Labour Relations Act and Occupational Health and Safety checklists, animal-linked chemical and remedy registers, and an Audit Pack Builder that produces inspection-ready PDFs.</li>
+              <li><strong>Currency:</strong> All pricing, expenses, sales and reports are in South African Rand. No conversions, no rounding errors, no surprises at month-end.</li>
+              <li><strong>Climate &amp; mix:</strong> Domestic livestock and wild game side-by-side. Drought-aware feeding plans. Veld management is a first-class concept.</li>
+              <li><strong>Connectivity:</strong> Mobile-first UX with safe-area insets, large touch targets and resilient sync — designed for farms with intermittent rural connectivity.</li>
+              <li><strong>Language &amp; payment:</strong> Local payment rails (Yoco, EFT, SnapScan, Zapper, PayPal) and ZA-native communication patterns.</li>
+            </ul>
           </CardContent>
         </Card>
 
