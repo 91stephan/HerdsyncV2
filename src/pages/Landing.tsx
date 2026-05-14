@@ -637,6 +637,7 @@ export default function Landing() {
           </Card>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="bg-card/80 backdrop-blur-sm border-t border-border py-12">
