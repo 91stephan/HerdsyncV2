@@ -173,10 +173,17 @@ export default function Landing() {
   }, [user, loading, navigate]);
 
   return (
-    <div 
+    <div
       className="min-h-screen farm-background"
       style={{ '--farm-bg-image': `url(${farmBackground})` } as React.CSSProperties}
     >
+      {/* Skip to content (a11y) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       {/* Navigation */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-card/90 backdrop-blur-md">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -232,6 +239,7 @@ export default function Landing() {
         </div>
       </header>
 
+      <main id="main-content" tabIndex={-1}>
       {/* Hero Section */}
       <section className="py-16 lg:py-28">
         <div className="container mx-auto px-4">
@@ -370,19 +378,31 @@ export default function Landing() {
             </div>
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
-                <img 
-                  src={cowImage} 
-                  alt="Cattle management" 
+                <img
+                  src={cowImage}
+                  alt="Bonsmara cattle on a South African farm tracked in HerdSync"
+                  loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="400"
                   className="rounded-xl shadow-lg w-full h-48 object-cover"
                 />
-                <img 
-                  src={sheepImage} 
-                  alt="Sheep farming" 
+                <img
+                  src={sheepImage}
+                  alt="Merino sheep flock managed with HerdSync livestock records"
+                  loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="400"
                   className="rounded-xl shadow-lg w-full h-48 object-cover mt-8"
                 />
-                <img 
-                  src={chickenImage} 
-                  alt="Poultry tracking" 
+                <img
+                  src={chickenImage}
+                  alt="Free-range poultry tracked in HerdSync for South African smallholders"
+                  loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="400"
                   className="rounded-xl shadow-lg w-full h-48 object-cover -mt-4"
                 />
                 <div className="rounded-xl bg-primary/10 backdrop-blur-sm p-6 flex flex-col items-center justify-center text-center">
@@ -617,6 +637,7 @@ export default function Landing() {
           </Card>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="bg-card/80 backdrop-blur-sm border-t border-border py-12">

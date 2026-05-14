@@ -1,0 +1,21 @@
+/* TEAM */
+Maintainer: The HerdSync Team
+Site: https://herdsync.co.za
+Contact: syncherd [at] gmail.com
+Location: Krugersdorp, Gauteng, South Africa
+
+/* SITE */
+Standards: HTML5, CSS3, ES2022, WCAG 2.1 AA
+Components: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+Backend: Lovable Cloud (PostgreSQL, edge functions, storage)
+Mobile: Capacitor (iOS, Android)
+Language: en-ZA
+Currency: ZAR (South African Rand)
+
+/* PURPOSE */
+HerdSync is livestock and farm management software built for South
+African farmers — herd tracking, AIDA compliance, feeding, health,
+inventory, market prices and audit-ready PDF reports in ZAR.
+
+/* AI ENGINES */
+Discovery: /llms.txt, /llms-full.txt, /sitemap.xml, /changelog
