@@ -370,19 +370,31 @@ export default function Landing() {
             </div>
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
-                <img 
-                  src={cowImage} 
-                  alt="Cattle management" 
+                <img
+                  src={cowImage}
+                  alt="Bonsmara cattle on a South African farm tracked in HerdSync"
+                  loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="400"
                   className="rounded-xl shadow-lg w-full h-48 object-cover"
                 />
-                <img 
-                  src={sheepImage} 
-                  alt="Sheep farming" 
+                <img
+                  src={sheepImage}
+                  alt="Merino sheep flock managed with HerdSync livestock records"
+                  loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="400"
                   className="rounded-xl shadow-lg w-full h-48 object-cover mt-8"
                 />
-                <img 
-                  src={chickenImage} 
-                  alt="Poultry tracking" 
+                <img
+                  src={chickenImage}
+                  alt="Free-range poultry tracked in HerdSync for South African smallholders"
+                  loading="lazy"
+                  decoding="async"
+                  width="600"
+                  height="400"
                   className="rounded-xl shadow-lg w-full h-48 object-cover -mt-4"
                 />
                 <div className="rounded-xl bg-primary/10 backdrop-blur-sm p-6 flex flex-col items-center justify-center text-center">
