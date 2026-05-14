@@ -173,10 +173,17 @@ export default function Landing() {
   }, [user, loading, navigate]);
 
   return (
-    <div 
+    <div
       className="min-h-screen farm-background"
       style={{ '--farm-bg-image': `url(${farmBackground})` } as React.CSSProperties}
     >
+      {/* Skip to content (a11y) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
       {/* Navigation */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-card/90 backdrop-blur-md">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -232,6 +239,7 @@ export default function Landing() {
         </div>
       </header>
 
+      <main id="main-content" tabIndex={-1}>
       {/* Hero Section */}
       <section className="py-16 lg:py-28">
         <div className="container mx-auto px-4">
