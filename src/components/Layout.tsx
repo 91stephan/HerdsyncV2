@@ -16,15 +16,12 @@ import {
   UserCog,
   BookOpen,
   Shuffle,
-  ChevronDown,
-  ChevronRight,
   Menu,
   X,
   ArrowLeft,
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useState, useRef, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -32,7 +29,6 @@ import { useProfile } from "@/hooks/useProfile";
 import { SyncStatusBar } from "@/components/SyncStatusBar";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { PageProgressBar } from "@/components/PageProgressBar";
-import { NotificationBell } from "@/components/NotificationBell";
 
 interface NavItem {
   name: string;
@@ -250,7 +246,6 @@ export function Layout({ children }: LayoutProps) {
             <BookOpen className="w-5 h-5 text-primary" />
             <span className="font-bold text-base">HerdSync V2</span>
           </Link>
-          {user && <NotificationBell />}
         </header>
 
         {/* Sync status bar */}
@@ -259,9 +254,6 @@ export function Layout({ children }: LayoutProps) {
         {/* Page content */}
         <main className="flex-1 overflow-auto">
           <div className="p-3 sm:p-4 lg:p-6">
-            <div className="hidden lg:flex justify-end mb-2">
-              {user && <NotificationBell />}
-            </div>
             {showBackButton && (
               <Button
                 variant="ghost"

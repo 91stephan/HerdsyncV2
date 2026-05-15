@@ -308,7 +308,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 size="sm"
-                className="border-white/30 text-white hover:bg-white/10 hover:text-white"
+                className="border-white/40 bg-white/15 text-white hover:bg-white/25 hover:text-white"
                 onClick={load}
                 disabled={loading}
               >
