@@ -1,4 +1,4 @@
-project_id = "REPLACE_WITH_NEW_PROJECT_ID"
+project_id = "lrsygvqdbsrkkikaqdcg"
 
 [functions.liamis-sync]
 verify_jwt = true
