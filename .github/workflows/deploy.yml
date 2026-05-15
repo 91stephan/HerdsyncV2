@@ -20,28 +20,50 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ------------------------------------------------------------------
+      # 1. Push migrations via psql — bypasses Supabase CLI auth entirely.
+      #    Tracks applied versions in supabase_migrations.schema_migrations
+      #    (the same table the Supabase CLI uses).
+      # ------------------------------------------------------------------
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Push database migrations
+        run: |
+          DB_URL="postgresql://postgres:${PGPASSWORD}@db.lrsygvqdbsrkkikaqdcg.supabase.co:5432/postgres"
+
+          # Ensure migration tracking table exists
+          psql "$DB_URL" -c "
+            CREATE SCHEMA IF NOT EXISTS supabase_migrations;
+            CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (
+              version text NOT NULL PRIMARY KEY,
+              statements text[],
+              name text
+            );
+          " 2>/dev/null || true
+
+          for f in supabase/migrations/*.sql; do
+            version=$(basename "$f" | grep -oP '^\d+')
+            exists=$(psql "$DB_URL" -tAc "SELECT 1 FROM supabase_migrations.schema_migrations WHERE version='$version'" 2>/dev/null)
+            if [ "$exists" = "1" ]; then
+              echo "Already applied: $f"
+            else
+              echo "Applying: $f"
+              psql "$DB_URL" -f "$f"
+              psql "$DB_URL" -c "INSERT INTO supabase_migrations.schema_migrations(version,name) VALUES('$version','$(basename $f)') ON CONFLICT DO NOTHING"
+            fi
+          done
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      # ------------------------------------------------------------------
+      # 2. Deploy edge functions via Supabase CLI.
+      # ------------------------------------------------------------------
       - name: Set up Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
-      - name: Check secrets are present
-        run: |
-          echo "ACCESS_TOKEN set: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' }}"
-          echo "DB_PASSWORD set:  ${{ secrets.SUPABASE_DB_PASSWORD != '' }}"
-
-      # ------------------------------------------------------------------
-      # 1. Push migrations via direct DB URL — no access token needed.
-      # ------------------------------------------------------------------
-      - name: Push database migrations
-        run: |
-          supabase db push --db-url "postgresql://postgres:${SUPABASE_DB_PASSWORD}@db.lrsygvqdbsrkkikaqdcg.supabase.co:5432/postgres"
-        env:
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-
-      # ------------------------------------------------------------------
-      # 2. Deploy edge functions — requires access token.
-      # ------------------------------------------------------------------
       - name: Deploy edge functions
         run: supabase functions deploy
         env:
