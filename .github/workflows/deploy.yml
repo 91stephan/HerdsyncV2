@@ -20,9 +20,7 @@ jobs:
 
       - name: Push database migrations
         run: |
-          PGHOST=$(python3 -c "import socket; print(socket.getaddrinfo('db.lrsygvqdbsrkkikaqdcg.supabase.co', 5432, socket.AF_INET)[0][4][0])")
-          export PGHOST
-          echo "Connecting to IPv4: $PGHOST"
+          echo "Connecting via Supabase session pooler (IPv4)..."
 
           psql -c "CREATE SCHEMA IF NOT EXISTS supabase_migrations; CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (version text NOT NULL PRIMARY KEY, statements text[], name text);" 2>/dev/null || true
 
@@ -38,8 +36,9 @@ jobs:
             fi
           done
         env:
+          PGHOST: aws-0-eu-central-1.pooler.supabase.com
           PGPORT: "5432"
-          PGUSER: postgres
+          PGUSER: postgres.lrsygvqdbsrkkikaqdcg
           PGDATABASE: postgres
           PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           PGSSLMODE: require
