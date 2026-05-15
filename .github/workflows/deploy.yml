@@ -30,6 +30,10 @@ jobs:
 
       - name: Push database migrations
         run: |
+          # Force IPv4 — GitHub runners can't reach Supabase over IPv6
+          export PGHOST=$(getent ahostsv4 db.lrsygvqdbsrkkikaqdcg.supabase.co | head -1 | awk '{print $1}')
+          echo "Connecting to: $PGHOST"
+
           # Ensure migration tracking table exists
           psql -c "
             CREATE SCHEMA IF NOT EXISTS supabase_migrations;
@@ -52,7 +56,6 @@ jobs:
             fi
           done
         env:
-          PGHOST: db.lrsygvqdbsrkkikaqdcg.supabase.co
           PGPORT: "5432"
           PGUSER: postgres
           PGDATABASE: postgres
