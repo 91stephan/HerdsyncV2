@@ -1,0 +1,187 @@
+TASK: Write a comprehensive User Manual for the system described below.
+This is a mandatory deliverable under a Lesotho Government tender.
+The manual must cover all user-facing modules for all staff roles.
+Write in clear, plain English. Use numbered steps for procedures.
+Include a section per module. Approximately 3,500 words.
+
+=====================================================================
+SYSTEM CONTEXT
+=====================================================================
+
+PROJECT: HerdSync V2 — Lesotho National Breeding System
+CLIENT: Ministry of Agriculture and Food Security, Kingdom of Lesotho
+TENDER: LSO-2000003942-0137-CS-QCBS
+URL: [System URL provided by Ministry IT]
+MOBILE: Available as Android and iOS app via Capacitor
+
+---------------------------------------------------------------------
+USER ROLES (describe permissions for each in the manual)
+---------------------------------------------------------------------
+system_admin    — Full access to all modules, user management,
+                  audit log, system configuration
+center_manager  — Manages their breeding center: animals, staff tasks,
+                  culling records, documents
+district_officer — Reads all data in their district; approves and
+                   updates records; submits WOAH reports
+veterinarian    — Creates and updates health records, vaccination
+                   schedules, disease reports
+field_worker    — Registers animals (online or offline), records
+                   culling exchanges, registers farmers
+
+---------------------------------------------------------------------
+MODULES TO DOCUMENT
+---------------------------------------------------------------------
+
+MODULE 1: AUTHENTICATION
+- Login with email and password
+- Reset forgotten password
+- Role displayed on profile page
+
+MODULE 2: DASHBOARD
+- Overview of key stats for the user's district/center
+- Sync status bar (shows if records are pending upload)
+- Quick links to most-used modules
+
+MODULE 3: LIVESTOCK REGISTRY
+- View all livestock (filter by species, status, district)
+- Register a new animal:
+  * Scan 15-digit RFID tag OR enter manually
+  * Select species: Merino Sheep / Angora Goat / Cattle / Other
+  * Enter breed, sex, date of birth, weight
+  * Enter fiber metrics (for Merino/Angora):
+    - Greasy Fleece Weight (kg)
+    - Micron Diameter (µm)
+    - Staple Length (cm)
+    - Clean Oven-Dry Yield (%)
+  * Link to sire and dam (optional — enables pedigree)
+  * Assign to district and breeding center
+- Edit an existing animal record
+- Record a status change (active → culled / deceased / transferred)
+- View pedigree tree for an animal
+
+MODULE 4: PEDIGREE LINEAGE
+- View multi-generational pedigree for any animal
+- Understand inbreeding coefficient displayed
+- How the system prevents inbreeding: warning if coefficient > 0.125
+
+MODULE 5: BREEDING RECORDS
+- Record a mating event (sire + dam + date + center)
+- Mark outcome: in progress / successful / unsuccessful
+- Record birth outcome (birth date, weight, alive/dead, offspring ID)
+- View breeding history for a dam
+
+MODULE 6: GENETIC INDICES (District Officers and Admins)
+- Open Breeding Expert Dashboard
+- Select district and species
+- View three Basotho indices:
+  * Annual Mortality Rate (%)
+  * Annual Offtake Rate (%)
+  * Lambing / Kidding Rate (per animal-day × 365)
+- Understand what each index means
+- Trigger recalculation for the current year
+- Export index report as PDF
+
+MODULE 7: CULLING & EXCHANGE PROGRAM
+- Register a participating farmer
+- Create a new culling exchange record:
+  * Select farmer and district
+  * Identify the low-yielding animal (tag, species, breed, reason)
+  * Select replacement type (Merino Ram / Angora Buck)
+  * Set scheduled date
+- Advance status step by step:
+  Step 1 — Scheduled
+  Step 2 — Mark as Collected (collection_date auto-filled)
+  Step 3 — Mark as Replaced (replacement_date auto-filled)
+  Step 4 — Mark as Completed
+- View exchange history by farmer or district
+
+MODULE 8: HEALTH RECORDS
+- Record a health event for an animal:
+  * Event type: vaccination / treatment / examination / diagnosis
+  * Medication, dosage, veterinarian
+  * Next follow-up date
+- View upcoming follow-up reminders
+- Add a vaccination record (with batch number and next due date)
+- View vaccination schedule due in next 30 days
+
+MODULE 9: WOAH DISEASE REPORTING
+- Create a new disease report (suspected outbreak):
+  * Disease name and WOAH code (if known)
+  * Species affected, district, date detected
+  * Animals at risk, confirmed cases, deaths
+  * Containment measures taken
+  * Lab confirmation toggle and reference
+- Update status: suspected → confirmed → resolved
+- Export WAHIS-compliant JSON for Ministry submission
+  (Button: "Export for WAHIS Submission")
+
+MODULE 10: OFFLINE SYNC (Field Workers)
+- Working offline: system continues to function with no internet
+- Records created offline are saved locally (shown as "Pending")
+- Sync Status Bar: visible at top of screen when records are pending
+  * Green = all synced
+  * Yellow = records pending upload
+  * Red = sync errors or conflicts
+- How to sync when connectivity restored:
+  * Connect to WiFi or mobile data
+  * Click "Sync Now" button in the status bar OR wait for auto-sync
+- Resolving conflicts: if a record was edited on the server while
+  you were offline, the system flags it — contact your district
+  officer to resolve
+
+MODULE 11: RFID SCANNER SETTINGS
+- Open Settings → RFID Scanner Configuration
+- Select reader model and connection type (Bluetooth / USB-C)
+- Enter Bluetooth device address
+- Set frequency to 134.2 kHz (ISO 11784/11785)
+- Validate a tag ID in the "Test Scan" section
+  * Green = valid 15-digit national ID
+  * Red = invalid format
+- Country code for Lesotho: 426
+
+MODULE 12: COMPLIANCE DOCUMENTS
+- Upload a document: select category, enter date, upload file
+- Document categories: Animal Registration, Movement Permit,
+  Health Certificate, Vaccination Record, WOAH Report,
+  EFI Certificate, Training Record, Ministry Directive
+- View and download existing documents
+- Documents with an expiry date are highlighted when approaching
+
+MODULE 13: TASK MANAGEMENT (Officers and Managers)
+- Create a task: title, description, assign to staff member,
+  priority (low/medium/high/urgent), due date
+- Assigned staff can update task status:
+  pending → in_progress → completed
+- View overdue tasks in dashboard
+
+MODULE 14: USER MANAGEMENT (Admins Only)
+- Invite a new staff member (sends email)
+- Assign role: field_worker / veterinarian / district_officer /
+  center_manager / system_admin
+- Assign district and breeding center
+- Deactivate a user account
+
+MODULE 15: AUDIT LOG (Admins Only)
+- View all system actions with timestamp, user, and data changed
+- Filter by user, action type, or date range
+- Export audit log for compliance review
+
+---------------------------------------------------------------------
+GLOSSARY FOR THE MANUAL
+---------------------------------------------------------------------
+Include a glossary at the end defining:
+RFID, ISO 11784/11785, Pedigree, Inbreeding Coefficient,
+Greasy Fleece Weight, Micron Diameter, Staple Length, Clean Yield,
+Offtake Rate, Lambing Rate, WOAH, WAHIS, EFI, LIAMIS, WaMCoP,
+Culling, Exchange Program, Offline Sync, District, Breeding Center
+
+=====================================================================
+FORMAT INSTRUCTIONS
+=====================================================================
+- Title page: "HerdSync V2 — User Manual", version, date, Ministry logo placeholder
+- Table of contents
+- Numbered sections and sub-sections
+- Use numbered steps (Step 1, Step 2…) for all procedures
+- Use NOTE: and WARNING: callouts where important
+- Plain English — assume users are literate but not technical
+- Approx. 3,500 words

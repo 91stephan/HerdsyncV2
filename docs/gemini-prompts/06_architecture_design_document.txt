@@ -1,0 +1,258 @@
+TASK: Write a formal Architectural Design Document (ADD) for the
+system described below. This is a mandatory deliverable separate
+from the TOGAF document — it is the technical blueprint that
+developers and Ministry IT staff use to understand exactly how the
+system is built. Approximately 2,500 words. Include diagrams
+described in text (ASCII or mermaid notation is acceptable).
+
+=====================================================================
+SYSTEM CONTEXT
+=====================================================================
+
+PROJECT: HerdSync V2 — Lesotho National Breeding System
+CLIENT: Ministry of Agriculture and Food Security, Kingdom of Lesotho
+TENDER: LSO-2000003942-0137-CS-QCBS
+VERSION: 1.0
+
+---------------------------------------------------------------------
+FULL TECHNICAL STACK
+---------------------------------------------------------------------
+FRONTEND
+  Framework:     React 18.3 + TypeScript
+  Build tool:    Vite 5.4
+  Styling:       Tailwind CSS 3.4, shadcn/ui (Radix UI)
+  Charts:        Recharts 2.15
+  PDF export:    jsPDF 4
+  Mobile:        Capacitor 8 (iOS + Android)
+  Routing:       React Router DOM 6
+  State/data:    TanStack React Query 5
+  Forms:         React Hook Form 7 + Zod
+
+BACKEND (Self-hosted Supabase)
+  Database:      PostgreSQL 15
+  REST API:      PostgREST v12
+  Auth:          GoTrue v2 (Supabase Auth)
+  Realtime:      Supabase Realtime v2
+  Storage:       Supabase Storage API v1
+  Edge Runtime:  Supabase Edge Runtime v1 (Deno)
+  API Gateway:   Kong 2.8
+  Admin UI:      Supabase Studio
+
+INFRASTRUCTURE
+  OS:            Ubuntu 22.04 LTS
+  Container:     Docker Compose
+  Reverse proxy: Nginx (TLS, rate limiting, IP whitelist)
+  Firewall:      UFW + Fail2ban
+  Backups:       Daily pg_dump, 30-day retention, gzip
+  Data center:   Lesotho Government — Mohale's Hoek
+
+---------------------------------------------------------------------
+COMPLETE DATABASE SCHEMA
+---------------------------------------------------------------------
+
+ENUMS:
+  staff_role: system_admin, center_manager, district_officer,
+              field_worker, veterinarian
+  livestock_species: merino_sheep, angora_goat, cattle, other
+  livestock_sex: male, female
+  livestock_status: active, culled, deceased, sold, transferred,
+                    quarantined
+  movement_type: sale, slaughter, stolen, gift_out, gift_in,
+                 purchase, transfer_in, transfer_out, death, birth
+  document_category: animal_registration, movement_permit,
+    health_certificate, vaccination_record, breeding_certificate,
+    import_export_permit, woah_report, efi_certificate,
+    training_record, ministry_directive, other
+  sync_status: pending, synced, conflict, failed
+  woah_disease_status: suspected, confirmed, resolved
+  culling_exchange_status: scheduled, collected, replaced,
+                            completed, cancelled
+  task_priority: low, medium, high, urgent
+  task_status: pending, in_progress, completed, cancelled
+  breeding_outcome: in_progress, successful, unsuccessful
+  external_sync_status: pending, success, failed
+
+KEY TABLES (include column names and types in the document):
+  districts (id, name, code)
+  breeding_centers (id, name, district_id, location, gps_coordinates,
+    contact_phone, contact_email, established_date, active)
+  profiles (id→auth.users, full_name, role:staff_role, district_id,
+    breeding_center_id, phone, employee_number, active)
+  farmers (id, full_name, national_id, village, district_id, phone,
+    gps_coordinates, registered_by)
+  livestock (id, national_id[15-digit RFID], rfid_tag, species, breed,
+    sex, color_markings, date_of_birth, birth_weight, weight,
+    greasy_fleece_weight, micron_diameter, staple_length, clean_yield_pct,
+    sire_id→livestock, dam_id→livestock, generation_number,
+    inbreeding_coefficient, district_id, breeding_center_id,
+    owner_farmer_id, status, acquisition_date, removed_at,
+    removal_reason, registered_by)
+  pedigree_records (id, animal_id, ancestor_id, relationship,
+    generation_depth)
+  breeding_records (id, sire_id, dam_id, breeding_center_id,
+    district_id, mating_date, expected_birth_date, outcome)
+  birthing_records (id, breeding_record_id, dam_id, sire_id,
+    offspring_id, birth_date, birth_weight, alive, district_id)
+  livestock_movements (id, livestock_id, species, sex,
+    movement_type, movement_date, quantity, unit_value, total_value,
+    counterparty_name, district_id, breeding_center_id,
+    culling_exchange_id)
+  genetic_indices (id, district_id, breeding_center_id, species,
+    year, herd_size_start, herd_size_end, avg_herd_size,
+    total_deaths, total_sales, total_slaughter, total_stolen,
+    total_gifts_out, total_gifts_in, total_purchases, total_births,
+    total_parturitions, total_female_animal_days,
+    annual_mortality_rate, annual_offtake_rate, lambing_kidding_rate,
+    avg_greasy_fleece_weight, avg_micron_diameter, avg_staple_length,
+    avg_clean_yield_pct)
+  reproductive_indices (id, district_id, breeding_center_id, species,
+    period_start, period_end, total_females, total_births, live_births,
+    deaths_before_weaning, weaned, lambing_kidding_rate,
+    weaning_survival_rate, mortality_risk_rate)
+  culling_exchange_records (id, farmer_id, district_id,
+    breeding_center_id, culled_animal_id, culled_animal_species,
+    culled_animal_breed, culled_animal_tag, culling_reason,
+    replacement_animal_id, replacement_type, status,
+    scheduled_date, collection_date, replacement_date, field_officer_id)
+  health_records (id, livestock_id, district_id, breeding_center_id,
+    event_date, event_type, diagnosis, treatment, medication, dosage,
+    veterinarian_id, next_followup_date)
+  vaccination_records (id, livestock_id, vaccine_name, disease_target,
+    vaccination_date, batch_number, next_due_date, administered_by)
+  woah_disease_reports (id, district_id, breeding_center_id,
+    disease_name, woah_disease_code, species_affected, date_detected,
+    date_reported, resolved_at, animals_at_risk, cases_confirmed,
+    deaths, status, containment_measures, lab_confirmation,
+    lab_reference, reported_by)
+  compliance_documents (id, district_id, breeding_center_id, title,
+    category, file_url, file_name, date_of_document, expiry_date)
+  tasks (id, title, description, assigned_to, assigned_by,
+    district_id, breeding_center_id, priority, status, due_date)
+  offline_sync_queue (id, device_id, user_id, table_name, operation,
+    record_id, payload:JSONB, status, conflict_data:JSONB,
+    retry_count, synced_at, error_message)
+  liamis_sync_log (id, sync_type, record_ids, status, request_payload,
+    response_payload, error_message, retry_count, synced_at)
+  project_mis_sync_log (same structure as liamis_sync_log)
+  efi_export_records (id, district_id, period_start, period_end,
+    species, total_animals, avg_micron_diameter, avg_staple_length,
+    avg_clean_yield_pct, total_greasy_fleece_kg, export_file_url)
+  notifications (id, user_id, title, message, type, read)
+  audit_log (id, user_id, action, table_name, record_id,
+    old_data:JSONB, new_data:JSONB, ip_address)
+
+KEY SQL FUNCTIONS:
+  update_updated_at_column()   — trigger for updated_at timestamps
+  handle_new_user()            — auto-creates profile on auth signup
+  get_user_role()              — returns current user's staff_role
+  get_user_district_id()       — returns current user's district UUID
+  get_user_center_id()         — returns current user's center UUID
+  build_pedigree_cache(animal_id) — populates pedigree_records up to 4 generations
+  calculate_genetic_indices(district_id, species, year, center_id)
+    — computes annual_mortality_rate = deaths/avg_herd × 100
+       annual_offtake_rate = (sales+slaughter+stolen+gifts_out
+                              −gifts_in−purchases)/avg_herd × 100
+       lambing_kidding_rate = parturitions/female_animal_days × 365
+  recalculate_reproductive_indices(district, period_start, period_end, species)
+
+EDGE FUNCTIONS (Deno):
+  wahis-export            — POST, formats woah_disease_reports to WAHIS JSON
+  process-offline-queue   — POST, applies pending offline_sync_queue entries
+  calculate-genetic-indices — POST/scheduled, calls calculate_genetic_indices
+                              across all districts
+
+VIEWS:
+  livestock_summary        — flat view joining districts, centers, farmers
+  district_health_summary  — WOAH case counts per district
+
+---------------------------------------------------------------------
+SECURITY MODEL
+---------------------------------------------------------------------
+- Every table has RLS enabled
+- Helper functions (SECURITY DEFINER) used in policies:
+  get_user_role(), get_user_district_id(), get_user_center_id()
+- Permission matrix:
+  system_admin:   SELECT/INSERT/UPDATE/DELETE on all tables
+  center_manager: Full access within their center
+  district_officer: SELECT all in district, INSERT/UPDATE in district
+  veterinarian:   SELECT all, INSERT/UPDATE health/vaccination/WOAH
+  field_worker:   SELECT/INSERT in their district only
+
+=====================================================================
+ADD STRUCTURE TO PRODUCE
+=====================================================================
+
+COVER PAGE + VERSION HISTORY TABLE
+
+1. INTRODUCTION
+   1.1 Purpose and scope of this document
+   1.2 Intended audience
+   1.3 Related documents
+
+2. SYSTEM OVERVIEW
+   2.1 High-level architecture description
+   2.2 Key design decisions and rationale
+       - Why self-hosted Supabase (data sovereignty)
+       - Why Capacitor (offline mobile + web from single codebase)
+       - Why PostgreSQL RLS (government-grade row security)
+       - Why offline-first sync queue (connectivity in highlands)
+
+3. NETWORK TOPOLOGY DIAGRAM
+   Describe in text or ASCII/Mermaid:
+   [Mobile/Browser] → [Nginx TLS] → [Kong Gateway] →
+   [PostgREST | GoTrue | Realtime | Storage | Edge Runtime]
+   → [PostgreSQL 15]
+   [Kong] → [Supabase Studio] (Ministry IP only)
+
+4. DATA ARCHITECTURE
+   4.1 Entity relationship overview (text description of key relationships)
+   4.2 Full table list with key fields (use the schema above)
+   4.3 Data flows (field registration → offline queue → server sync)
+   4.4 Data retention and archival policy
+
+5. APPLICATION ARCHITECTURE
+   5.1 Frontend layer (React + Capacitor)
+   5.2 API layer (PostgREST auto-generated from schema)
+   5.3 Business logic layer (Edge Functions + SQL functions)
+   5.4 Integration layer (LIAMIS, MIS, WAHIS, EFI)
+
+6. SECURITY ARCHITECTURE
+   6.1 Authentication flow (JWT via GoTrue)
+   6.2 Authorisation model (RLS + helper functions)
+   6.3 Network security (Nginx, UFW, Fail2ban)
+   6.4 Encryption (TLS in transit, disk encryption at rest)
+   6.5 Audit trail (audit_log table)
+
+7. OFFLINE-FIRST ARCHITECTURE
+   7.1 Device ID generation and persistence
+   7.2 offline_sync_queue record structure
+   7.3 Conflict detection algorithm (updated_at comparison)
+   7.4 Retry strategy (max 3 retries, then status=failed)
+
+8. RFID INTEGRATION ARCHITECTURE
+   8.1 ISO 11784/11785 LF 134.2 kHz standard summary
+   8.2 15-digit ID structure (3-digit country code + 12-digit individual)
+   8.3 Bluetooth reader interface (Capacitor plugin)
+   8.4 Validation constraint in database
+
+9. EXTERNAL INTEGRATION SPECIFICATIONS
+   9.1 LIAMIS — outbound REST push, sync_type options, retry logic
+   9.2 WaMCoP Project MIS — scheduled sync approach
+   9.3 WAHIS export — JSON structure, WAHIS country code LSO
+   9.4 EFI export — fiber data fields mapped to EFI schema
+
+10. DEPLOYMENT ARCHITECTURE
+    10.1 Docker Compose service topology
+    10.2 Volume mounts and persistence
+    10.3 Environment variables and secrets management
+    10.4 Backup and recovery procedure
+
+11. SCALABILITY AND PERFORMANCE CONSIDERATIONS
+    - Expected data volumes (5 centers × ~500 animals each)
+    - PostgreSQL indexing strategy (national_id, district, species)
+    - Connection pooling approach
+
+12. GLOSSARY
+
+FORMAT: Technical document. Include textual diagrams. Full prose
+plus tables for schema summary. Numbered sections. ~2,500 words.

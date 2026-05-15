@@ -1,0 +1,153 @@
+TASK: Write a formal Training Report for the system described below.
+This is a mandatory deliverable under a Lesotho Government tender.
+The report must prove that Ministry IT staff and center managers
+have been trained on system administration and sustainability.
+Approximately 1,500 words. Professional government document style.
+
+=====================================================================
+SYSTEM CONTEXT
+=====================================================================
+
+PROJECT: HerdSync V2 — Lesotho National Breeding System
+CLIENT: Ministry of Agriculture and Food Security, Kingdom of Lesotho
+TENDER: LSO-2000003942-0137-CS-QCBS
+CONTRACTOR: [Your Company Name]
+
+TRAINING MANDATE (from tender):
+"The consultant is required to submit a Training Report proving
+IT staff and farm managers have been trained on system
+administration and sustainability."
+
+---------------------------------------------------------------------
+TRAINING THAT WAS CONDUCTED
+---------------------------------------------------------------------
+
+TRAINING PROGRAMME 1: System Administration
+Duration: 3 days
+Audience: Ministry IT Department (4 staff), hosted at Maseru
+Topics covered:
+  Day 1 — Infrastructure management
+    - Docker Compose service management (start, stop, update)
+    - Database backup and restore procedure (backup.sh)
+    - Server monitoring (disk space, container health, logs)
+    - How to apply new database migrations
+    - SSL certificate renewal (nginx.conf)
+  Day 2 — Supabase Studio administration
+    - Using Supabase Studio to inspect database
+    - Managing user accounts and roles (profiles table)
+    - Reviewing the audit_log table
+    - Managing offline_sync_queue conflicts
+    - LIAMIS and MIS sync log monitoring
+  Day 3 — Security and incident response
+    - UFW firewall rules management
+    - Fail2ban log review
+    - Responding to a data breach (audit log + account suspension)
+    - Supabase Edge Function deployment
+    - How to roll back a bad migration
+
+TRAINING PROGRAMME 2: Center Manager Operations
+Duration: 2 days
+Audience: Breeding center managers (5 centers, 1 manager each)
+  - Semonkong Merino Stud Center
+  - Mohale's Hoek Angora Breeding Center
+  - Quthing National Stud Center
+  - Mokhotlong Highland Breeding Center
+  - Leribe Fiber Production Center
+Topics covered:
+  Day 1 — Daily operations
+    - Registering animals and fiber metrics
+    - Managing breeding records and birthing outcomes
+    - Running the genetic indices recalculation
+    - Using the Culling & Exchange workflow
+    - Reviewing reproductive indices for their district
+  Day 2 — Reporting and compliance
+    - Creating WOAH disease reports
+    - Exporting WAHIS-compliant JSON for Ministry submission
+    - Generating EFI fiber export for Basotho Brand reporting
+    - Document vault management
+    - Training their field workers on offline sync
+
+TRAINING PROGRAMME 3: Field Worker Orientation
+Duration: 1 day (delivered at each center)
+Audience: Extension workers (estimated 15 across all centers)
+Topics covered:
+  - Using the mobile app offline
+  - Registering animals with RFID scanner
+  - Recording culling exchange events
+  - Understanding the Sync Status Bar
+  - Escalating conflicts to district officer
+
+---------------------------------------------------------------------
+ASSESSMENT CONDUCTED
+---------------------------------------------------------------------
+Each participant completed a practical assessment:
+  IT Staff: Successfully perform a database backup and restore
+  Center Managers: Register an animal, create a culling record,
+    generate a genetic index report
+  Field Workers: Register 3 animals offline and sync on reconnect
+
+Pass rate: 18/19 participants (95%)
+One field worker (Mokhotlong) requires a repeat session due to
+connectivity challenges during training.
+
+=====================================================================
+TRAINING REPORT STRUCTURE TO PRODUCE
+=====================================================================
+
+COVER PAGE
+- "HerdSync V2 — Training Report"
+- Tender reference, date, submitted to Ministry of Agriculture
+
+1. EXECUTIVE SUMMARY
+   - Training objective and mandate
+   - Total participants trained by programme
+   - Overall assessment outcome
+
+2. TRAINING NEEDS ANALYSIS
+   - How training requirements were identified
+   - Mapping of roles to training programmes
+
+3. TRAINING PROGRAMME DETAILS
+   For each of the 3 programmes above:
+   3.1 Programme name
+   3.2 Dates and venue
+   3.3 Trainer(s)
+   3.4 Participants (table: Name | Role | Centre/District | Attended)
+   3.5 Training objectives
+   3.6 Curriculum summary (as above)
+   3.7 Delivery method (in-person, hands-on lab, demonstration)
+   3.8 Materials distributed (User Manual, Quick Reference Cards)
+
+4. ASSESSMENT RESULTS
+   Table: Participant | Programme | Assessment Task | Result (Pass/Fail)
+   Summary statistics: pass rate per programme
+
+5. PARTICIPANT FEEDBACK SUMMARY
+   - What participants found most valuable
+   - Areas needing improvement in the system or training materials
+   - Request from Mokhotlong center for translated Quick Reference Card
+
+6. KNOWLEDGE TRANSFER SUSTAINABILITY PLAN
+   6.1 Train-the-trainer: designated Ministry IT lead for onboarding
+       new staff using existing materials
+   6.2 User Manual availability (built into the system help section)
+   6.3 2-year support window for follow-up questions
+   6.4 Recommended refresher training schedule (annual)
+
+7. OUTSTANDING TRAINING ACTIONS
+   - Repeat session for Mokhotlong field worker
+   - Quick Reference Card for offline sync to be laminated
+     and posted at all 5 centers
+
+8. CONCLUSION
+   - Certification that Ministry staff are trained and capable of
+     operating and administering the HerdSync V2 system
+   - Recommendation that the 2-year support agreement commence
+
+APPENDIX A: Signed Attendance Registers (one per programme)
+APPENDIX B: Assessment Rubric and Marking Guide
+APPENDIX C: Training Materials Issued
+
+FORMAT: Formal government report. Numbered sections. Tables for
+participant lists and results. Approx. 1,500 words.
+Professional, certification-worthy tone.

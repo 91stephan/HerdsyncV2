@@ -1,0 +1,139 @@
+TASK: Write a formal Inception Report for the system described below.
+This is a mandatory deliverable under a Lesotho Government tender.
+The document should be professional, structured, and approximately
+2,000 words. It is submitted at project kick-off to confirm shared
+understanding between the contractor and the Ministry.
+
+=====================================================================
+SYSTEM CONTEXT
+=====================================================================
+
+PROJECT NAME: HerdSync V2 — Lesotho National Breeding System
+CLIENT: Ministry of Agriculture and Food Security, Kingdom of Lesotho
+TENDER REFERENCE: LSO-2000003942-0137-CS-QCBS
+  "Digitalisation of National Breeding Centers" under WaMCoP
+CONTRACTOR: [Your Company Name] — acting as technology subcontractor
+PRIME CONTRACTOR: CBS (lead firm under JV arrangement)
+CONTRACT TYPE: Quality and Cost-Based Selection (QCBS)
+
+BACKGROUND:
+The Kingdom of Lesotho's economy is substantially dependent on wool
+and mohair production from Merino sheep and Angora goats. The
+WaMCoP (Wool and Mohair Competitiveness Project) project, funded
+by the International Fund for Agricultural Development (IFAD),
+mandates the digitalisation of national breeding centers to:
+- Prevent inbreeding in the national stud through pedigree tracking
+- Enable the Ministry to calculate and report Basotho livestock
+  indices (mortality rate, offtake rate, lambing/kidding rate)
+- Support the Ethical Fashion Initiative (EFI) Basotho Brand
+  certification for international luxury wool/mohair markets
+- Achieve WOAH/OIE disease notification compliance
+- Connect rural extension workers in Quthing and Mokhotlong
+  districts via offline-capable mobile tools
+
+BREEDING CENTERS IN SCOPE:
+- Semonkong Merino Stud Center (Maseru District)
+- Mohale's Hoek Angora Breeding Center
+- Quthing National Stud Center
+- Mokhotlong Highland Breeding Center
+- Leribe Fiber Production Center
+
+SYSTEM BEING DELIVERED:
+A self-hosted React/TypeScript web and mobile application backed by
+a self-hosted PostgreSQL (Supabase) stack deployed on Lesotho
+Government infrastructure. Key modules:
+1. National livestock registry (ISO 11784/11785 RFID, 15-digit ID)
+2. Pedigree lineage engine (multi-generational, inbreeding coefficient)
+3. Fiber production tracking (fleece weight, micron, staple, yield)
+4. Culling & Exchange program workflow
+5. WOAH/OIE-compliant disease reporting
+6. Genetic indices calculator (Basotho-specific)
+7. Offline field sync for remote districts
+8. LIAMIS and WaMCoP MIS integration
+9. EFI fiber data exports
+
+=====================================================================
+INCEPTION REPORT STRUCTURE TO PRODUCE
+=====================================================================
+
+COVER PAGE
+- Project title, tender reference, date, prepared by/for
+
+1. INTRODUCTION
+   1.1 Purpose of this report
+   1.2 Project background and mandate
+   1.3 Scope statement
+
+2. UNDERSTANDING OF THE ASSIGNMENT
+   2.1 Problem statement (current manual, paper-based system)
+   2.2 Objectives of digitalisation
+   2.3 Expected outcomes and success criteria
+   2.4 Scope inclusions and exclusions
+
+3. STAKEHOLDER ANALYSIS
+   - Ministry of Agriculture and Food Security
+   - WaMCoP Project Management Unit
+   - National Breeding Center managers
+   - District field extension workers
+   - Rural smallholder farmers
+   - WOAH / OIE (reporting authority)
+   - EFI (international market linkage)
+   - ICAR (RFID standards body)
+
+4. SYSTEM NEEDS ASSESSMENT
+   4.1 Functional requirements summary
+       - Livestock registration and RFID integration
+       - Pedigree and genetic management
+       - Culling and exchange program
+       - Disease surveillance and WOAH reporting
+       - Offline field operations
+       - Integration with LIAMIS and Project MIS
+   4.2 Non-functional requirements
+       - Government server hosting (data sovereignty)
+       - Offline-first mobile capability
+       - Role-based access control
+       - TOGAF architectural compliance
+       - 2-year post-deployment support
+
+5. PROPOSED METHODOLOGY AND APPROACH
+   5.1 Development methodology (Agile with fixed deliverables)
+   5.2 Technology choices and justification
+   5.3 Phased delivery plan (Phase 1: Core registry and pedigree;
+       Phase 2: Culling/exchange and disease reporting;
+       Phase 3: Integrations and EFI exports;
+       Phase 4: Deployment and training)
+   5.4 Risk management approach
+
+6. PROJECT GOVERNANCE
+   6.1 Project organisation chart
+   6.2 Roles and responsibilities
+   6.3 Reporting lines and escalation
+   6.4 JV arrangement (CBS as prime, technology subcontractor)
+   6.5 20% subcontracting limit compliance note
+
+7. WORK PLAN AND SCHEDULE
+   - Deliverable schedule aligned to tender Schedule of Deliverables:
+     D1: Inception Report (this document)
+     D2: Architectural Design Document
+     D3: Prototype Presentation and Testing Report
+     D4: Deployed System
+     D5: User Manual
+     D6: Training Report
+     D7: 2-year Support Agreement
+
+8. RESOURCE PLAN
+   - Development team composition
+   - Ministry counterpart requirements
+   - Infrastructure requirements (server specs for Mohale's Hoek)
+
+9. RISKS AND MITIGATION
+   - Connectivity challenges in Mokhotlong and Quthing
+   - Government server procurement timelines
+   - Farmer adoption and change management
+   - LIAMIS API availability
+
+10. CONCLUSION AND NEXT STEPS
+
+FORMAT: Formal government report. Numbered sections. Cover page.
+Full prose paragraphs. Tables for schedule and risk register.
+Approx. 2,000 words. Professional tone throughout.

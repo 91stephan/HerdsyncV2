@@ -1,0 +1,151 @@
+TASK: Write a formal Prototype Presentation and Testing Report for
+the system described below. This is a mandatory deliverable under a
+Lesotho Government tender. Approximately 1,800 words. Professional
+government document style.
+
+=====================================================================
+SYSTEM CONTEXT
+=====================================================================
+
+PROJECT: HerdSync V2 — Lesotho National Breeding System
+TENDER: LSO-2000003942-0137-CS-QCBS
+CLIENT: Ministry of Agriculture and Food Security, Kingdom of Lesotho
+
+THIS REPORT COVERS: The prototype demonstration held with Ministry
+stakeholders and the structured testing process that validated the
+core system modules before proceeding to full deployment.
+
+---------------------------------------------------------------------
+MODULES THAT WERE PROTOTYPED AND TESTED
+---------------------------------------------------------------------
+
+MODULE 1 — Livestock Registration & RFID
+- Register a Merino sheep with 15-digit ISO 11784 national ID
+- Scan via Bluetooth handheld reader (Agrident AWR250-type)
+- Validate that IDs not matching ^\d{15}$ are rejected
+- Test: registered 50 animals across 3 districts successfully
+
+MODULE 2 — Pedigree Lineage Engine
+- Register sire and dam, then register offspring linked to both
+- Verify pedigree_records table populated to generation depth 4
+- Verify inbreeding_coefficient updated on registration
+- Test: created 3-generation pedigree trees for 12 family groups
+
+MODULE 3 — Fiber Metrics
+- Record greasy_fleece_weight, micron_diameter, staple_length,
+  clean_yield_pct for Merino sheep and Angora goats
+- Verify district averages shown on Breeding Expert Dashboard
+- Test: entered 120 shearing records, averages within 0.5% of manual
+
+MODULE 4 — Culling & Exchange Workflow
+- Register a farmer and their low-yielding animal
+- Create a culling_exchange_record: status = scheduled
+- Advance through: collected → replaced → completed
+- Test: 8 exchange records completed end-to-end in UAT session
+
+MODULE 5 — Genetic Indices Calculator
+- Trigger calculate_genetic_indices() for Maseru district,
+  merino_sheep, year 2025
+- Verify annual_mortality_rate, annual_offtake_rate,
+  lambing_kidding_rate_per_animal_day computed correctly
+- Test: cross-checked against manual paper register — within 2%
+
+MODULE 6 — WOAH Disease Report & WAHIS Export
+- Create a suspected Brucellosis outbreak in Mokhotlong
+- Submit via WOAH Disease Reports module
+- Call wahis-export edge function, inspect JSON output
+- Verified: output contains reportingCountryCode: "LSO",
+  species code "OVI", all required WAHIS fields populated
+
+MODULE 7 — Offline Sync
+- Simulate field worker registering 3 animals with no network
+- Confirm records appear in offline_sync_queue with status=pending
+- Restore connectivity and trigger process-offline-queue
+- Test: all 3 records synced to livestock table, status=synced
+
+MODULE 8 — Role-Based Access Control
+- Verified field_worker cannot view LIAMIS sync log
+- Verified veterinarian can create health records but not delete livestock
+- Verified system_admin has full access
+
+---------------------------------------------------------------------
+TEST ENVIRONMENT
+---------------------------------------------------------------------
+- Environment: Staging server (Ubuntu 22.04, Docker Compose)
+- Database: PostgreSQL 15 with full migration set applied
+- Frontend: React build served via Nginx
+- Mobile: Android test device (Capacitor APK)
+- Test data: 200 mock livestock records across 5 breeding centers
+
+---------------------------------------------------------------------
+DEFECTS FOUND AND RESOLVED DURING PROTOTYPE PHASE
+---------------------------------------------------------------------
+BUG-001: national_id constraint allowed 14-digit IDs — FIXED
+  (regex updated to require exactly 15 digits)
+BUG-002: Pedigree cache not built when sire_id added via UPDATE — FIXED
+  (trigger added to call build_pedigree_cache() on UPDATE)
+BUG-003: Offline queue processed records out of chronological order — FIXED
+  (added ORDER BY created_at ASC to process-offline-queue)
+BUG-004: WAHIS export returned empty outbreaks array when
+  breeding_centers join was null — FIXED (LEFT JOIN + fallback)
+BUG-005: RFIDSettings page did not persist settings across sessions — FIXED
+  (localStorage persistence added)
+
+=====================================================================
+TESTING REPORT STRUCTURE TO PRODUCE
+=====================================================================
+
+COVER PAGE
+- Report title, tender reference, project name, date, version
+
+1. EXECUTIVE SUMMARY
+   - Purpose of the prototype phase
+   - Overall test outcome (pass/fail summary)
+   - Readiness recommendation for full deployment
+
+2. PROTOTYPE SCOPE AND OBJECTIVES
+   2.1 What was demonstrated
+   2.2 Stakeholders present at prototype review session
+       (Ministry Director of Animal Production, Breeding Center
+       managers from Quthing and Mokhotlong, WaMCoP PMU representative)
+   2.3 Prototype acceptance criteria
+
+3. TEST METHODOLOGY
+   3.1 Test types used (Unit, Integration, UAT, Security)
+   3.2 Test environment specification
+   3.3 Test data preparation
+
+4. MODULE-BY-MODULE TEST RESULTS
+   For each of the 8 modules above, include:
+   - Module name and purpose
+   - Test cases executed (numbered: TC-01, TC-02, etc.)
+   - Pass/Fail for each test case
+   - Notes and observations
+   Present as a table per module.
+
+5. DEFECT LOG
+   Table with columns: Bug ID | Severity | Description | Status | Resolution
+
+6. PERFORMANCE OBSERVATIONS
+   - Page load times on government server
+   - Offline queue processing speed
+   - Database query performance on genetic indices calculation
+
+7. STAKEHOLDER FEEDBACK
+   - Summary of Ministry feedback during prototype demonstration
+   - Requested changes incorporated before full deployment
+
+8. SECURITY TESTING SUMMARY
+   - RLS policy verification results
+   - JWT token handling
+   - Input validation (RFID format, SQL injection prevention)
+
+9. OUTSTANDING ITEMS BEFORE DEPLOYMENT
+   - Any deferred defects or enhancements
+
+10. CONCLUSION AND SIGN-OFF
+    - Recommendation to proceed to full deployment
+    - Space for Ministry representative signature
+
+FORMAT: Professional government report. Tables for test results and
+defect log. Numbered test cases. Approx. 1,800 words.

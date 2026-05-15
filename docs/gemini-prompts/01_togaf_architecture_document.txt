@@ -1,0 +1,162 @@
+TASK: Write a full TOGAF-compliant Enterprise Architecture Design Document for the system described below. The document must be formal, professional, and suitable for submission as a mandatory deliverable under a Lesotho Government tender. Use TOGAF ADM (Architecture Development Method) phase headings. Minimum 2,500 words.
+
+=====================================================================
+SYSTEM CONTEXT — READ THIS CAREFULLY BEFORE WRITING
+=====================================================================
+
+PROJECT NAME: HerdSync V2 — Lesotho National Breeding System
+CLIENT: Ministry of Agriculture and Food Security, Kingdom of Lesotho
+TENDER REFERENCE: LSO-2000003942-0137-CS-QCBS
+  "Digitalisation of National Breeding Centers" under the WaMCoP Project
+
+PURPOSE: Replace manual paper-based livestock management at national
+breeding centers with a digital system that manages Merino sheep and
+Angora goat genetics across all 10 Lesotho districts.
+
+---------------------------------------------------------------------
+TECHNICAL STACK
+---------------------------------------------------------------------
+Frontend:    React 18 + TypeScript, Vite, Tailwind CSS, shadcn/ui,
+             Capacitor (iOS/Android mobile), Recharts
+Backend:     Supabase (PostgreSQL 15, PostgREST, GoTrue Auth,
+             Realtime, Storage, Deno Edge Functions)
+Deployment:  Self-hosted Docker Compose on Lesotho Government servers
+             (Mohale's Hoek Data Center)
+Auth:        JWT-based, Row Level Security (RLS) on all tables
+
+---------------------------------------------------------------------
+DATABASE SCHEMA (KEY TABLES)
+---------------------------------------------------------------------
+districts               — 10 Lesotho administrative districts
+breeding_centers        — National breeding centers per district
+profiles                — Ministry staff (system_admin, center_manager,
+                          district_officer, field_worker, veterinarian)
+farmers                 — Rural smallholder participants
+livestock               — Animals with 15-digit ISO 11784 national RFID
+                          ID, fiber metrics (greasy fleece weight, micron
+                          diameter, staple length, clean yield %), pedigree
+                          linkage (sire_id, dam_id), inbreeding coefficient
+pedigree_records        — Materialised multi-gen ancestor cache
+breeding_records        — Mating events
+birthing_records        — Birth outcomes
+reproductive_indices    — Period-based lambing/kidding rates
+genetic_indices         — Annual Basotho indices: mortality rate,
+                          offtake rate, lambing/kidding rate per animal-day
+livestock_movements     — Tracks sales, slaughter, stolen, gifts, purchases
+culling_exchange_records — Farmer low-yielding animal collection +
+                           replacement distribution workflow
+health_records          — Veterinary events
+vaccination_records     — Vaccination schedule
+woah_disease_reports    — WOAH/OIE disease notifications
+compliance_documents    — Ministry document vault
+tasks                   — Staff task assignments
+offline_sync_queue      — Field-to-server sync for remote areas
+liamis_sync_log         — LIAMIS integration audit
+project_mis_sync_log    — WaMCoP MIS integration audit
+efi_export_records      — Ethical Fashion Initiative fiber data exports
+notifications           — In-app staff notifications
+audit_log               — Immutable change audit trail
+
+---------------------------------------------------------------------
+EDGE FUNCTIONS (DENO / SERVER-SIDE)
+---------------------------------------------------------------------
+wahis-export            — Formats disease reports to WAHIS/OIE JSON
+process-offline-queue   — Applies offline field records on reconnect
+calculate-genetic-indices — Recalculates annual Basotho indices
+
+---------------------------------------------------------------------
+INTEGRATION POINTS
+---------------------------------------------------------------------
+- LIAMIS (Lesotho Integrated Agriculture MIS) — outbound data push
+- WaMCoP Project MIS — scheduled sync
+- WAHIS/OIE — disease event export (24h reporting requirement)
+- EFI (Ethical Fashion Initiative) — fiber data for Basotho Brand
+
+---------------------------------------------------------------------
+SECURITY
+---------------------------------------------------------------------
+- Row Level Security on every table
+- Role hierarchy: system_admin > center_manager > district_officer
+  > veterinarian > field_worker
+- JWT auth with refresh tokens
+- Nginx TLS reverse proxy, UFW firewall, Fail2ban, no root SSH
+- Immutable audit_log table
+
+---------------------------------------------------------------------
+TOGAF DOCUMENT STRUCTURE TO PRODUCE
+---------------------------------------------------------------------
+
+Use the TOGAF ADM phases as section headings. Include all of:
+
+1. EXECUTIVE SUMMARY
+   - Project purpose, government mandate, 5-year sustainability plan
+
+2. PRELIMINARY PHASE
+   - Architecture principles adopted
+   - Stakeholders (Ministry, WaMCoP, ICAR, WOAH, EFI)
+   - Scope and constraints (government infrastructure, offline field use)
+
+3. PHASE A — ARCHITECTURE VISION
+   - Problem statement: manual paper-based breeding center management
+   - Target state: national digital genetic management platform
+   - Key drivers: WaMCoP project goals, EFI Basotho Brand, WOAH compliance
+   - High-level architecture diagram description (textual)
+
+4. PHASE B — BUSINESS ARCHITECTURE
+   - Business capabilities: livestock registration, pedigree tracking,
+     culling/exchange program, disease reporting, fiber data export
+   - Business process flows: field worker → offline queue → server sync;
+     culling collection → center assignment → replacement distribution
+   - Organisational roles and responsibilities
+
+5. PHASE C — INFORMATION SYSTEMS ARCHITECTURE
+   C1. Data Architecture
+       - Entity relationship summary (the key tables above)
+       - Data governance: who owns what data, retention policies
+       - Data flows: field device → offline queue → PostgreSQL → LIAMIS/WAHIS
+   C2. Application Architecture
+       - Frontend (React + Capacitor mobile)
+       - Backend (Supabase self-hosted)
+       - Edge Functions
+       - Integration adapters (LIAMIS, MIS, WAHIS, EFI)
+
+6. PHASE D — TECHNOLOGY ARCHITECTURE
+   - Infrastructure stack (Docker Compose on government server)
+   - Network topology (Nginx → Kong → Supabase services)
+   - Offline-first mobile architecture (Capacitor + offline_sync_queue)
+   - RFID integration (ISO 11784/11785 LF 134.2 kHz, Bluetooth/USB-C)
+   - Backup and disaster recovery (daily pg_dump, 30-day retention)
+
+7. PHASE E — OPPORTUNITIES AND SOLUTIONS
+   - Implementation roadmap (phased delivery)
+   - Quick wins vs long-term integrations
+
+8. PHASE F — MIGRATION PLANNING
+   - Migration from Supabase Cloud to government self-hosted server
+   - Data migration strategy
+   - Rollback plan
+
+9. PHASE G — IMPLEMENTATION GOVERNANCE
+   - Change management process
+   - Architecture compliance checks
+   - KPIs and success metrics
+
+10. PHASE H — ARCHITECTURE CHANGE MANAGEMENT
+    - 2-year post-deployment support model
+    - Knowledge transfer to Ministry IT staff
+    - Version control and update process
+
+11. SECURITY ARCHITECTURE APPENDIX
+    - Authentication and authorisation model
+    - Data encryption at rest and in transit
+    - Government cybersecurity standards alignment
+
+12. GLOSSARY
+    - TOGAF, ADM, LIAMIS, WAHIS, WaMCoP, EFI, ICAR, ISO 11784/11785,
+      Merino, Angora, Basotho Brand, RLS, JWT
+
+FORMAT: Formal government document. Use numbered sections and
+sub-sections. Include a cover page with project name, tender
+reference, date, and "Prepared for: Ministry of Agriculture and
+Food Security, Kingdom of Lesotho". No bullet-heavy slides — full
+prose paragraphs for each section. Tables where appropriate.
