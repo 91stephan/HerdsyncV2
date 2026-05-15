@@ -58,6 +58,9 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const Changelog = lazy(() => import("./pages/Changelog"));
 const Methodology = lazy(() => import("./pages/Methodology"));
+const BreedingExpertDashboard = lazy(() => import("./pages/BreedingExpertDashboard"));
+const CullingExchange = lazy(() => import("./pages/CullingExchange"));
+const RFIDSettings = lazy(() => import("./pages/RFIDSettings"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -148,6 +151,10 @@ const App = () => (
                     <Route path="/blog/:slug" element={<BlogPost />} />
                     <Route path="/changelog" element={<Changelog />} />
                     <Route path="/methodology" element={<Methodology />} />
+                    {/* Lesotho National Breeding System routes */}
+                    <Route path="/breeding-dashboard" element={<BreedingExpertDashboard />} />
+                    <Route path="/culling-exchange" element={<CullingExchange />} />
+                    <Route path="/rfid-settings" element={<RFIDSettings />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

@@ -1,0 +1,200 @@
+# =============================================================
+# HerdSync V2 — Lesotho National Breeding System
+# Self-hosted Supabase stack for Lesotho Government Data Center
+# Target: Mohale's Hoek Government Data Center / Ministry of
+#         Agriculture and Food Security server infrastructure
+#
+# Usage:
+#   1. Copy .env.example to .env and fill in all secrets
+#   2. docker compose up -d
+#   3. Run: docker compose exec db psql -U postgres -f /docker-entrypoint-initdb.d/init.sql
+# =============================================================
+
+version: "3.9"
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────
+  db:
+    image: supabase/postgres:15.1.1.41
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── PostgREST (auto REST API) ────────────────────────────────
+  rest:
+    image: postgrest/postgrest:v12.0.2
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI:             postgres://authenticator:${AUTHENTICATOR_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS:         public,storage,graphql_public
+      PGRST_DB_ANON_ROLE:       anon
+      PGRST_JWT_SECRET:         ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY:-3600}
+
+  # ── Supabase Auth (GoTrue) ───────────────────────────────────
+  auth:
+    image: supabase/gotrue:v2.158.1
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST:         "0.0.0.0"
+      GOTRUE_API_PORT:         9999
+      API_EXTERNAL_URL:        ${API_EXTERNAL_URL}
+      GOTRUE_DB_DRIVER:        postgres
+      GOTRUE_DB_DATABASE_URL:  postgres://supabase_auth_admin:${AUTHENTICATOR_PASSWORD}@db:5432/postgres
+      GOTRUE_SITE_URL:         ${SITE_URL}
+      GOTRUE_URI_ALLOW_LIST:   ${ADDITIONAL_REDIRECT_URLS}
+      GOTRUE_DISABLE_SIGNUP:   "false"
+      GOTRUE_JWT_ADMIN_ROLES:  service_role
+      GOTRUE_JWT_AUD:          authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP:          ${JWT_EXPIRY:-3600}
+      GOTRUE_JWT_SECRET:       ${JWT_SECRET}
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_SMTP_HOST:        ${SMTP_HOST}
+      GOTRUE_SMTP_PORT:        ${SMTP_PORT:-587}
+      GOTRUE_SMTP_USER:        ${SMTP_USER}
+      GOTRUE_SMTP_PASS:        ${SMTP_PASS}
+      GOTRUE_SMTP_SENDER_NAME: "HerdSync — Lesotho Ministry of Agriculture"
+
+  # ── Realtime ─────────────────────────────────────────────────
+  realtime:
+    image: supabase/realtime:v2.30.34
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT:            4000
+      DB_HOST:         db
+      DB_PORT:         5432
+      DB_USER:         supabase_admin
+      DB_PASSWORD:     ${POSTGRES_PASSWORD}
+      DB_NAME:         postgres
+      DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
+      DB_ENC_KEY:      ${REALTIME_ENC_KEY}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      ERL_AFLAGS:      "-proto_dist inet_tcp"
+      ENABLE_TAILSCALE: "false"
+
+  # ── Storage API ───────────────────────────────────────────────
+  storage:
+    image: supabase/storage-api:v1.11.13
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ANON_KEY:              ${ANON_KEY}
+      SERVICE_KEY:           ${SERVICE_ROLE_KEY}
+      POSTGREST_URL:         http://rest:3000
+      PGRST_JWT_SECRET:      ${JWT_SECRET}
+      DATABASE_URL:          postgres://supabase_storage_admin:${AUTHENTICATOR_PASSWORD}@db:5432/postgres
+      FILE_SIZE_LIMIT:       52428800   # 50 MB
+      STORAGE_BACKEND:       file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID:             stub
+      REGION:                local
+      GLOBAL_S3_BUCKET:      stub
+      ENABLE_IMAGE_TRANSFORMATION: "true"
+    volumes:
+      - storage_data:/var/lib/storage
+
+  # ── Supabase Edge Runtime ─────────────────────────────────────
+  edge-runtime:
+    image: supabase/edge-runtime:v1.58.7
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SUPABASE_URL:              http://kong:8000
+      SUPABASE_ANON_KEY:         ${ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      SUPABASE_DB_URL:           postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      VERIFY_JWT:                "true"
+    volumes:
+      - ../supabase/functions:/home/deno/functions:ro
+    command:
+      - start
+      - --main-service
+      - /home/deno/functions/main
+
+  # ── Kong API Gateway ──────────────────────────────────────────
+  kong:
+    image: kong:2.8.1
+    restart: unless-stopped
+    ports:
+      - "8000:8000/tcp"   # HTTP  — point nginx/Traefik here
+      - "8443:8443/tcp"   # HTTPS
+    environment:
+      KONG_DATABASE:         "off"
+      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      KONG_DNS_ORDER:        LAST,A,CNAME
+      KONG_PLUGINS:          request-transformer,cors,key-auth,acl,basic-auth
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE:   160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS:       64 160k
+      KONG_LOG_LEVEL:        warn
+    volumes:
+      - ./kong.yml:/home/kong/kong.yml:ro
+    depends_on:
+      - auth
+      - rest
+      - realtime
+      - storage
+      - edge-runtime
+
+  # ── Supabase Studio (admin UI) ────────────────────────────────
+  studio:
+    image: supabase/studio:20240729-ce42139
+    restart: unless-stopped
+    depends_on:
+      - kong
+    environment:
+      STUDIO_PG_META_URL:    http://meta:8080
+      POSTGRES_PASSWORD:     ${POSTGRES_PASSWORD}
+      DEFAULT_ORGANIZATION_NAME: "Lesotho Ministry of Agriculture and Food Security"
+      DEFAULT_PROJECT_NAME:  "HerdSync V2 — National Breeding System"
+      SUPABASE_URL:          http://kong:8000
+      SUPABASE_PUBLIC_URL:   ${API_EXTERNAL_URL}
+      SUPABASE_ANON_KEY:     ${ANON_KEY}
+      SUPABASE_SERVICE_KEY:  ${SERVICE_ROLE_KEY}
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # ── pg-meta (database introspection) ─────────────────────────
+  meta:
+    image: supabase/postgres-meta:v0.84.2
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PG_META_PORT:     8080
+      PG_META_DB_HOST:  db
+      PG_META_DB_PORT:  5432
+      PG_META_DB_NAME:  postgres
+      PG_META_DB_USER:  supabase_admin
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+volumes:
+  db_data:
+  storage_data:
