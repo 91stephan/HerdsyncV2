@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
-import { HealthRecordCard, HealthRecord, HealthRecordType } from "@/components/HealthRecordCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { useProfile } from "@/hooks/useProfile";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -21,382 +20,461 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Syringe, Stethoscope, Pill, Baby, Scissors, Plus } from "lucide-react";
-import { useFarm } from "@/hooks/useFarm";
-import { useAnimals } from "@/hooks/useAnimals";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, Search, RefreshCw, Syringe, Stethoscope, Pill } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const healthTypes: { type: HealthRecordType; icon: typeof Syringe; label: string }[] = [
-  { type: "Vaccination", icon: Syringe, label: "Vaccinations" },
-  { type: "Checkup", icon: Stethoscope, label: "Checkups" },
-  { type: "Treatment", icon: Pill, label: "Treatments" },
-  { type: "Pregnancy Check", icon: Baby, label: "Pregnancy" },
-  { type: "Farrier Visit", icon: Scissors, label: "Farrier" },
-];
+const EVENT_TYPES = [
+  "vaccination", "treatment", "examination", "diagnosis", "quarantine", "other",
+] as const;
+
+const EVENT_COLOURS: Record<string, string> = {
+  vaccination: "bg-success/15 text-success border-success/30",
+  treatment: "bg-warning/15 text-warning border-warning/30",
+  examination: "bg-info/15 text-info border-info/30",
+  diagnosis: "bg-destructive/15 text-destructive border-destructive/30",
+  quarantine: "bg-destructive/15 text-destructive border-destructive/30",
+  other: "bg-muted text-muted-foreground border-border",
+};
+
+const EVENT_ICONS: Record<string, React.ElementType> = {
+  vaccination: Syringe,
+  treatment: Pill,
+  examination: Stethoscope,
+  diagnosis: Stethoscope,
+  quarantine: Stethoscope,
+  other: Stethoscope,
+};
+
+interface HealthRecord {
+  id: string;
+  livestock_id: string;
+  national_id: string | null;
+  event_type: string;
+  event_date: string;
+  diagnosis: string | null;
+  treatment: string | null;
+  medication: string | null;
+  dosage: string | null;
+  notes: string | null;
+  next_followup_date: string | null;
+}
+
+interface VaxRecord {
+  id: string;
+  livestock_id: string;
+  national_id: string | null;
+  vaccine_name: string;
+  disease_target: string;
+  vaccination_date: string;
+  batch_number: string | null;
+  next_due_date: string | null;
+  notes: string | null;
+}
+
+interface LivestockOption { id: string; national_id: string; species: string; }
 
 export default function Health() {
-  const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { farm } = useFarm();
-  const { animals } = useAnimals();
+  const { profile } = useProfile();
   const { toast } = useToast();
 
-  const [newRecord, setNewRecord] = useState({
-    animalId: "",
-    animalName: "",
-    type: "" as HealthRecordType,
-    date: new Date().toISOString().split('T')[0],
-    provider: "",
+  const [records, setRecords] = useState<HealthRecord[]>([]);
+  const [vaxRecords, setVaxRecords] = useState<VaxRecord[]>([]);
+  const [livestockOptions, setLivestockOptions] = useState<LivestockOption[]>([]);
+  const [districts, setDistricts] = useState<{ id: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [vaxDialogOpen, setVaxDialogOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [form, setForm] = useState({
+    livestock_id: "",
+    district_id: "",
+    event_type: "examination" as string,
+    event_date: new Date().toISOString().split("T")[0],
+    diagnosis: "",
+    treatment: "",
+    medication: "",
+    dosage: "",
+    next_followup_date: "",
     notes: "",
-    nextDue: "",
   });
 
-  // Get available animals for the dropdown
-  const availableAnimals = animals.filter(a => a.status === "available");
+  const [vaxForm, setVaxForm] = useState({
+    livestock_id: "",
+    vaccine_name: "",
+    disease_target: "",
+    vaccination_date: new Date().toISOString().split("T")[0],
+    batch_number: "",
+    next_due_date: "",
+    notes: "",
+  });
 
-  useEffect(() => {
-    if (!farm?.id) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchHealthRecords = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
+  const load = async () => {
+    setLoading(true);
+    const [hrRes, vrRes, lsRes, dRes] = await Promise.all([
+      supabase
         .from("health_records")
-        .select("*")
-        .eq("farm_id", farm.id)
-        .order("date", { ascending: false });
+        .select("id,livestock_id,event_type,event_date,diagnosis,treatment,medication,dosage,notes,next_followup_date,livestock(national_id)")
+        .order("event_date", { ascending: false })
+        .limit(200),
+      supabase
+        .from("vaccination_records")
+        .select("id,livestock_id,vaccine_name,disease_target,vaccination_date,batch_number,next_due_date,notes,livestock(national_id)")
+        .order("vaccination_date", { ascending: false })
+        .limit(200),
+      supabase
+        .from("livestock")
+        .select("id,national_id,species")
+        .eq("status", "active")
+        .order("national_id"),
+      supabase.from("districts").select("id,name").order("name"),
+    ]);
 
-      if (error) {
-        console.error("Error fetching health records:", error);
-      } else {
-        setHealthRecords(data.map(r => ({
-          id: r.id,
-          animalId: r.animal_id || "",
-          animalName: r.animal_name,
-          type: r.type as HealthRecordType,
-          date: r.date,
-          provider: r.provider || "",
-          notes: r.notes || "",
-          nextDue: r.next_due || undefined,
-        })));
-      }
-      setLoading(false);
-    };
+    if (hrRes.data) {
+      setRecords(hrRes.data.map((r: any) => ({
+        ...r,
+        national_id: r.livestock?.national_id ?? null,
+      })));
+    }
+    if (vrRes.data) {
+      setVaxRecords(vrRes.data.map((r: any) => ({
+        ...r,
+        national_id: r.livestock?.national_id ?? null,
+      })));
+    }
+    if (lsRes.data) setLivestockOptions(lsRes.data);
+    if (dRes.data) setDistricts(dRes.data);
+    setLoading(false);
+  };
 
-    fetchHealthRecords();
-  }, [farm?.id]);
+  useEffect(() => { load(); }, []);
 
-  const handleAddRecord = async () => {
-    if (!farm?.id) {
-      toast({
-        title: "No Farm Selected",
-        description: "Please select a farm first.",
-        variant: "destructive",
-      });
+  const saveHealth = async () => {
+    if (!form.livestock_id || !form.event_type) {
+      toast({ title: "Missing fields", description: "Animal and event type are required.", variant: "destructive" });
       return;
     }
-
-    if (!newRecord.animalName || !newRecord.type || !newRecord.date) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in animal name, type, and date.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("health_records")
-      .insert({
-        farm_id: farm.id,
-        animal_id: newRecord.animalId || null,
-        animal_name: newRecord.animalName,
-        type: newRecord.type,
-        date: newRecord.date,
-        provider: newRecord.provider || null,
-        notes: newRecord.notes || null,
-        next_due: newRecord.nextDue || null,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Error adding health record:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add health record.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const record: HealthRecord = {
-      id: data.id,
-      animalId: data.animal_id || "",
-      animalName: data.animal_name,
-      type: data.type as HealthRecordType,
-      date: data.date,
-      provider: data.provider || "",
-      notes: data.notes || "",
-      nextDue: data.next_due || undefined,
-    };
-
-    setHealthRecords([record, ...healthRecords]);
-    setNewRecord({
-      animalId: "",
-      animalName: "",
-      type: "" as HealthRecordType,
-      date: new Date().toISOString().split('T')[0],
-      provider: "",
-      notes: "",
-      nextDue: "",
+    const animal = livestockOptions.find((l) => l.id === form.livestock_id);
+    setSaving(true);
+    const { error } = await supabase.from("health_records").insert({
+      livestock_id: form.livestock_id,
+      district_id: form.district_id || profile?.district_id,
+      event_type: form.event_type,
+      event_date: form.event_date,
+      diagnosis: form.diagnosis || null,
+      treatment: form.treatment || null,
+      medication: form.medication || null,
+      dosage: form.dosage || null,
+      next_followup_date: form.next_followup_date || null,
+      notes: form.notes || null,
     });
-    setIsAddDialogOpen(false);
+    setSaving(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Health record saved", description: animal?.national_id });
+      setDialogOpen(false);
+      setForm({ ...form, livestock_id: "", diagnosis: "", treatment: "", medication: "", dosage: "", next_followup_date: "", notes: "" });
+      load();
+    }
+  };
 
-    toast({
-      title: "Record Added",
-      description: `Health record for ${record.animalName} has been added.`,
+  const saveVax = async () => {
+    if (!vaxForm.livestock_id || !vaxForm.vaccine_name || !vaxForm.disease_target) {
+      toast({ title: "Missing fields", description: "Animal, vaccine name and disease target are required.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("vaccination_records").insert({
+      livestock_id: vaxForm.livestock_id,
+      vaccine_name: vaxForm.vaccine_name,
+      disease_target: vaxForm.disease_target,
+      vaccination_date: vaxForm.vaccination_date,
+      batch_number: vaxForm.batch_number || null,
+      next_due_date: vaxForm.next_due_date || null,
+      notes: vaxForm.notes || null,
     });
-  };
-
-  const handleEditRecord = async (updated: HealthRecord) => {
-    const { error } = await supabase
-      .from("health_records")
-      .update({
-        animal_name: updated.animalName,
-        type: updated.type,
-        date: updated.date,
-        provider: updated.provider || null,
-        notes: updated.notes || null,
-        next_due: updated.nextDue || null,
-      })
-      .eq("id", updated.id);
-
+    setSaving(false);
     if (error) {
-      toast({ title: "Error", description: "Failed to update record.", variant: "destructive" });
-      return;
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Vaccination recorded" });
+      setVaxDialogOpen(false);
+      setVaxForm({ ...vaxForm, livestock_id: "", vaccine_name: "", disease_target: "", batch_number: "", next_due_date: "", notes: "" });
+      load();
     }
-
-    setHealthRecords(healthRecords.map(r => r.id === updated.id ? updated : r));
-    toast({ title: "Updated", description: `Record for ${updated.animalName} updated.` });
   };
 
-  const handleDeleteRecord = async (id: string) => {
-    const { error } = await supabase.from("health_records").delete().eq("id", id);
-    if (error) {
-      toast({ title: "Error", description: "Failed to delete record.", variant: "destructive" });
-      return;
-    }
-    setHealthRecords(healthRecords.filter(r => r.id !== id));
-    toast({ title: "Deleted", description: "Health record deleted." });
-  };
+  const filteredRecords = records.filter((r) => {
+    const q = search.toLowerCase();
+    return !q ||
+      (r.national_id ?? "").toLowerCase().includes(q) ||
+      r.event_type.includes(q) ||
+      (r.diagnosis ?? "").toLowerCase().includes(q);
+  });
 
-  const typeCounts = healthTypes.reduce((acc, { type }) => {
-    acc[type] = healthRecords.filter(r => r.type === type).length;
-    return acc;
-  }, {} as Record<HealthRecordType, number>);
-
-  if (!farm) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-foreground mb-2">No Farm Selected</h2>
-            <p className="text-muted-foreground">Create or select a farm to view health records.</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+  const overdueVax = vaxRecords.filter(
+    (v) => v.next_due_date && new Date(v.next_due_date) < new Date()
+  ).length;
 
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold font-display text-foreground">
-              Health Records
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Comprehensive health tracking for all your livestock
+            <h1 className="text-2xl font-bold text-foreground">Health Records</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Veterinary events, treatments and vaccination schedules
+              {overdueVax > 0 && (
+                <span className="ml-2 text-destructive font-medium">· {overdueVax} overdue vaccinations</span>
+              )}
             </p>
           </div>
-
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-primary text-primary-foreground">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Record
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle className="font-display">Add Health Record</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="animalTag">Animal (Tag Number)</Label>
-                    <Select 
-                      value={newRecord.animalId} 
-                      onValueChange={(value) => {
-                        const selectedAnimal = availableAnimals.find(a => a.id === value);
-                        setNewRecord({ 
-                          ...newRecord, 
-                          animalId: value,
-                          animalName: selectedAnimal ? (selectedAnimal.name || selectedAnimal.animal_tag_id) : ""
-                        });
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select animal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableAnimals.map((animal) => (
-                          <SelectItem key={animal.id} value={animal.id}>
-                            {animal.animal_tag_id}{animal.name ? ` - ${animal.name}` : ""} ({animal.species})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="type">Record Type</Label>
-                    <Select value={newRecord.type} onValueChange={(v) => setNewRecord({ ...newRecord, type: v as HealthRecordType })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {healthTypes.map(({ type, label }) => (
-                          <SelectItem key={type} value={type}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="date">Date</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={newRecord.date}
-                      onChange={(e) => setNewRecord({ ...newRecord, date: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="provider">Provider</Label>
-                    <Input
-                      id="provider"
-                      value={newRecord.provider}
-                      onChange={(e) => setNewRecord({ ...newRecord, provider: e.target.value })}
-                      placeholder="e.g., Dr. Smith"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="notes">Notes</Label>
-                  <Textarea
-                    id="notes"
-                    value={newRecord.notes}
-                    onChange={(e) => setNewRecord({ ...newRecord, notes: e.target.value })}
-                    placeholder="Additional notes..."
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="nextDue">Next Due Date (optional)</Label>
-                  <Input
-                    id="nextDue"
-                    type="date"
-                    value={newRecord.nextDue}
-                    onChange={(e) => setNewRecord({ ...newRecord, nextDue: e.target.value })}
-                  />
-                </div>
-              </div>
-              <Button onClick={handleAddRecord} className="w-full bg-gradient-primary text-primary-foreground">
-                Add Record
-              </Button>
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+              <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setVaxDialogOpen(true)}>
+              <Syringe className="w-4 h-4 mr-1.5" /> Vaccination
+            </Button>
+            <Button size="sm" onClick={() => setDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-1.5" /> Health Event
+            </Button>
+          </div>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {healthTypes.map(({ type, icon: Icon, label }) => (
-            <div key={type} className="card-elevated p-4 text-center">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-2">
-                <Icon className="w-5 h-5 text-primary" />
-              </div>
-              <p className="text-2xl font-bold text-foreground">{typeCounts[type] || 0}</p>
-              <p className="text-sm text-muted-foreground">{label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Records Tabs */}
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent p-0">
-            <TabsTrigger 
-              value="all" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              All Records
-              <Badge variant="secondary" className="ml-2">{healthRecords.length}</Badge>
+        <Tabs defaultValue="events">
+          <TabsList>
+            <TabsTrigger value="events">Health Events ({records.length})</TabsTrigger>
+            <TabsTrigger value="vaccinations">
+              Vaccinations ({vaxRecords.length})
+              {overdueVax > 0 && (
+                <Badge variant="destructive" className="ml-2 text-xs py-0">{overdueVax}</Badge>
+              )}
             </TabsTrigger>
-            {healthTypes.map(({ type, label }) => (
-              <TabsTrigger 
-                key={type} 
-                value={type}
-                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                {label}
-                <Badge variant="secondary" className="ml-2">{typeCounts[type] || 0}</Badge>
-              </TabsTrigger>
-            ))}
           </TabsList>
 
-          <TabsContent value="all" className="mt-6">
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-32 bg-muted/50 animate-pulse rounded-xl" />
-                ))}
+          <TabsContent value="events" className="mt-4">
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  className="pl-10"
+                  placeholder="Search by animal ID, diagnosis…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
               </div>
-            ) : healthRecords.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {healthRecords.map((record) => (
-                  <HealthRecordCard key={record.id} record={record} onEdit={handleEditRecord} onDelete={handleDeleteRecord} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No health records yet. Click 'Add Record' to get started.</p>
-              </div>
-            )}
+            </div>
+            <div className="card-elevated overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Animal (National ID)</TableHead>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Diagnosis</TableHead>
+                    <TableHead>Treatment</TableHead>
+                    <TableHead>Follow-up</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">Loading…</TableCell></TableRow>
+                  ) : filteredRecords.length === 0 ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">No health records found.</TableCell></TableRow>
+                  ) : filteredRecords.map((r) => {
+                    const Icon = EVENT_ICONS[r.event_type] ?? Stethoscope;
+                    return (
+                      <TableRow key={r.id} className="hover:bg-muted/30">
+                        <TableCell className="font-mono text-xs">{r.national_id ?? r.livestock_id.slice(0, 8)}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={`text-xs flex items-center gap-1 w-fit ${EVENT_COLOURS[r.event_type] ?? ""}`}>
+                            <Icon className="w-3 h-3" />
+                            {r.event_type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm">{new Date(r.event_date).toLocaleDateString("en-LS")}</TableCell>
+                        <TableCell className="text-sm max-w-[200px] truncate">{r.diagnosis ?? "—"}</TableCell>
+                        <TableCell className="text-sm max-w-[180px] truncate">{r.treatment ?? "—"}</TableCell>
+                        <TableCell className="text-sm">
+                          {r.next_followup_date ? (
+                            <span className={new Date(r.next_followup_date) < new Date() ? "text-destructive font-medium" : ""}>
+                              {new Date(r.next_followup_date).toLocaleDateString("en-LS")}
+                            </span>
+                          ) : "—"}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           </TabsContent>
 
-          {healthTypes.map(({ type }) => (
-            <TabsContent key={type} value={type} className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {healthRecords
-                  .filter(r => r.type === type)
-                  .map((record) => (
-                    <HealthRecordCard key={record.id} record={record} onEdit={handleEditRecord} onDelete={handleDeleteRecord} />
-                  ))}
-              </div>
-              {healthRecords.filter(r => r.type === type).length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">No {type.toLowerCase()} records found.</p>
-                </div>
-              )}
-            </TabsContent>
-          ))}
+          <TabsContent value="vaccinations" className="mt-4">
+            <div className="card-elevated overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Animal (National ID)</TableHead>
+                    <TableHead>Vaccine</TableHead>
+                    <TableHead>Disease Target</TableHead>
+                    <TableHead>Date Given</TableHead>
+                    <TableHead>Batch</TableHead>
+                    <TableHead>Next Due</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">Loading…</TableCell></TableRow>
+                  ) : vaxRecords.length === 0 ? (
+                    <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">No vaccination records found.</TableCell></TableRow>
+                  ) : vaxRecords.map((v) => {
+                    const overdue = v.next_due_date && new Date(v.next_due_date) < new Date();
+                    return (
+                      <TableRow key={v.id} className={`hover:bg-muted/30 ${overdue ? "bg-destructive/5" : ""}`}>
+                        <TableCell className="font-mono text-xs">{v.national_id ?? v.livestock_id.slice(0, 8)}</TableCell>
+                        <TableCell className="text-sm font-medium">{v.vaccine_name}</TableCell>
+                        <TableCell className="text-sm">{v.disease_target}</TableCell>
+                        <TableCell className="text-sm">{new Date(v.vaccination_date).toLocaleDateString("en-LS")}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">{v.batch_number ?? "—"}</TableCell>
+                        <TableCell className="text-sm">
+                          {v.next_due_date ? (
+                            <span className={overdue ? "text-destructive font-medium" : ""}>
+                              {new Date(v.next_due_date).toLocaleDateString("en-LS")}
+                              {overdue && " · OVERDUE"}
+                            </span>
+                          ) : "—"}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
         </Tabs>
+
+        {/* Health Event Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+            <DialogHeader><DialogTitle>Record Health Event</DialogTitle></DialogHeader>
+            <div className="space-y-4 py-2">
+              <div>
+                <Label>Animal *</Label>
+                <Select value={form.livestock_id} onValueChange={(v) => setForm({ ...form, livestock_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select animal by national ID" /></SelectTrigger>
+                  <SelectContent>
+                    {livestockOptions.map((l) => (
+                      <SelectItem key={l.id} value={l.id}>{l.national_id} ({l.species})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Event Type *</Label>
+                  <Select value={form.event_type} onValueChange={(v) => setForm({ ...form, event_type: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {EVENT_TYPES.map((t) => <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Event Date *</Label>
+                  <Input type="date" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <Label>Diagnosis</Label>
+                <Input value={form.diagnosis} onChange={(e) => setForm({ ...form, diagnosis: e.target.value })} placeholder="e.g. Footrot, Pneumonia" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Treatment</Label>
+                  <Input value={form.treatment} onChange={(e) => setForm({ ...form, treatment: e.target.value })} placeholder="e.g. Antibiotic course" />
+                </div>
+                <div>
+                  <Label>Medication</Label>
+                  <Input value={form.medication} onChange={(e) => setForm({ ...form, medication: e.target.value })} placeholder="e.g. Oxytetracycline" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Dosage</Label>
+                  <Input value={form.dosage} onChange={(e) => setForm({ ...form, dosage: e.target.value })} placeholder="e.g. 5ml IM" />
+                </div>
+                <div>
+                  <Label>Follow-up Date</Label>
+                  <Input type="date" value={form.next_followup_date} onChange={(e) => setForm({ ...form, next_followup_date: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <Label>Notes</Label>
+                <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} />
+              </div>
+            </div>
+            <Button className="w-full" onClick={saveHealth} disabled={saving}>{saving ? "Saving…" : "Save Health Record"}</Button>
+          </DialogContent>
+        </Dialog>
+
+        {/* Vaccination Dialog */}
+        <Dialog open={vaxDialogOpen} onOpenChange={setVaxDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader><DialogTitle>Record Vaccination</DialogTitle></DialogHeader>
+            <div className="space-y-4 py-2">
+              <div>
+                <Label>Animal *</Label>
+                <Select value={vaxForm.livestock_id} onValueChange={(v) => setVaxForm({ ...vaxForm, livestock_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select animal" /></SelectTrigger>
+                  <SelectContent>
+                    {livestockOptions.map((l) => (
+                      <SelectItem key={l.id} value={l.id}>{l.national_id} ({l.species})</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Vaccine Name *</Label>
+                  <Input value={vaxForm.vaccine_name} onChange={(e) => setVaxForm({ ...vaxForm, vaccine_name: e.target.value })} placeholder="e.g. Gudair" />
+                </div>
+                <div>
+                  <Label>Disease Target *</Label>
+                  <Input value={vaxForm.disease_target} onChange={(e) => setVaxForm({ ...vaxForm, disease_target: e.target.value })} placeholder="e.g. OJD" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Date Given *</Label>
+                  <Input type="date" value={vaxForm.vaccination_date} onChange={(e) => setVaxForm({ ...vaxForm, vaccination_date: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Batch Number</Label>
+                  <Input value={vaxForm.batch_number} onChange={(e) => setVaxForm({ ...vaxForm, batch_number: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <Label>Next Due Date</Label>
+                <Input type="date" value={vaxForm.next_due_date} onChange={(e) => setVaxForm({ ...vaxForm, next_due_date: e.target.value })} />
+              </div>
+            </div>
+            <Button className="w-full" onClick={saveVax} disabled={saving}>{saving ? "Saving…" : "Save Vaccination"}</Button>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );

@@ -1,166 +1,196 @@
- import { useState } from "react";
- import { Layout } from "@/components/Layout";
- import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
- import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
- import { Input } from "@/components/ui/input";
- import { Label } from "@/components/ui/label";
- import { Button } from "@/components/ui/button";
- import { Badge } from "@/components/ui/badge";
- import { Settings as SettingsIcon, Users, Building, CreditCard, Crown } from "lucide-react";
- import { useFarm } from "@/hooks/useFarm";
- import { useSubscription } from "@/hooks/useSubscription";
- import { useAuth } from "@/hooks/useAuth";
- import { InvitedUsersManager } from "@/components/InvitedUsersManager";
- import { Link } from "react-router-dom";
- import { supabase } from "@/integrations/supabase/client";
- import { useToast } from "@/hooks/use-toast";
- 
- export default function Settings() {
-   const { farm } = useFarm();
-   const { subscription } = useSubscription();
-   const { user } = useAuth();
-   const { toast } = useToast();
-   const [farmName, setFarmName] = useState(farm?.name || "");
-   const [isSaving, setIsSaving] = useState(false);
- 
-   const handleSaveFarm = async () => {
-     if (!farm?.id || !farmName.trim()) return;
-     setIsSaving(true);
-     
-     const { error } = await supabase
-       .from("farms")
-       .update({ name: farmName.trim() })
-       .eq("id", farm.id);
- 
-     if (error) {
-       toast({
-         title: "Error updating farm",
-         description: error.message,
-         variant: "destructive",
-       });
-     } else {
-       toast({ title: "Farm name updated" });
-     }
-     setIsSaving(false);
-   };
- 
-   const getTierBadge = () => {
-     switch (subscription?.tier) {
-       case "pro":
-         return <Badge className="bg-gradient-to-r from-amber-500 to-orange-500">Pro</Badge>;
-       case "basic":
-         return <Badge variant="secondary">Basic</Badge>;
-       default:
-         return <Badge variant="outline">Starter</Badge>;
-     }
-   };
- 
-   return (
-     <Layout>
-       <div className="space-y-6">
-         <div>
-           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-             <SettingsIcon className="w-8 h-8" />
-             Settings
-           </h1>
-           <p className="text-muted-foreground">Manage your farm and account settings</p>
-         </div>
- 
-         <Tabs defaultValue="users" className="w-full">
-           <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-flex">
-             <TabsTrigger value="users" className="flex items-center gap-2">
-               <Users className="w-4 h-4" />
-               <span className="hidden sm:inline">Users</span>
-             </TabsTrigger>
-             <TabsTrigger value="farm" className="flex items-center gap-2">
-               <Building className="w-4 h-4" />
-               <span className="hidden sm:inline">Farm</span>
-             </TabsTrigger>
-             <TabsTrigger value="subscription" className="flex items-center gap-2">
-               <CreditCard className="w-4 h-4" />
-               <span className="hidden sm:inline">Subscription</span>
-             </TabsTrigger>
-           </TabsList>
- 
-           <TabsContent value="users" className="mt-6">
-             <InvitedUsersManager />
-           </TabsContent>
- 
-           <TabsContent value="farm" className="mt-6">
-             <Card>
-               <CardHeader>
-                 <CardTitle>Farm Details</CardTitle>
-                 <CardDescription>Update your farm information</CardDescription>
-               </CardHeader>
-               <CardContent className="space-y-4">
-                 <div className="space-y-2">
-                   <Label htmlFor="farmName">Farm Name</Label>
-                   <Input
-                     id="farmName"
-                     value={farmName}
-                     onChange={(e) => setFarmName(e.target.value)}
-                     placeholder="My Farm"
-                   />
-                 </div>
-                 <Button onClick={handleSaveFarm} disabled={isSaving || !farmName.trim()}>
-                   {isSaving ? "Saving..." : "Save Changes"}
-                 </Button>
-               </CardContent>
-             </Card>
-           </TabsContent>
- 
-           <TabsContent value="subscription" className="mt-6">
-             <Card>
-               <CardHeader>
-                 <CardTitle className="flex items-center justify-between">
-                   <span>Your Subscription</span>
-                   {getTierBadge()}
-                 </CardTitle>
-                 <CardDescription>Manage your subscription and billing</CardDescription>
-               </CardHeader>
-               <CardContent className="space-y-6">
-                 <div className="grid gap-4 md:grid-cols-2">
-                   <div className="space-y-1">
-                     <p className="text-sm text-muted-foreground">Current Plan</p>
-                     <p className="font-medium capitalize">{subscription?.tier || "None"}</p>
-                   </div>
-                   <div className="space-y-1">
-                     <p className="text-sm text-muted-foreground">Status</p>
-                     <p className="font-medium capitalize">{subscription?.status || "Unknown"}</p>
-                   </div>
-                   <div className="space-y-1">
-                     <p className="text-sm text-muted-foreground">Animal Limit</p>
-                     <p className="font-medium">
-                       {subscription?.animal_limit === 999999 ? "Unlimited" : subscription?.animal_limit || 0}
-                     </p>
-                   </div>
-                   <div className="space-y-1">
-                     <p className="text-sm text-muted-foreground">Days Remaining</p>
-                     <p className="font-medium">{subscription?.days_remaining || 0} days</p>
-                   </div>
-                 </div>
- 
-                 {subscription?.tier !== "pro" && (
-                   <div className="p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800">
-                     <div className="flex items-start gap-3">
-                       <Crown className="w-5 h-5 text-amber-600 mt-0.5" />
-                       <div className="space-y-2">
-                         <p className="font-medium">Upgrade to Pro</p>
-                         <p className="text-sm text-muted-foreground">
-                           Get unlimited animals, unlimited users, and access to all premium features.
-                         </p>
-                         <Button asChild size="sm">
-                           <Link to="/pricing">View Plans</Link>
-                         </Button>
-                       </div>
-                     </div>
-                   </div>
-                 )}
-               </CardContent>
-             </Card>
-           </TabsContent>
-         </Tabs>
-       </div>
-     </Layout>
-   );
- }
+import { useState } from "react";
+import { Layout } from "@/components/Layout";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Settings as SettingsIcon, User, Lock, Info } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+const ROLE_LABELS: Record<string, string> = {
+  system_admin: "System Administrator",
+  district_officer: "District Officer",
+  center_manager: "Centre Manager",
+  veterinarian: "Veterinarian",
+  field_officer: "Field Officer",
+  readonly: "Read Only",
+};
+
+export default function Settings() {
+  const { user } = useAuth();
+  const { profile, role } = useProfile();
+  const { toast } = useToast();
+
+  const [displayName, setDisplayName] = useState(profile?.full_name ?? "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [changingPw, setChangingPw] = useState(false);
+
+  const saveProfile = async () => {
+    if (!displayName.trim()) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: displayName.trim() })
+      .eq("id", user?.id);
+    setSaving(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Profile updated" });
+    }
+  };
+
+  const changePassword = async () => {
+    if (!newPassword || newPassword !== confirmPassword) {
+      toast({ title: "Passwords do not match", variant: "destructive" });
+      return;
+    }
+    if (newPassword.length < 8) {
+      toast({ title: "Password too short", description: "Minimum 8 characters.", variant: "destructive" });
+      return;
+    }
+    setChangingPw(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setChangingPw(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Password changed" });
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+    }
+  };
+
+  return (
+    <Layout>
+      <div className="space-y-6 max-w-2xl">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <SettingsIcon className="w-6 h-6 text-primary" />
+            Settings
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage your profile and account preferences</p>
+        </div>
+
+        <Tabs defaultValue="profile">
+          <TabsList>
+            <TabsTrigger value="profile" className="flex items-center gap-1.5">
+              <User className="w-4 h-4" /> Profile
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-1.5">
+              <Lock className="w-4 h-4" /> Security
+            </TabsTrigger>
+            <TabsTrigger value="system" className="flex items-center gap-1.5">
+              <Info className="w-4 h-4" /> System
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Profile tab */}
+          <TabsContent value="profile" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Information</CardTitle>
+                <CardDescription>Update your display name and view account details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Email</Label>
+                  <Input value={user?.email ?? ""} disabled className="bg-muted" />
+                  <p className="text-xs text-muted-foreground mt-1">Email cannot be changed here. Contact your System Administrator.</p>
+                </div>
+                <div>
+                  <Label>Display Name</Label>
+                  <Input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Your full name"
+                  />
+                </div>
+                <div>
+                  <Label>Role</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                      {ROLE_LABELS[role ?? ""] ?? role ?? "—"}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">Assigned by System Administrator</span>
+                  </div>
+                </div>
+                <Button onClick={saveProfile} disabled={saving}>
+                  {saving ? "Saving…" : "Save Changes"}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security tab */}
+          <TabsContent value="security" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Change Password</CardTitle>
+                <CardDescription>Choose a strong password of at least 8 characters</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>New Password</Label>
+                  <Input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                  />
+                </div>
+                <div>
+                  <Label>Confirm New Password</Label>
+                  <Input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat new password"
+                  />
+                </div>
+                <Button onClick={changePassword} disabled={changingPw}>
+                  {changingPw ? "Updating…" : "Update Password"}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* System info tab */}
+          <TabsContent value="system" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>System Information</CardTitle>
+                <CardDescription>HerdSync V2 — Lesotho National Breeding System</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <dl className="space-y-3 text-sm">
+                  {[
+                    ["System", "HerdSync V2"],
+                    ["Ministry", "Ministry of Agriculture, Food Security and Nutrition"],
+                    ["Tender Reference", "LSO-2000003942-0137-CS-QCBS"],
+                    ["Standard", "ISO 11784/11785 RFID · WAHIS/WOAH Reporting"],
+                    ["Country Code", "LSO (426 — Lesotho)"],
+                    ["Version", "2.0.0"],
+                    ["Environment", import.meta.env.DEV ? "Development" : "Production"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex gap-4">
+                      <dt className="text-muted-foreground w-40 shrink-0">{label}</dt>
+                      <dd className="font-medium text-foreground">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
+  );
+}
