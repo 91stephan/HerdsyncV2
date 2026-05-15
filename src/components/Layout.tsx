@@ -69,7 +69,7 @@ const navSections: NavSection[] = [
     items: [
       { name: "Health Records",     href: "/health",                icon: Stethoscope },
       { name: "WOAH Disease Reports", href: "/woah-reports",       icon: AlertTriangle },
-      { name: "Document Vault",     href: "/compliance/documents",  icon: FileText },
+      { name: "Document Vault",     href: "/documents",  icon: FileText },
     ],
   },
   {
