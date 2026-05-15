@@ -2,171 +2,133 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   PawPrint,
-  Clock,
-  Package,
+  GitBranch,
   Stethoscope,
   BarChart3,
-  MapPin,
-  Menu,
-  X,
-  Wheat,
-  ClipboardCheck,
-  Shield,
   FileText,
   Users,
-  Beaker,
   LogOut,
-  TrendingUp,
-  CreditCard,
-  UserCog,
-  ArrowLeft,
-  Receipt,
-  MessageSquare,
-  Info,
-  FileText as FileTextIcon,
-  AlertCircle,
-  Sparkles,
   Settings,
   ClipboardList,
+  AlertTriangle,
+  Activity,
+  Scan,
+  UserCog,
+  BookOpen,
+  Shuffle,
+  ChevronDown,
+  ChevronRight,
+  Menu,
+  X,
+  ArrowLeft,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
- import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { useState, useRef, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import { useFarm } from "@/hooks/useFarm";
-import { useSubscription } from "@/hooks/useSubscription";
- import { useAdmin } from "@/hooks/useAdmin";
-import { useEmployeePermissions } from "@/hooks/useEmployeePermissions";
-import { SubscriptionBanner } from "@/components/SubscriptionBanner";
-import { FarmSwitcher } from "@/components/FarmSwitcher";
+import { useProfile } from "@/hooks/useProfile";
+import { SyncStatusBar } from "@/components/SyncStatusBar";
 import { PageErrorBoundary } from "@/components/PageErrorBoundary";
 import { PageProgressBar } from "@/components/PageProgressBar";
-import { PageSkeleton } from "@/components/PageSkeleton";
-import farmBackground from "@/assets/farm-background.jpg";
 import { NotificationBell } from "@/components/NotificationBell";
-import { SEOFooter } from "@/components/SEOFooter";
+
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  roles?: string[];
+}
+
+interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
+  {
+    label: "Operations",
+    items: [
+      { name: "Dashboard",          href: "/dashboard",         icon: LayoutDashboard },
+      { name: "Livestock Registry", href: "/livestock",         icon: PawPrint },
+      { name: "Farmers Registry",   href: "/farmers",           icon: Users },
+      { name: "Breeding Records",   href: "/breeding",          icon: GitBranch },
+      { name: "Culling & Exchange", href: "/culling-exchange",  icon: Shuffle },
+    ],
+  },
+  {
+    label: "Analytics",
+    items: [
+      { name: "Genetic Indices",       href: "/breeding-dashboard",    icon: BarChart3,  roles: ["system_admin","center_manager","district_officer"] },
+      { name: "Reproductive Indices",  href: "/reproductive-indices",  icon: Activity,   roles: ["system_admin","center_manager","district_officer"] },
+    ],
+  },
+  {
+    label: "Health & Compliance",
+    items: [
+      { name: "Health Records",     href: "/health",                icon: Stethoscope },
+      { name: "WOAH Disease Reports", href: "/woah-reports",       icon: AlertTriangle },
+      { name: "Document Vault",     href: "/compliance/documents",  icon: FileText },
+    ],
+  },
+  {
+    label: "Field Tools",
+    items: [
+      { name: "RFID Settings",   href: "/rfid-settings",  icon: Scan },
+    ],
+  },
+  {
+    label: "Administration",
+    items: [
+      { name: "Task Management",   href: "/tasks",         icon: ClipboardList,  roles: ["system_admin","center_manager","district_officer"] },
+      { name: "User Management",   href: "/users",         icon: UserCog,        roles: ["system_admin"] },
+      { name: "Audit Log",         href: "/audit",         icon: ShieldCheck,    roles: ["system_admin"] },
+      { name: "Settings",          href: "/settings",      icon: Settings },
+    ],
+  },
+];
+
+const allNavPaths = navSections.flatMap((s) => s.items.map((i) => i.href));
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Animal Sale", href: "/animal-sale", icon: CreditCard },
-  { name: "Ask a Pro", href: "/ask-a-pro", icon: Sparkles },
-  { name: "Audit & Compliance", href: "/audit", icon: ClipboardCheck },
-  { name: "Employees", href: "/employees", icon: UserCog, ownerOnly: true },
-  { name: "Employee Tasks", href: "/employee-tasks", icon: ClipboardList },
-  { name: "Farm Expenses", href: "/expenses", icon: Receipt },
-  { name: "Farm Inventory", href: "/inventory", icon: Package },
-  { name: "Feeding Schedule", href: "/feeding", icon: Clock },
-  { name: "Health Records", href: "/health", icon: Stethoscope },
-  { name: "Livestock", href: "/livestock", icon: PawPrint },
-  { name: "Market Area", href: "/market", icon: TrendingUp },
-  { name: "Reports", href: "/reports", icon: BarChart3 },
-   { name: "Tracking", href: "/tracking", icon: MapPin, proOnly: true },
-];
-
-
-const settingsNavigation = [
-  { name: "Settings", href: "/settings", icon: Settings },
-];
-
- const adminNavigation = [
-   { name: "Admin Dashboard", href: "/admin", icon: Shield },
- ];
- 
-const complianceNavigation = [
-  { name: "Chemicals & Remedies", href: "/compliance/chemicals", icon: Beaker },
-  { name: "Compliance Dashboard", href: "/compliance", icon: Shield },
-  { name: "Document Vault", href: "/compliance/documents", icon: FileText },
-  { name: "Labour & OHS", href: "/compliance/labour-ohs", icon: Users },
-];
-
-const informationNavigation = [
-  { name: "About Us", href: "/about", icon: Info },
-  { name: "Contact Us", href: "/contact", icon: MessageSquare },
-  { name: "Disclaimer", href: "/disclaimer", icon: AlertCircle },
-  { name: "Pricing & Plans", href: "/pricing", icon: CreditCard },
-  { name: "Terms of Service", href: "/terms", icon: FileTextIcon },
-];
-
-// Routes that are in the sidebar navigation (main pages)
-const mainNavigationPaths = [
-  "/dashboard",
-  "/livestock",
-  "/employees",
-  "/employee-tasks", 
-  "/feeding",
-  "/inventory",
-  "/health",
-  "/expenses",
-  "/market",
-  "/animal-sale",
-  "/audit",
-  "/reports",
-  "/tracking",
-  "/pricing",
-  "/ask-a-pro",
-  "/compliance",
-  "/compliance/documents",
-  "/compliance/labour-ohs",
-  "/compliance/chemicals",
-  "/compliance/audit-pack",
-  "/settings",
-   "/admin",
-  "/about",
-  "/contact",
-  "/terms",
-  "/disclaimer",
-  "/auth",
-];
-
 export function Layout({ children }: LayoutProps) {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location  = useLocation();
+  const navigate  = useNavigate();
   const { user, signOut } = useAuth();
-  const { farm, loading: farmLoading } = useFarm();
-  const { subscription, isActive, loading: subLoading } = useSubscription();
-   const { isAdmin } = useAdmin();
-  const { isEmployee } = useEmployeePermissions();
-  
-  // Only show back button on sub-pages (not main navigation pages)
-  const showBackButton = !mainNavigationPaths.includes(location.pathname);
+  const { profile, role } = useProfile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Preserve sidebar scroll position across navigations
+  const showBackButton = !allNavPaths.includes(location.pathname);
+
   const navRef = useRef<HTMLElement>(null);
   const scrollPositionRef = useRef(0);
 
-  // Use useLayoutEffect to restore scroll position synchronously after DOM updates
   useLayoutEffect(() => {
-    // Restore scroll position after navigation
     if (navRef.current) {
-      // Use requestAnimationFrame to ensure DOM is fully painted
       requestAnimationFrame(() => {
-        if (navRef.current) {
-          navRef.current.scrollTop = scrollPositionRef.current;
-        }
+        if (navRef.current) navRef.current.scrollTop = scrollPositionRef.current;
       });
     }
   }, [location.pathname]);
 
   const handleNavClick = () => {
-    // Save current scroll position before navigation
-    if (navRef.current) {
-      scrollPositionRef.current = navRef.current.scrollTop;
-    }
+    if (navRef.current) scrollPositionRef.current = navRef.current.scrollTop;
     setSidebarOpen(false);
   };
 
+  const isVisible = (item: NavItem) => {
+    if (!item.roles) return true;
+    return role ? item.roles.includes(role) : false;
+  };
+
   return (
-    <div 
-      className="h-screen flex overflow-hidden farm-background"
-      style={{ '--farm-bg-image': `url(${farmBackground})` } as React.CSSProperties}
-    >
+    <div className="h-screen flex overflow-hidden bg-background">
       <PageProgressBar />
+
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -183,26 +145,20 @@ export function Layout({ children }: LayoutProps) {
         )}
       >
         <div className="flex flex-col h-full overflow-hidden">
-          {/* Logo - Links to home/dashboard */}
-          <Link 
-            to={user ? "/dashboard" : "/"} 
+          {/* Logo */}
+          <Link
+            to={user ? "/dashboard" : "/"}
             className="flex items-center gap-2.5 px-4 py-4 border-b border-sidebar-border flex-shrink-0 hover:bg-sidebar-accent/50 transition-colors"
           >
             <div className="w-9 h-9 rounded-lg bg-sidebar-primary flex items-center justify-center">
-              <Wheat className="w-5 h-5 text-sidebar-primary-foreground" />
+              <BookOpen className="w-5 h-5 text-sidebar-primary-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-bold text-sidebar-foreground font-display">
-                HerdSync
-              </h1>
-              <FarmSwitcher />
+              <h1 className="text-base font-bold text-sidebar-foreground leading-tight">HerdSync V2</h1>
+              <p className="text-[10px] text-sidebar-foreground/60 truncate">National Breeding System</p>
             </div>
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setSidebarOpen(false);
-              }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setSidebarOpen(false); }}
               className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground"
               aria-label="Close menu"
             >
@@ -210,125 +166,57 @@ export function Layout({ children }: LayoutProps) {
             </button>
           </Link>
 
-          {/* Navigation */}
-          <nav ref={navRef} className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-            {navigation
-              .filter((item) => !item.ownerOnly || !isEmployee)
-              .map((item) => {
-              const isActive = location.pathname === item.href;
+          {/* Nav sections */}
+          <nav ref={navRef} className="flex-1 px-3 py-3 overflow-y-auto space-y-4">
+            {navSections.map((section) => {
+              const visibleItems = section.items.filter(isVisible);
+              if (visibleItems.length === 0) return null;
               return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={handleNavClick}
-                  className={cn("sidebar-nav-item", isActive && "active")}
-                >
-                  <item.icon className="w-5 h-5" />
-                   <span className="font-medium">{item.name}</span>
-                   {item.proOnly && (
-                     <Badge variant="outline" className="ml-auto text-[10px] px-1.5 py-0">
-                       PRO
-                     </Badge>
-                   )}
-                </Link>
+                <div key={section.label}>
+                  <p className="px-3 text-[10px] font-semibold text-sidebar-foreground/50 uppercase tracking-wider mb-1">
+                    {section.label}
+                  </p>
+                  {visibleItems.map((item) => {
+                    const active = location.pathname === item.href;
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        onClick={handleNavClick}
+                        className={cn("sidebar-nav-item", active && "active")}
+                      >
+                        <item.icon className="w-4 h-4" />
+                        <span className="font-medium text-sm">{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               );
             })}
-
-            {/* Settings Section */}
-            <div className="pt-4 mt-4 border-t border-sidebar-border">
-              <p className="px-3 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-                Account
-              </p>
-              {settingsNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={handleNavClick}
-                    className={cn("sidebar-nav-item", isActive && "active")}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="font-medium">{item.name}</span>
-                  </Link>
-                );
-              })}
-               {isAdmin && adminNavigation.map((item) => {
-                 const isActiveNav = location.pathname === item.href;
-                 return (
-                   <Link
-                     key={item.name}
-                     to={item.href}
-                      onClick={handleNavClick}
-                     className={cn("sidebar-nav-item", isActiveNav && "active")}
-                   >
-                     <item.icon className="w-5 h-5 text-primary" />
-                     <span className="font-medium">{item.name}</span>
-                   </Link>
-                 );
-               })}
-            </div>
-
-            {/* Compliance Section */}
-            <div className="pt-4 mt-4 border-t border-sidebar-border">
-              <p className="px-3 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-                Compliance (SA)
-              </p>
-              {complianceNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={handleNavClick}
-                    className={cn("sidebar-nav-item", isActive && "active")}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="font-medium">{item.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Information Section */}
-            <div className="pt-4 mt-4 border-t border-sidebar-border">
-              <p className="px-3 text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider mb-2">
-                Information
-              </p>
-              {informationNavigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={handleNavClick}
-                    className={cn("sidebar-nav-item", isActive && "active")}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="font-medium">{item.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
           </nav>
 
-          {/* Footer */}
+          {/* User footer */}
           <div className="px-4 py-3 border-t border-sidebar-border flex-shrink-0">
             {user ? (
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-semibold text-sidebar-foreground">
-                    {user.email?.slice(0, 2).toUpperCase()}
+                    {(profile?.full_name ?? user.email ?? "??").slice(0, 2).toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-sidebar-foreground truncate">
-                    {user.email}
+                    {profile?.full_name ?? user.email}
                   </p>
+                  {role && (
+                    <p className="text-[10px] text-sidebar-foreground/60 capitalize">
+                      {role.replace(/_/g, " ")}
+                    </p>
+                  )}
                 </div>
                 <button
                   onClick={signOut}
-                  className="p-2 text-sidebar-foreground/60 hover:text-sidebar-foreground"
+                  className="p-1.5 text-sidebar-foreground/60 hover:text-sidebar-foreground"
                   title="Sign out"
                   aria-label="Sign out"
                 >
@@ -359,19 +247,21 @@ export function Layout({ children }: LayoutProps) {
             <Menu className="w-6 h-6" />
           </button>
           <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2 flex-1">
-            <Wheat className="w-6 h-6 text-primary" />
-            <span className="font-bold text-lg font-display">HerdSync</span>
+            <BookOpen className="w-5 h-5 text-primary" />
+            <span className="font-bold text-base">HerdSync V2</span>
           </Link>
           {user && <NotificationBell />}
         </header>
 
+        {/* Sync status bar */}
+        <SyncStatusBar />
+
         {/* Page content */}
         <main className="flex-1 overflow-auto">
-          <div className="p-3 sm:p-4 lg:p-6 xl:p-8">
+          <div className="p-3 sm:p-4 lg:p-6">
             <div className="hidden lg:flex justify-end mb-2">
               {user && <NotificationBell />}
             </div>
-            <SubscriptionBanner />
             {showBackButton && (
               <Button
                 variant="ghost"
@@ -383,15 +273,10 @@ export function Layout({ children }: LayoutProps) {
                 Back
               </Button>
             )}
-            <PageErrorBoundary resetKey={`${location.pathname}|${farm?.id ?? "no-farm"}`}>
-              {user && (farmLoading || (subLoading && !!farm)) ? (
-                <PageSkeleton />
-              ) : (
-                children
-              )}
+            <PageErrorBoundary resetKey={location.pathname}>
+              {children}
             </PageErrorBoundary>
           </div>
-          {!user && <SEOFooter />}
         </main>
       </div>
     </div>

@@ -20,6 +20,7 @@ import { RouteTracker } from "@/components/RouteTracker";
 import { RobotsGuard } from "@/components/RobotsGuard";
 import Landing from "./pages/Landing";
 import { AdminProvider } from "@/hooks/useAdmin";
+import { ProfileProvider } from "@/hooks/useProfile";
 import { DevToolbar } from "@/components/DevToolbar";
 import { isDevMode } from "@/lib/testMode";
 
@@ -63,6 +64,11 @@ const Methodology = lazy(() => import("./pages/Methodology"));
 const BreedingExpertDashboard = lazy(() => import("./pages/BreedingExpertDashboard"));
 const CullingExchange = lazy(() => import("./pages/CullingExchange"));
 const RFIDSettings = lazy(() => import("./pages/RFIDSettings"));
+const WoahReports = lazy(() => import("./pages/WoahReports"));
+const FarmersRegistry = lazy(() => import("./pages/FarmersRegistry"));
+const BreedingRecordsPage = lazy(() => import("./pages/BreedingRecordsPage"));
+const ReproductiveIndices = lazy(() => import("./pages/ReproductiveIndices"));
+const UserManagement = lazy(() => import("./pages/UserManagement"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -110,6 +116,7 @@ const App = () => (
       <FarmProvider>
         <SubscriptionProvider>
          <AdminProvider>
+          <ProfileProvider>
            <EmployeePermissionsProvider>
             <TooltipProvider>
               <Toaster />
@@ -157,6 +164,12 @@ const App = () => (
                     <Route path="/breeding-dashboard" element={<BreedingExpertDashboard />} />
                     <Route path="/culling-exchange" element={<CullingExchange />} />
                     <Route path="/rfid-settings" element={<RFIDSettings />} />
+                    <Route path="/woah-reports" element={<WoahReports />} />
+                    <Route path="/farmers" element={<FarmersRegistry />} />
+                    <Route path="/breeding" element={<BreedingRecordsPage />} />
+                    <Route path="/reproductive-indices" element={<ReproductiveIndices />} />
+                    <Route path="/users" element={<UserManagement />} />
+                    <Route path="/tasks" element={<EmployeeTasks />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
@@ -171,6 +184,7 @@ const App = () => (
               </BrowserRouter>
             </TooltipProvider>
            </EmployeePermissionsProvider>
+          </ProfileProvider>
          </AdminProvider>
         </SubscriptionProvider>
       </FarmProvider>
