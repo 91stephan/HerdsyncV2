@@ -7,68 +7,35 @@ import { toast } from "sonner";
 import { logError } from "@/lib/telemetry";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import { FarmProvider } from "@/hooks/useFarm";
-import { SubscriptionProvider } from "@/hooks/useSubscription";
-import { EmployeePermissionsProvider } from "@/hooks/useEmployeePermissions";
-import { SupportChat } from "@/components/SupportChat";
+import { ProfileProvider } from "@/hooks/useProfile";
 import { AndroidBackButtonHandler } from "@/components/AndroidBackButtonHandler";
-import { useKeyboardScroll } from "@/hooks/useKeyboardScroll";
-import { CookieConsent } from "@/components/CookieConsent";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageSkeleton } from "@/components/PageSkeleton";
-import { RouteTracker } from "@/components/RouteTracker";
-import { RobotsGuard } from "@/components/RobotsGuard";
-import Landing from "./pages/Landing";
-import { AdminProvider } from "@/hooks/useAdmin";
-import { ProfileProvider } from "@/hooks/useProfile";
 import { DevToolbar } from "@/components/DevToolbar";
 import { isDevMode } from "@/lib/testMode";
+import Landing from "./pages/Landing";
 
-// Lazy-loaded routes, keeps the initial bundle small (especially on mobile)
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Livestock = lazy(() => import("./pages/Livestock"));
-const Feeding = lazy(() => import("./pages/Feeding"));
-const Inventory = lazy(() => import("./pages/Inventory"));
-const Health = lazy(() => import("./pages/Health"));
-const Reports = lazy(() => import("./pages/Reports"));
-const Tracking = lazy(() => import("./pages/Tracking"));
-const Audit = lazy(() => import("./pages/Audit"));
-const Auth = lazy(() => import("./pages/Auth"));
-const MarketArea = lazy(() => import("./pages/MarketArea"));
-const ComplianceDashboard = lazy(() => import("./pages/ComplianceDashboard"));
-const DocumentVault = lazy(() => import("./pages/DocumentVault"));
-const LabourOHS = lazy(() => import("./pages/LabourOHS"));
-const ChemicalsRemedies = lazy(() => import("./pages/ChemicalsRemedies"));
-const AuditPackBuilder = lazy(() => import("./pages/AuditPackBuilder"));
-const Pricing = lazy(() => import("./pages/Pricing"));
-const Employees = lazy(() => import("./pages/Employees"));
-const EmployeeTasks = lazy(() => import("./pages/EmployeeTasks"));
-const AnimalSale = lazy(() => import("./pages/AnimalSale"));
-const FarmExpenses = lazy(() => import("./pages/FarmExpenses"));
-const Contact = lazy(() => import("./pages/Contact"));
-const About = lazy(() => import("./pages/About"));
-const Terms = lazy(() => import("./pages/Terms"));
-const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
-const Disclaimer = lazy(() => import("./pages/Disclaimer"));
-const AskAPro = lazy(() => import("./pages/AskAPro"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Settings = lazy(() => import("./pages/Settings"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const TrialExpired = lazy(() => import("./pages/TrialExpired"));
-const DeleteAccount = lazy(() => import("./pages/DeleteAccount"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const Blog = lazy(() => import("./pages/Blog"));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
-const Changelog = lazy(() => import("./pages/Changelog"));
-const Methodology = lazy(() => import("./pages/Methodology"));
+// Lesotho National Breeding System — lazy-loaded routes
+const Dashboard            = lazy(() => import("./pages/Dashboard"));
+const Livestock            = lazy(() => import("./pages/Livestock"));
+const Health               = lazy(() => import("./pages/Health"));
+const Audit                = lazy(() => import("./pages/Audit"));
+const DocumentVault        = lazy(() => import("./pages/DocumentVault"));
+const Settings             = lazy(() => import("./pages/Settings"));
+const Auth                 = lazy(() => import("./pages/Auth"));
+const ResetPassword        = lazy(() => import("./pages/ResetPassword"));
+const NotFound             = lazy(() => import("./pages/NotFound"));
+
+// Lesotho-specific modules
 const BreedingExpertDashboard = lazy(() => import("./pages/BreedingExpertDashboard"));
-const CullingExchange = lazy(() => import("./pages/CullingExchange"));
-const RFIDSettings = lazy(() => import("./pages/RFIDSettings"));
-const WoahReports = lazy(() => import("./pages/WoahReports"));
-const FarmersRegistry = lazy(() => import("./pages/FarmersRegistry"));
-const BreedingRecordsPage = lazy(() => import("./pages/BreedingRecordsPage"));
-const ReproductiveIndices = lazy(() => import("./pages/ReproductiveIndices"));
-const UserManagement = lazy(() => import("./pages/UserManagement"));
+const CullingExchange         = lazy(() => import("./pages/CullingExchange"));
+const RFIDSettings            = lazy(() => import("./pages/RFIDSettings"));
+const WoahReports             = lazy(() => import("./pages/WoahReports"));
+const FarmersRegistry         = lazy(() => import("./pages/FarmersRegistry"));
+const BreedingRecordsPage     = lazy(() => import("./pages/BreedingRecordsPage"));
+const ReproductiveIndices     = lazy(() => import("./pages/ReproductiveIndices"));
+const UserManagement          = lazy(() => import("./pages/UserManagement"));
+const EmployeeTasks           = lazy(() => import("./pages/EmployeeTasks"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,7 +51,6 @@ const queryClient = new QueryClient({
         severity: "warning",
         context: { queryKey: query.queryKey as unknown as Record<string, unknown> },
       });
-      // Only surface a toast if the query was actively observed by the UI
       if (query.state.data !== undefined) {
         toast.error("Something went wrong loading data. Please try again.");
       }
@@ -104,92 +70,51 @@ const queryClient = new QueryClient({
   }),
 });
 
-const AppShell = () => {
-  useKeyboardScroll();
-  return null;
-};
-
 const App = () => (
   <ErrorBoundary>
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <FarmProvider>
-        <SubscriptionProvider>
-         <AdminProvider>
-          <ProfileProvider>
-           <EmployeePermissionsProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Suspense fallback={<PageSkeleton />}>
-                  <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/livestock" element={<Livestock />} />
-                    <Route path="/feeding" element={<Feeding />} />
-                    <Route path="/inventory" element={<Inventory />} />
-                    <Route path="/health" element={<Health />} />
-                    <Route path="/audit" element={<Audit />} />
-                    <Route path="/reports" element={<Reports />} />
-                    <Route path="/tracking" element={<Tracking />} />
-                    <Route path="/market" element={<MarketArea />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/pricing" element={<Pricing />} />
-                    <Route path="/compliance" element={<ComplianceDashboard />} />
-                    <Route path="/compliance/audit-pack" element={<AuditPackBuilder />} />
-                    <Route path="/compliance/documents" element={<DocumentVault />} />
-                    <Route path="/compliance/labour-ohs" element={<LabourOHS />} />
-                    <Route path="/compliance/chemicals" element={<ChemicalsRemedies />} />
-                    <Route path="/employees" element={<Employees />} />
-                    <Route path="/employee-tasks" element={<EmployeeTasks />} />
-                    <Route path="/animal-sale" element={<AnimalSale />} />
-                    <Route path="/expenses" element={<FarmExpenses />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/disclaimer" element={<Disclaimer />} />
-                    <Route path="/ask-a-pro" element={<AskAPro />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/trial-expired" element={<TrialExpired />} />
-                    <Route path="/delete-account" element={<DeleteAccount />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/blog/:slug" element={<BlogPost />} />
-                    <Route path="/changelog" element={<Changelog />} />
-                    <Route path="/methodology" element={<Methodology />} />
-                    {/* Lesotho National Breeding System routes */}
-                    <Route path="/breeding-dashboard" element={<BreedingExpertDashboard />} />
-                    <Route path="/culling-exchange" element={<CullingExchange />} />
-                    <Route path="/rfid-settings" element={<RFIDSettings />} />
-                    <Route path="/woah-reports" element={<WoahReports />} />
-                    <Route path="/farmers" element={<FarmersRegistry />} />
-                    <Route path="/breeding" element={<BreedingRecordsPage />} />
-                    <Route path="/reproductive-indices" element={<ReproductiveIndices />} />
-                    <Route path="/users" element={<UserManagement />} />
-                    <Route path="/tasks" element={<EmployeeTasks />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-                <RouteTracker />
-                <RobotsGuard />
-                <SupportChat />
-                <CookieConsent />
-                <AndroidBackButtonHandler />
-                <AppShell />
-                {isDevMode && <DevToolbar />}
-              </BrowserRouter>
-            </TooltipProvider>
-           </EmployeePermissionsProvider>
-          </ProfileProvider>
-         </AdminProvider>
-        </SubscriptionProvider>
-      </FarmProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ProfileProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<PageSkeleton />}>
+                <Routes>
+                  {/* Public */}
+                  <Route path="/"              element={<Landing />} />
+                  <Route path="/auth"          element={<Auth />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+
+                  {/* Core operations */}
+                  <Route path="/dashboard"    element={<Dashboard />} />
+                  <Route path="/livestock"    element={<Livestock />} />
+                  <Route path="/health"       element={<Health />} />
+                  <Route path="/audit"        element={<Audit />} />
+                  <Route path="/documents"    element={<DocumentVault />} />
+                  <Route path="/settings"     element={<Settings />} />
+                  <Route path="/tasks"        element={<EmployeeTasks />} />
+
+                  {/* Lesotho National Breeding System modules */}
+                  <Route path="/farmers"               element={<FarmersRegistry />} />
+                  <Route path="/breeding"              element={<BreedingRecordsPage />} />
+                  <Route path="/culling-exchange"      element={<CullingExchange />} />
+                  <Route path="/breeding-dashboard"    element={<BreedingExpertDashboard />} />
+                  <Route path="/reproductive-indices"  element={<ReproductiveIndices />} />
+                  <Route path="/woah-reports"          element={<WoahReports />} />
+                  <Route path="/rfid-settings"         element={<RFIDSettings />} />
+                  <Route path="/users"                 element={<UserManagement />} />
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+              <AndroidBackButtonHandler />
+              {isDevMode && <DevToolbar />}
+            </BrowserRouter>
+          </TooltipProvider>
+        </ProfileProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   </ErrorBoundary>
 );
 

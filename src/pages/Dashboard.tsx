@@ -1,426 +1,485 @@
 import { useEffect, useState } from "react";
 import { Layout } from "@/components/Layout";
-import { StatsCard } from "@/components/StatsCard";
-import { FeedingSchedule, FeedingItem } from "@/components/FeedingSchedule";
-import { AlertList } from "@/components/AlertCard";
-import { WeatherWidget } from "@/components/WeatherWidget";
-import { Badge } from "@/components/ui/badge";
-import { getAnimalImage } from "@/utils/animalImages";
-import { SaleCountdownBadge } from "@/components/SaleCountdownBadge";
-import { DashboardTasks } from "@/components/dashboard/DashboardTasks";
-import { CreateFarmDialog } from "@/components/CreateFarmDialog";
-import { WelcomeDialog } from "@/components/WelcomeDialog";
-import { useFarm } from "@/hooks/useFarm";
 import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
+import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  PawPrint, 
-  Heart, 
-  AlertTriangle, 
-  Package,
-  Clock,
-  Calendar,
-  ArrowRight
-} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  ShieldAlert,
+  ArrowRight,
+  RefreshCw,
+  Leaf,
+  Activity,
+  Users,
+  Stethoscope,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+} from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
-interface LivestockItem {
+interface SpeciesCount {
+  species: string;
+  count: number;
+}
+
+interface RecentCulling {
   id: string;
-  name: string;
-  type: string;
+  national_id: string;
+  species: string;
+  exchange_status: string;
+  scheduled_date: string | null;
+}
+
+interface DiseaseReport {
+  id: string;
+  disease_name: string;
   status: string;
-  tag: string;
-  breed: string | null;
-  age: string | null;
-  weight: string | null;
-  planned_sale_date: string | null;
+  district_name: string | null;
+  date_detected: string;
 }
 
-interface HealthRecord {
-  id: string;
-  animal_name: string;
-  type: string;
-  date: string;
+interface HealthStat {
+  district_name: string;
+  confirmed_cases: number;
+  suspected_cases: number;
+  resolved_cases: number;
 }
 
-interface AlertItem {
-  id: string;
-  type: string;
+const SPECIES_LABELS: Record<string, string> = {
+  cattle: "Cattle",
+  sheep: "Sheep",
+  goat: "Goat",
+  horse: "Horse",
+  pig: "Pig",
+  donkey: "Donkey",
+  chicken: "Chicken",
+  other: "Other",
+};
+
+const STATUS_COLOURS: Record<string, string> = {
+  suspected: "bg-warning/15 text-warning border-warning/30",
+  confirmed: "bg-destructive/15 text-destructive border-destructive/30",
+  resolved: "bg-success/15 text-success border-success/30",
+  scheduled: "bg-info/15 text-info border-info/30",
+  collected: "bg-warning/15 text-warning border-warning/30",
+  replaced: "bg-accent/15 text-accent border-accent/30",
+  completed: "bg-success/15 text-success border-success/30",
+};
+
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  sub,
+  onClick,
+  accent = false,
+}: {
   title: string;
-  message: string;
-  created_at: string;
-}
-
-interface FeedInventoryItem {
-  id: string;
-  quantity: number;
-  reorder_level: number;
+  value: number | string;
+  icon: React.ElementType;
+  sub?: string;
+  onClick?: () => void;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={`card-elevated p-5 flex items-start gap-4 ${onClick ? "cursor-pointer hover:border-primary/40" : ""}`}
+      onClick={onClick}
+    >
+      <div className={`p-2.5 rounded-lg ${accent ? "bg-accent/10" : "bg-primary/10"}`}>
+        <Icon className={`w-5 h-5 ${accent ? "text-accent" : "text-primary"}`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-muted-foreground">{title}</p>
+        <p className="text-2xl font-bold text-foreground mt-0.5">{value}</p>
+        {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
+      </div>
+    </div>
+  );
 }
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { profile } = useProfile();
+
+  const [speciesCounts, setSpeciesCounts] = useState<SpeciesCount[]>([]);
+  const [totalLivestock, setTotalLivestock] = useState(0);
+  const [activeCenters, setActiveCenters] = useState(0);
+  const [activeFarmers, setActiveFarmers] = useState(0);
+  const [recentCulling, setRecentCulling] = useState<RecentCulling[]>([]);
+  const [diseaseReports, setDiseaseReports] = useState<DiseaseReport[]>([]);
+  const [healthStats, setHealthStats] = useState<HealthStat[]>([]);
+  const [pendingSyncCount, setPendingSyncCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
-   const { user, loading: authLoading } = useAuth();
-   const { farm, loading: farmLoading } = useFarm();
-  const { subscription, isActive, loading: subLoading, adminInfo } = useSubscription();
-
-  // Redirect expired trial users to dedicated page (admins bypass)
-  useEffect(() => {
-    if (!subLoading && subscription && !isActive && !adminInfo.isAdmin) {
-      navigate("/trial-expired", { replace: true });
-    }
-  }, [subLoading, subscription, isActive, adminInfo.isAdmin, navigate]);
-  const [livestock, setLivestock] = useState<LivestockItem[]>([]);
-  const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
-  const [feedingSchedule, setFeedingSchedule] = useState<FeedingItem[]>([]);
-  const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [feedInventory, setFeedInventory] = useState<FeedInventoryItem[]>([]);
-   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    const timer = setInterval(() => setCurrentTime(new Date()), 60_000);
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (!farm?.id) {
-       setDataLoading(false);
-      return;
-    }
-
-    const fetchData = async () => {
-       setDataLoading(true);
-      
-      const [livestockRes, healthRes, feedingRes, alertsRes, inventoryRes] = await Promise.all([
-        supabase.from("livestock").select("id, name, type, status, tag, breed, age, weight, planned_sale_date").eq("farm_id", farm.id),
-        supabase.from("health_records").select("id, animal_name, type, date").eq("farm_id", farm.id).order("date", { ascending: false }).limit(5),
-        supabase.from("feeding_schedule").select("*").eq("farm_id", farm.id).order("time"),
-        supabase.from("alerts").select("*").eq("farm_id", farm.id).eq("dismissed", false).order("created_at", { ascending: false }).limit(6),
-        supabase.from("feed_inventory").select("id, quantity, reorder_level").eq("farm_id", farm.id),
+  const load = async () => {
+    setLoading(true);
+    try {
+      const [
+        livestockRes,
+        centersRes,
+        farmersRes,
+        cullingRes,
+        diseaseRes,
+        healthRes,
+        syncRes,
+      ] = await Promise.all([
+        supabase.from("livestock").select("species").eq("status", "active"),
+        supabase.from("breeding_centers").select("id").eq("is_active", true),
+        supabase.from("farmers").select("id").eq("is_active", true),
+        supabase
+          .from("culling_exchanges")
+          .select("id, national_id, species, exchange_status, scheduled_date")
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("woah_disease_reports")
+          .select("id, disease_name, status, date_detected, districts(name)")
+          .neq("status", "resolved")
+          .order("date_detected", { ascending: false })
+          .limit(5),
+        supabase
+          .from("district_health_summary")
+          .select("district_name, confirmed_cases, suspected_cases, resolved_cases")
+          .order("confirmed_cases", { ascending: false })
+          .limit(6),
+        supabase
+          .from("offline_sync_queue")
+          .select("id", { count: "exact", head: true })
+          .eq("synced", false),
       ]);
 
-      if (livestockRes.data) setLivestock(livestockRes.data);
-      if (healthRes.data) setHealthRecords(healthRes.data);
-      if (feedingRes.data) setFeedingSchedule(feedingRes.data.map(f => ({
-        id: f.id,
-        animalType: f.animal_type,
-        feedType: f.feed_type,
-        time: f.time,
-        period: f.period as "morning" | "evening",
-        notes: f.notes || undefined,
-      })));
-      if (alertsRes.data) setAlerts(alertsRes.data);
-      if (inventoryRes.data) setFeedInventory(inventoryRes.data);
+      // Species breakdown
+      if (livestockRes.data) {
+        const counts: Record<string, number> = {};
+        for (const row of livestockRes.data) {
+          counts[row.species] = (counts[row.species] || 0) + 1;
+        }
+        const sorted = Object.entries(counts)
+          .map(([species, count]) => ({ species, count }))
+          .sort((a, b) => b.count - a.count);
+        setSpeciesCounts(sorted);
+        setTotalLivestock(livestockRes.data.length);
+      }
 
-       setDataLoading(false);
-    };
+      if (centersRes.data) setActiveCenters(centersRes.data.length);
+      if (farmersRes.data) setActiveFarmers(farmersRes.data.length);
 
-    fetchData();
-  }, [farm?.id]);
+      if (cullingRes.data) {
+        setRecentCulling(
+          cullingRes.data.map((r) => ({
+            id: r.id,
+            national_id: r.national_id ?? "—",
+            species: r.species,
+            exchange_status: r.exchange_status,
+            scheduled_date: r.scheduled_date,
+          }))
+        );
+      }
 
-   const loading = dataLoading;
- 
-  // Calculate stats from real data
-  const stats = {
-    total: livestock.length,
-    healthy: livestock.filter(a => a.status === "Healthy").length,
-    needsAttention: livestock.filter(a => a.status === "Under Observation" || a.status === "Sick").length,
-    byType: livestock.reduce((acc, animal) => {
-      acc[animal.type] = (acc[animal.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>),
+      if (diseaseRes.data) {
+        setDiseaseReports(
+          diseaseRes.data.map((r: any) => ({
+            id: r.id,
+            disease_name: r.disease_name,
+            status: r.status,
+            district_name: r.districts?.name ?? null,
+            date_detected: r.date_detected,
+          }))
+        );
+      }
+
+      if (healthRes.data) setHealthStats(healthRes.data as HealthStat[]);
+      setPendingSyncCount(syncRes.count ?? 0);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Get animals with upcoming planned sales (within 30 days)
-  const upcomingSales = livestock
-    .filter(animal => {
-      if (!animal.planned_sale_date) return false;
-      const saleDate = new Date(animal.planned_sale_date);
-      const today = new Date();
-      const daysUntilSale = Math.floor((saleDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      return daysUntilSale <= 30 && daysUntilSale >= 0;
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.planned_sale_date!);
-      const dateB = new Date(b.planned_sale_date!);
-      return dateA.getTime() - dateB.getTime();
-    });
+  useEffect(() => { load(); }, []);
 
-  const lowStockItems = feedInventory.filter(item => item.quantity <= item.reorder_level);
-  const morningFeedings = feedingSchedule.filter(f => f.period === "morning").slice(0, 4);
+  const confirmedDiseases = diseaseReports.filter((r) => r.status === "confirmed").length;
+  const pendingCulling = recentCulling.filter(
+    (r) => r.exchange_status === "scheduled" || r.exchange_status === "collected"
+  ).length;
 
-  // Format alerts for AlertList component
-  const formattedAlerts = alerts.map(a => ({
-    id: a.id,
-    type: a.type as "danger" | "warning" | "info",
-    title: a.title,
-    message: a.message,
-    time: formatRelativeTime(a.created_at),
+  const chartData = speciesCounts.map((s) => ({
+    name: SPECIES_LABELS[s.species] ?? s.species,
+    count: s.count,
   }));
-
-  function formatRelativeTime(dateString: string) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffHours < 1) return "Just now";
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-  }
-
-   // Show loading state while auth or farm is loading
-   if (authLoading || farmLoading) {
-     return (
-       <Layout>
-         <div className="flex items-center justify-center h-96">
-           <div className="text-center space-y-4">
-             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-             <div>
-               <h2 className="text-xl font-semibold text-foreground mb-2">Loading your farm...</h2>
-               <p className="text-muted-foreground">Please wait while we fetch your data.</p>
-             </div>
-           </div>
-         </div>
-       </Layout>
-     );
-   }
- 
-  if (!farm) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center space-y-4">
-            <h2 className="text-xl font-semibold text-foreground mb-2">Welcome to HerdSync!</h2>
-            <p className="text-muted-foreground">Create your first farm to get started.</p>
-            <CreateFarmDialog />
-          </div>
-        </div>
-      </Layout>
-    );
-  }
 
   return (
     <Layout>
-      <WelcomeDialog />
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        {/* Page header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold font-display text-foreground">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Welcome back! Here's what's happening on {farm.name} today.
+            <h1 className="text-2xl font-bold text-foreground">National Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Lesotho National Breeding System — {currentTime.toLocaleDateString("en-LS", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
             </p>
           </div>
-          
-          <div className="flex items-center gap-3 bg-card border border-border rounded-xl px-5 py-3">
-            <Clock className="w-5 h-5 text-primary" />
-            <div>
-              <p className="text-2xl font-bold font-mono text-foreground">
-                {currentTime.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' })}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {currentTime.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' })}
-              </p>
-            </div>
+          <div className="flex items-center gap-2">
+            {pendingSyncCount > 0 && (
+              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30 gap-1">
+                <Clock className="w-3 h-3" />
+                {pendingSyncCount} pending sync
+              </Badge>
+            )}
+            <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+              <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* KPI row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            title="Total Livestock"
-            value={loading ? "-" : stats.total}
-            icon={PawPrint}
-            variant="primary"
+          <StatCard
+            title="Registered Livestock"
+            value={loading ? "—" : totalLivestock.toLocaleString()}
+            icon={Leaf}
+            sub="Active animals"
+            onClick={() => navigate("/livestock")}
           />
-          <StatsCard
-            title="Healthy Animals"
-            value={loading ? "-" : stats.healthy}
-            icon={Heart}
-            variant="success"
+          <StatCard
+            title="Breeding Centers"
+            value={loading ? "—" : activeCenters}
+            icon={Activity}
+            sub="Operational"
+            onClick={() => navigate("/breeding-dashboard")}
           />
-          <StatsCard
-            title="Needs Attention"
-            value={loading ? "-" : stats.needsAttention}
-            icon={AlertTriangle}
-            variant="warning"
+          <StatCard
+            title="Registered Farmers"
+            value={loading ? "—" : activeFarmers}
+            icon={Users}
+            sub="Programme participants"
+            onClick={() => navigate("/farmers")}
+            accent
           />
-          <StatsCard
-            title="Low Stock Items"
-            value={loading ? "-" : lowStockItems.length}
-            icon={Package}
-            variant={lowStockItems.length > 0 ? "danger" : "default"}
+          <StatCard
+            title="Active Disease Reports"
+            value={loading ? "—" : diseaseReports.length}
+            icon={confirmedDiseases > 0 ? ShieldAlert : Stethoscope}
+            sub={confirmedDiseases > 0 ? `${confirmedDiseases} confirmed` : "No confirmed cases"}
+            onClick={() => navigate("/woah-reports")}
           />
         </div>
 
-        {/* Main Content Grid */}
+        {/* Main content grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Livestock Breakdown & Feeding */}
+          {/* Left — species chart + health summary */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Livestock Breakdown */}
+            {/* Species breakdown chart */}
             <div className="card-elevated p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display font-semibold text-lg text-foreground">
-                  Livestock Breakdown
-                </h3>
-                <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:underline" onClick={() => navigate("/livestock")}>
-                  View All <ArrowRight className="ml-1 h-4 w-4" />
+                <h3 className="font-semibold text-foreground">Livestock by Species</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary text-xs"
+                  onClick={() => navigate("/livestock")}
+                >
+                  View Registry <ArrowRight className="ml-1 w-3.5 h-3.5" />
                 </Button>
               </div>
-              {Object.keys(stats.byType).length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No livestock added yet. Go to the Livestock page to add your animals.
-                </p>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                  {Object.entries(stats.byType).map(([type, count]) => (
-                    <div key={type} className="bg-muted/50 rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all hover:shadow-md">
-                      <div className="aspect-square relative">
-                        <img 
-                          src={getAnimalImage(type)} 
-                          alt={type}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                        <div className="absolute bottom-2 left-2 right-2">
-                          <p className="text-2xl font-bold text-white">{count}</p>
-                          <p className="text-xs text-white/90">{type}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+              {loading ? (
+                <div className="h-48 flex items-center justify-center text-muted-foreground text-sm">
+                  Loading…
                 </div>
+              ) : chartData.length === 0 ? (
+                <div className="h-48 flex items-center justify-center text-muted-foreground text-sm">
+                  No livestock records yet. Register animals to see the breakdown.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={chartData} barSize={32}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "0.5rem",
+                        fontSize: 13,
+                      }}
+                    />
+                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               )}
             </div>
 
-            {/* Employee Tasks */}
-            <DashboardTasks />
-
-            {/* Feeding Schedule */}
-            {morningFeedings.length > 0 ? (
-              <FeedingSchedule 
-                items={morningFeedings} 
-                title="Morning Feeding Schedule"
-              />
-            ) : (
-              <div className="card-elevated p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display font-semibold text-lg text-foreground">
-                  Morning Feeding Schedule
-                </h3>
-                <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:underline" onClick={() => navigate("/feeding")}>
-                  View All <ArrowRight className="ml-1 h-4 w-4" />
-                </Button>
-              </div>
-                <p className="text-muted-foreground text-center py-8">
-                  No feeding schedule set up yet. Go to the Feeding page to create one.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Right Column - Weather & Alerts */}
-          <div className="space-y-6">
-            {/* Weather Widget */}
-            <WeatherWidget />
-
-            {/* Upcoming Sales - Placed prominently after weather */}
-            {upcomingSales.length > 0 && (
-              <div className="card-elevated p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-display font-semibold text-lg text-foreground">
-                    Upcoming Sales
-                  </h3>
-                  <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:underline" onClick={() => navigate("/animal-sale")}>
-                    View All <ArrowRight className="ml-1 h-4 w-4" />
-                  </Button>
-                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
-                    {upcomingSales.length} Pending
-                  </Badge>
-                </div>
-                <div className="space-y-3">
-                  {upcomingSales.slice(0, 3).map((animal) => (
-                    <div key={animal.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                      <img 
-                        src={getAnimalImage(animal.type)} 
-                        alt={animal.type}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-foreground truncate">{animal.name}</p>
-                          <Badge variant="outline" className="text-xs shrink-0">
-                            #{animal.tag}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {animal.breed || animal.type} • {animal.age || 'Unknown age'} • {animal.weight || 'Unknown weight'}
-                        </p>
-                      </div>
-                      <SaleCountdownBadge plannedSaleDate={animal.planned_sale_date!} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            {/* Alerts */}
+            {/* District health summary */}
             <div className="card-elevated p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display font-semibold text-lg text-foreground">
-                  Alerts
-                </h3>
-                {/* Alerts are dashboard-only, no separate page */}
-                {formattedAlerts.length > 0 && (
-                  <Badge variant="destructive" className="animate-pulse-soft">
-                    {formattedAlerts.length} Active
+                <h3 className="font-semibold text-foreground">District Disease Summary</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary text-xs"
+                  onClick={() => navigate("/woah-reports")}
+                >
+                  WOAH Reports <ArrowRight className="ml-1 w-3.5 h-3.5" />
+                </Button>
+              </div>
+              {loading ? (
+                <p className="text-sm text-muted-foreground py-4">Loading…</p>
+              ) : healthStats.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4 text-center">No disease data available.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-muted-foreground text-xs border-b border-border">
+                        <th className="text-left pb-2 font-medium">District</th>
+                        <th className="text-center pb-2 font-medium">Suspected</th>
+                        <th className="text-center pb-2 font-medium">Confirmed</th>
+                        <th className="text-center pb-2 font-medium">Resolved</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {healthStats.map((row) => (
+                        <tr key={row.district_name} className="border-b border-border/50 hover:bg-muted/30">
+                          <td className="py-2 font-medium text-foreground">{row.district_name}</td>
+                          <td className="py-2 text-center text-warning">{row.suspected_cases ?? 0}</td>
+                          <td className="py-2 text-center text-destructive font-semibold">{row.confirmed_cases ?? 0}</td>
+                          <td className="py-2 text-center text-success">{row.resolved_cases ?? 0}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right — disease reports + culling */}
+          <div className="space-y-6">
+            {/* Active disease reports */}
+            <div className="card-elevated p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-foreground">Active Disease Reports</h3>
+                {diseaseReports.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className={confirmedDiseases > 0
+                      ? "bg-destructive/10 text-destructive border-destructive/30"
+                      : "bg-warning/10 text-warning border-warning/30"}
+                  >
+                    {diseaseReports.length}
                   </Badge>
                 )}
               </div>
-              {formattedAlerts.length > 0 ? (
-                <AlertList alerts={formattedAlerts.slice(0, 4)} />
+              {loading ? (
+                <p className="text-sm text-muted-foreground">Loading…</p>
+              ) : diseaseReports.length === 0 ? (
+                <div className="flex flex-col items-center py-6 gap-2 text-muted-foreground">
+                  <CheckCircle2 className="w-8 h-8 text-success" />
+                  <p className="text-sm">No active disease reports</p>
+                </div>
               ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  No active alerts
-                </p>
-              )}
-            </div>
-
-            {/* Recent Health Records */}
-            <div className="card-elevated p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-display font-semibold text-lg text-foreground">
-                  Recent Health Records
-                </h3>
-                <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:underline" onClick={() => navigate("/health")}>
-                  View All <ArrowRight className="ml-1 h-4 w-4" />
-                </Button>
-              </div>
-              {healthRecords.length > 0 ? (
-                <div className="space-y-3">
-                  {healthRecords.slice(0, 3).map((record) => (
-                    <div key={record.id} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                      <Calendar className="w-4 h-4 text-muted-foreground mt-0.5" />
+                <div className="space-y-2">
+                  {diseaseReports.map((r) => (
+                    <div key={r.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/40">
+                      <AlertCircle className={`w-4 h-4 mt-0.5 shrink-0 ${r.status === "confirmed" ? "text-destructive" : "text-warning"}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">{record.animal_name}</p>
-                        <p className="text-xs text-muted-foreground">{record.type} - {record.date}</p>
+                        <p className="text-sm font-medium text-foreground truncate">{r.disease_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {r.district_name ?? "—"} · {new Date(r.date_detected).toLocaleDateString("en-LS")}
+                        </p>
                       </div>
-                      <Badge variant="outline" className="text-xs shrink-0">
-                        {record.type}
+                      <Badge variant="outline" className={`text-xs shrink-0 ${STATUS_COLOURS[r.status] ?? ""}`}>
+                        {r.status}
                       </Badge>
                     </div>
                   ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-primary text-xs mt-1"
+                    onClick={() => navigate("/woah-reports")}
+                  >
+                    View All Reports <ArrowRight className="ml-1 w-3.5 h-3.5" />
+                  </Button>
                 </div>
+              )}
+            </div>
+
+            {/* Recent culling & exchange */}
+            <div className="card-elevated p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-foreground">Culling & Exchange</h3>
+                {pendingCulling > 0 && (
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
+                    {pendingCulling} pending
+                  </Badge>
+                )}
+              </div>
+              {loading ? (
+                <p className="text-sm text-muted-foreground">Loading…</p>
+              ) : recentCulling.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No culling records yet.</p>
               ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  No health records yet
-                </p>
+                <div className="space-y-2">
+                  {recentCulling.map((r) => (
+                    <div key={r.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/40">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground font-mono">{r.national_id}</p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {r.species}
+                          {r.scheduled_date
+                            ? ` · ${new Date(r.scheduled_date).toLocaleDateString("en-LS")}`
+                            : ""}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className={`text-xs shrink-0 capitalize ${STATUS_COLOURS[r.exchange_status] ?? ""}`}>
+                        {r.exchange_status}
+                      </Badge>
+                    </div>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-primary text-xs mt-1"
+                    onClick={() => navigate("/culling-exchange")}
+                  >
+                    Manage Exchange <ArrowRight className="ml-1 w-3.5 h-3.5" />
+                  </Button>
+                </div>
               )}
             </div>
           </div>
