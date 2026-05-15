@@ -27,28 +27,22 @@ jobs:
 
       # ------------------------------------------------------------------
       # 1. Push all pending SQL migrations to the live database.
-      #    Includes schema, seed data, and the security-invoker view fix.
+      #    config.toml already has the project_id; SUPABASE_DB_PASSWORD
+      #    is read from the environment by the CLI automatically.
       # ------------------------------------------------------------------
       - name: Push database migrations
-        run: |
-          supabase db push \
-            --project-ref "$SUPABASE_PROJECT_REF" \
-            --password     "$SUPABASE_DB_PASSWORD"
+        run: supabase db push
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF:  ${{ secrets.SUPABASE_PROJECT_REF }}
           SUPABASE_DB_PASSWORD:  ${{ secrets.SUPABASE_DB_PASSWORD }}
 
       # ------------------------------------------------------------------
       # 2. Deploy all Deno edge functions.
       # ------------------------------------------------------------------
       - name: Deploy edge functions
-        run: |
-          supabase functions deploy \
-            --project-ref "$SUPABASE_PROJECT_REF"
+        run: supabase functions deploy
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF:  ${{ secrets.SUPABASE_PROJECT_REF }}
 
       # ------------------------------------------------------------------
       # 3. Create / refresh test user accounts via the seed function.
