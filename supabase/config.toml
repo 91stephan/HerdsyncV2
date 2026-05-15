@@ -9,14 +9,23 @@ verify_jwt = true
 [functions.woah-report-export]
 verify_jwt = true
 
+[functions.wahis-export]
+verify_jwt = true
+
 [functions.efi-export]
 verify_jwt = true
 
 [functions.process-offline-queue]
 verify_jwt = true
 
+[functions.calculate-genetic-indices]
+verify_jwt = false
+
 [functions.recalculate-reproductive-indices]
 verify_jwt = true
 
 [functions.notify-staff]
 verify_jwt = true
+
+[functions.seed-test-data]
+verify_jwt = false

@@ -20,6 +20,8 @@ import { RouteTracker } from "@/components/RouteTracker";
 import { RobotsGuard } from "@/components/RobotsGuard";
 import Landing from "./pages/Landing";
 import { AdminProvider } from "@/hooks/useAdmin";
+import { DevToolbar } from "@/components/DevToolbar";
+import { isDevMode } from "@/lib/testMode";
 
 // Lazy-loaded routes, keeps the initial bundle small (especially on mobile)
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -165,6 +167,7 @@ const App = () => (
                 <CookieConsent />
                 <AndroidBackButtonHandler />
                 <AppShell />
+                {isDevMode && <DevToolbar />}
               </BrowserRouter>
             </TooltipProvider>
            </EmployeePermissionsProvider>

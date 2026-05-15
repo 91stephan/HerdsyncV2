@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Scan, Bluetooth, BluetoothOff, Settings2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { Scan, Bluetooth, BluetoothOff, Settings2, CheckCircle, XCircle, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { isDevMode, generateTestNationalId } from "@/lib/testMode";
 
 const SETTINGS_KEY = "herdsync_rfid_settings";
 
@@ -290,6 +291,20 @@ export default function RFIDSettings() {
               <Button onClick={handleTestScan}>
                 <Scan className="h-4 w-4 mr-1" /> Validate
               </Button>
+              {isDevMode && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const id = generateTestNationalId();
+                    setTestId(id);
+                    setTestResult(null);
+                    toast.info(`Simulated scan: ${id}`);
+                  }}
+                  title="DEV: generate a valid Lesotho national ID"
+                >
+                  <Zap className="h-4 w-4 mr-1 text-yellow-500" /> Simulate
+                </Button>
+              )}
             </div>
 
             {testResult === "pass" && (
