@@ -181,8 +181,8 @@ SELECT
   d.code  AS district_code,
   bc.name AS center_name,
   f.full_name AS farmer_name,
-  s.full_name AS sire_national_id_label,
-  dm.full_name AS dam_national_id_label,
+  COALESCE(s.rfid_tag, s.national_id)  AS sire_label,
+  COALESCE(dm.rfid_tag, dm.national_id) AS dam_label,
   l.notes,
   l.created_at,
   l.updated_at

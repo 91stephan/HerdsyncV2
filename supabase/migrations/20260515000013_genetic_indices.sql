@@ -156,10 +156,11 @@ BEGIN
   -- Sum of (min(removal_date, period_end) - max(acquisition_date, period_start))
   -- for each female active during the period.
   SELECT COALESCE(SUM(
-    EXTRACT(DAY FROM (
-      LEAST(COALESCE(removed_at::DATE, _period_end), _period_end)
-      - GREATEST(COALESCE(acquisition_date, _period_start), _period_start)
-    ))
+    GREATEST(
+      (LEAST(COALESCE(removed_at::DATE, _period_end), _period_end)
+       - GREATEST(COALESCE(acquisition_date, _period_start), _period_start))::INTEGER,
+      0
+    )
   ), 0) INTO _female_animal_days
   FROM public.livestock
   WHERE species = _species
